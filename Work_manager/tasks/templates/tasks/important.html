@@ -3,316 +3,558 @@
 <!DOCTYPE html>
 
 <html lang="en">
+
 <head>
+
+    <!-- Page character encoding -->
     <meta charset="UTF-8">
+
+    <!-- Make the page responsive on different screen sizes -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-```
-<title>Important Tasks - TaskFlow</title>
+    <!-- Browser tab title -->
+    <title>Important Tasks - TaskFlow</title>
 
-<link rel="stylesheet" href="{% static 'tasks/style.css' %}">
-```
+    <!-- Load the project's main CSS file -->
+    <link rel="stylesheet" href="{% static 'tasks/style.css' %}">
 
 </head>
+
 
 <body>
 
 <div class="app">
 
-```
-<!-- Sidebar -->
-<aside class="sidebar">
 
-    <div class="logo">
-        <div class="logo-icon">✓</div>
-        <span>TaskFlow</span>
-    </div>
+    <!-- =========================
+         Sidebar
+         ========================= -->
 
-    <div class="nav-title">Workspace</div>
+    <aside class="sidebar">
 
-    <nav class="nav">
 
-        <a href="{% url 'home' %}"
-           class="nav-item {% if page == 'dashboard' %}active{% endif %}">
-            <span>▦</span>
-            Dashboard
-        </a>
+        <!-- Application logo -->
+        <div class="logo">
 
-        <a href="#"
-           class="nav-item">
-            <span>✓</span>
-            My Tasks
-        </a>
+            <div class="logo-icon">
+                ✓
+            </div>
 
-        <a href="{% url 'important_tasks' %}"
-           class="nav-item {% if page == 'important' %}active{% endif %}">
-            <span>★</span>
-            Important
-        </a>
+            <span>
+                TaskFlow
+            </span>
 
-    </nav>
+        </div>
 
-    <div class="sidebar-bottom">
 
-        <div class="nav">
+        <!-- Sidebar section title -->
+        <div class="nav-title">
+            Workspace
+        </div>
 
-            <a href="#" class="nav-item">
-                <span>⚙</span>
-                Settings
+
+        <!-- Main navigation -->
+        <nav class="nav">
+
+
+            <!-- Dashboard -->
+            <a
+                href="{% url 'home' %}"
+                class="nav-item {% if page == 'dashboard' %}active{% endif %}"
+            >
+
+                <span>
+                    ▦
+                </span>
+
+                Dashboard
+
             </a>
 
-        </div>
 
-        <div class="profile">
+            <!-- My Tasks -->
+            <a
+                href="#"
+                class="nav-item"
+            >
 
-            <div class="avatar">MR</div>
-
-            <div class="profile-info">
-                <span class="profile-name">Mohammadreza</span>
-                <span class="profile-email">My account</span>
-            </div>
-
-        </div>
-
-    </div>
-
-</aside>
-
-
-<!-- Main Content -->
-<main class="main">
-
-    <!-- Header -->
-    <div class="topbar">
-
-        <div class="welcome">
-
-            <h1>Important Tasks ⭐</h1>
-
-            <p>
-                Tasks you've marked as important.
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <!-- Statistics -->
-    <section class="stats">
-
-        <div class="stat-card">
-
-            <div class="stat-header">
-                <span class="stat-title">
-                    Important Tasks
-                </span>
-
-                <div class="stat-icon">
-                    ★
-                </div>
-            </div>
-
-            <div class="stat-number">
-                {{ todos|length }}
-            </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-            <div class="stat-header">
-                <span class="stat-title">
-                    Completed
-                </span>
-
-                <div class="stat-icon">
+                <span>
                     ✓
-                </div>
-            </div>
-
-            <div class="stat-number">
-               {{ completed_tasks }}
-            </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-            <div class="stat-header">
-                <span class="stat-title">
-                    Remaining
                 </span>
 
-                <div class="stat-icon">
-                    ○
-                </div>
-            </div>
+                My Tasks
 
-            <div class="stat-number">
-                 {{ remaining_tasks }}
-            </div>
-
-        </div>
-
-    </section>
+            </a>
 
 
-    <!-- Tasks Header -->
-    <div class="tasks-header">
+            <!-- Important Tasks -->
+            <a
+                href="{% url 'important_tasks' %}"
+                class="nav-item {% if page == 'important' %}active{% endif %}"
+            >
 
-        <h2>Important</h2>
+                <span>
+                    ★
+                </span>
 
-    </div>
+                Important
+
+            </a>
+
+        </nav>
 
 
-    <!-- Important Tasks -->
-    <section class="todo-list">
+        <!-- =========================
+             Sidebar Bottom
+             ========================= -->
 
-        {% for todo in todos %}
+        <div class="sidebar-bottom">
 
-            <div class="todo-card">
 
-                <!-- Complete -->
-                <form
-                    method="POST"
-                    action="{% url 'toggle_todo' todo.id %}"
-                    class="complete-form"
+            <!-- Bottom navigation -->
+            <div class="nav">
+
+                <!-- Settings -->
+                <a
+                    href="#"
+                    class="nav-item"
                 >
 
-                    {% csrf_token %}
+                    <span>
+                        ⚙
+                    </span>
 
-                    <button
-                        type="submit"
-                        class="complete-button {% if todo.completed %}completed{% endif %}"
-                        title="{% if todo.completed %}Mark as active{% else %}Mark as completed{% endif %}"
-                    >
+                    Settings
 
-                        {% if todo.completed %}
-                            ✓
-                        {% endif %}
+                </a>
 
-                    </button>
-
-                </form>
+            </div>
 
 
-                <!-- Content -->
-                <div class="todo-content">
+            <!-- =========================
+                 User Profile
+                 ========================= -->
 
-                    <div class="todo-title">
-                        {{ todo.title }}
-                    </div>
+            <div class="profile">
 
-                    {% if todo.description %}
 
-                        <div class="todo-description">
-                            {{ todo.description }}
-                        </div>
-
-                    {% endif %}
-
+                <!-- User avatar -->
+                <div class="avatar">
+                    MR
                 </div>
 
 
-                <!-- Actions -->
-                <div class="todo-actions">
+                <!-- User information -->
+                <div class="profile-info">
 
-                    <!-- Status -->
-                    <span class="status {% if todo.completed %}completed{% endif %}">
-
-                        {% if todo.completed %}
-                            Completed
-                        {% else %}
-                            Pending
-                        {% endif %}
-
+                    <span class="profile-name">
+                        Mohammadreza
                     </span>
 
-
-                    <!-- Important -->
-                    <form
-                        method="POST"
-                        action="{% url 'toggle_important' todo.id %}"
-                    >
-
-                        {% csrf_token %}
-
-                        <button
-                            type="submit"
-                            class="important-button important"
-                            title="Remove from important"
-                        >
-                            ★
-                        </button>
-
-                    </form>
-
-
-                    <!-- Edit -->
-                    <a
-                        href="{% url 'edit_todo' todo.id %}"
-                        class="edit-button"
-                    >
-                        ✎ Edit
-                    </a>
-
-
-                    <!-- Delete -->
-                    <form
-                        method="POST"
-                        action="{% url 'delete_todo' todo.id %}"
-                        onsubmit="return confirm('Are you sure you want to delete this task?');"
-                    >
-
-                        {% csrf_token %}
-
-                        <button
-                            type="submit"
-                            class="delete-button"
-                        >
-                            🗑 Delete
-                        </button>
-
-                    </form>
-
-
-                    <!-- Date -->
-                    <span class="todo-date">
-                        {{ todo.created_at|date:"M d, Y" }}
+                    <span class="profile-email">
+                        My account
                     </span>
 
                 </div>
 
             </div>
 
-        {% empty %}
+        </div>
 
-            <!-- Empty State -->
-            <div class="empty-state">
+    </aside>
 
-                <div class="empty-icon">
-                    ★
-                </div>
 
-                <h3>No important tasks</h3>
 
+    <!-- =========================
+         Main Content
+         ========================= -->
+
+    <main class="main">
+
+
+        <!-- =========================
+             Page Header
+             ========================= -->
+
+        <div class="topbar">
+
+            <div class="welcome">
+
+                <!-- Page title -->
+                <h1>
+                    Important Tasks ⭐
+                </h1>
+
+
+                <!-- Short page description -->
                 <p>
-                    Mark a task as important and it will appear here.
+                    Tasks you've marked as important.
                 </p>
 
             </div>
 
-        {% endfor %}
+        </div>
 
-    </section>
 
-</main>
-```
+
+        <!-- =========================
+             Statistics
+             ========================= -->
+
+        <section class="stats">
+
+
+            <!-- =========================
+                 Important Tasks Count
+                 ========================= -->
+
+            <div class="stat-card">
+
+                <div class="stat-header">
+
+                    <span class="stat-title">
+                        Important Tasks
+                    </span>
+
+                    <div class="stat-icon">
+                        ★
+                    </div>
+
+                </div>
+
+
+                <!--
+                    Number of important tasks.
+
+                    The todos variable is provided
+                    by the important_tasks view.
+                -->
+                <div class="stat-number">
+                    {{ todos|length }}
+                </div>
+
+            </div>
+
+
+
+            <!-- =========================
+                 Completed Count
+                 ========================= -->
+
+            <div class="stat-card">
+
+                <div class="stat-header">
+
+                    <span class="stat-title">
+                        Completed
+                    </span>
+
+                    <div class="stat-icon">
+                        ✓
+                    </div>
+
+                </div>
+
+
+                <!-- Number of completed important tasks -->
+                <div class="stat-number">
+                    {{ completed_tasks }}
+                </div>
+
+            </div>
+
+
+
+            <!-- =========================
+                 Remaining Count
+                 ========================= -->
+
+            <div class="stat-card">
+
+                <div class="stat-header">
+
+                    <span class="stat-title">
+                        Remaining
+                    </span>
+
+                    <div class="stat-icon">
+                        ○
+                    </div>
+
+                </div>
+
+
+                <!-- Number of remaining important tasks -->
+                <div class="stat-number">
+                    {{ remaining_tasks }}
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================
+             Tasks Header
+             ========================= -->
+
+        <div class="tasks-header">
+
+            <h2>
+                Important
+            </h2>
+
+        </div>
+
+
+
+        <!-- =========================
+             Important Tasks List
+             ========================= -->
+
+        <section class="todo-list">
+
+
+            <!--
+                Loop through all important tasks
+                received from the Django view.
+            -->
+            {% for todo in todos %}
+
+
+                <!-- Single task card -->
+                <div class="todo-card"
+                     data-todo-id="{{ todo.id }}"
+                    >
+
+
+                    <!-- =========================
+                         Complete / Toggle
+                         ========================= -->
+
+                    <form
+                        method="POST"
+                        action="{% url 'toggle_todo' todo.id %}"
+                        class="complete-form toggle-complete-form"
+                    >
+
+                        <!-- Django CSRF protection -->
+                        {% csrf_token %}
+
+
+                        <!--
+                            Toggle task between
+                            Completed and Pending.
+                        -->
+                        <button
+                            type="submit"
+                            class="complete-button {% if todo.completed %}completed{% endif %}"
+                            title="{% if todo.completed %}Mark as active{% else %}Mark as completed{% endif %}"
+                        >
+
+                            {% if todo.completed %}
+                                ✓
+                            {% endif %}
+
+                        </button>
+
+                    </form>
+
+
+
+                    <!-- =========================
+                         Task Content
+                         ========================= -->
+
+                    <div class="todo-content">
+
+
+                        <!-- Task title -->
+                        <div class="todo-title">
+                            {{ todo.title }}
+                        </div>
+
+
+                        <!--
+                            Display description only
+                            if the task has one.
+                        -->
+                        {% if todo.description %}
+
+                            <div class="todo-description">
+                                {{ todo.description }}
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+
+                    <!-- =========================
+                         Task Actions
+                         ========================= -->
+
+                    <div class="todo-actions">
+
+
+                        <!-- =========================
+                             Task Status
+                             ========================= -->
+
+                        <span
+                            class="status {% if todo.completed %}completed{% endif %}"
+                        >
+
+                            {% if todo.completed %}
+
+                                Completed
+
+                            {% else %}
+
+                                Pending
+
+                            {% endif %}
+
+                        </span>
+
+
+
+                        <!-- =========================
+                             Important Toggle
+                             ========================= -->
+
+                        <form
+                            method="POST"
+                            action="{% url 'toggle_important' todo.id %}"
+                             class="toggle-important-form"
+                        >
+
+                            {% csrf_token %}
+
+
+                            <!--
+                                Since this page only contains
+                                important tasks, the star starts
+                                in the "important" state.
+
+                                Clicking it removes the task
+                                from the important list.
+                            -->
+                            <button
+                                type="submit"
+                                class="important-button important"
+                                title="Remove from important"
+                            >
+
+                                ★
+
+                            </button>
+
+                        </form>
+
+
+
+                        <!-- =========================
+                             Edit Task
+                             ========================= -->
+
+                        <a
+                            href="{% url 'edit_todo' todo.id %}"
+                            class="edit-button"
+                        >
+
+                            ✎ Edit
+
+                        </a>
+
+
+
+                        <!-- =========================
+                             Delete Task
+                             ========================= -->
+
+                        <form
+                            method="POST"
+                            action="{% url 'delete_todo' todo.id %}"
+                            class="delete-form"
+                        >
+
+                            {% csrf_token %}
+
+
+                            <!-- Delete button -->
+                            <button
+                                type="submit"
+                                class="delete-button"
+                            >
+
+                                🗑 Delete
+
+                            </button>
+
+                        </form>
+
+
+
+                        <!-- =========================
+                             Created Date
+                             ========================= -->
+
+                        <span class="todo-date">
+
+                            {{ todo.created_at|date:"M d, Y" }}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+            <!-- =========================
+                 Empty State
+                 ========================= -->
+
+            {% empty %}
+
+
+                <!--
+                    Displayed when the user has
+                    no important tasks.
+                -->
+                <div class="empty-state">
+
+
+                    <!-- Empty state icon -->
+                    <div class="empty-icon">
+                        ★
+                    </div>
+
+
+                    <!-- Empty state title -->
+                    <h3>
+                        No important tasks
+                    </h3>
+
+
+                    <!-- Empty state description -->
+                    <p>
+                        Mark a task as important and it will appear here.
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </section>
+
+    </main>
 
 </div>
 
+<script src="{% static 'tasks/todo.js' %}"></script>
 </body>
+
 </html>
