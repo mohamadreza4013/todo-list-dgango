@@ -1,5 +1,5 @@
 {% load static %}
-
+{% load jformat %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,10 +13,21 @@
 
     <!-- Browser tab title -->
     <title>TaskFlow</title>
-
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <!-- Load the project's main CSS file -->
     <link rel="stylesheet" href="{% static 'tasks/style.css' %}">
-
+    <!-- Persian Datepicker CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    
+    <!-- افزونه جلالی (Persian) -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fa.js"></script>
+    <!-- Persian Datepicker JS -->
+    <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
 </head>
 
 
@@ -219,12 +230,25 @@
                     >
 
 
-                    <!-- Optional task start date -->
+                    
+                          
+                    <!-- Task start date -->
                     <input
-                        type="date"
+                        type="text"
                         name="start_date"
+                        class="jalali-date-input"
+                        placeholder="انتخاب تاریخ شروع"
+                        autocomplete="off"
                     >
-
+                    
+                    <!-- Task deadline -->
+                    <input
+                        type="text"
+                        name="deadline"
+                        class="jalali-date-input"
+                        placeholder="انتخاب مهلت"
+                        autocomplete="off"
+                    >
 
                     <!-- Submit button -->
                     <button
@@ -570,9 +594,23 @@
                              Created Date
                              ========================= -->
 
+                        <!-- تاریخ ایجاد (میلادی → شمسی) -->
+                        <!-- تاریخ ایجاد -->
                         <span class="todo-date">
-                            {{ todo.created_at|date:"M d, Y" }}
+                            ایجاد: {{ todo.created_at_jalali_str }}
                         </span>
+                        
+                        {% if todo.start_date_jalali_str %}
+                            <span class="todo-date">
+                                شروع: {{ todo.start_date_jalali_str }}
+                            </span>
+                        {% endif %}
+                        
+                        {% if todo.deadline_jalali_str %}
+                            <span class="todo-date">
+                                مهلت: {{ todo.deadline_jalali_str }}
+                            </span>
+                        {% endif %}
 
                     </div>
 
@@ -619,8 +657,45 @@
 <!-- ==================================================
      JavaScript
      ================================================== -->
+<script>
+$(document).ready(function() {
+    $(".jalali-date-input").persianDatepicker({
+        formatDate: "YYYY/MM/DD",
+        autoClose: true,
+        viewMode: "day",
+        initialValue: false,
+        calendarType: 'persian',
+        responsive: true
+    });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".jalali-date-input").forEach(function(input) {
+        new PwtDatepicker(input, {
+            format: 'YYYY/MM/DD',
+            autoClose: true,
+            calendarType: 'persian',
+            position: 'bottom'
+        });
+    });
+});
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // تنظیمات مشترک
+        const commonConfig = {
+            dateFormat: "Y/m/d",        // فرمت خروجی: 1402/05/15
+            locale: "fa",               // تقویم جلالی
+            allowInput: true,           // اجازه تایپ دستی (اختیاری)
+            clickOpens: true,           // با کلیک باز شود
+            disableMobile: true,
+        };
 
-
+        // اتصال به فیلدها
+        flatpickr(".jalali-date-input", commonConfig);
+    });
+</script>
 <script src="{% static 'tasks/todo.js' %}"></script>
 <script src="{% static 'tasks/home.js' %}"></script>
 </body>

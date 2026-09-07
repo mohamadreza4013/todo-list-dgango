@@ -501,13 +501,27 @@
                         <!-- =========================
                              Created Date
                              ========================= -->
-
                         <span class="todo-date">
-
                             {{ todo.created_at|date:"M d, Y" }}
-
                         </span>
-
+                        
+                        <!-- =========================
+                             Start Date (if exists)
+                             ========================= -->
+                        {% if todo.start_date %}
+                            <span class="todo-date">
+                                Start: {{ todo.start_date|date:"M d, Y" }}
+                            </span>
+                        {% endif %}
+                        
+                        <!-- =========================
+                             Deadline (if exists)
+                             ========================= -->
+                        {% if todo.deadline %}
+                            <span class="todo-date">
+                                Deadline: {{ todo.deadline|date:"M d, Y" }}
+                            </span>
+                        {% endif %}
                     </div>
 
                 </div>

@@ -2,321 +2,112 @@
 // ADD TASK
 // ==================================================
 
-/*
-    Handles the Add Task form using AJAX.
-    The page will not reload after adding a task.
-*/
-
-const addTaskForm =
-    document.querySelector(
-        ".add-task-form-container"
-    );
-
+const addTaskForm = document.querySelector(".add-task-form-container");
 
 if (addTaskForm) {
+    addTaskForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
 
-    addTaskForm.addEventListener(
-        "submit",
-        async function(event) {
+        try {
+            const response = await fetch(window.location.href, {
+                method: "POST",
+                body: new FormData(addTaskForm),
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            });
 
-            // Prevent normal form submission
-            event.preventDefault();
+            const data = await response.json();
 
+            if (data.success) {
+                const todoList = document.querySelector(".todo-list");
 
-            try {
-
-                // Send form data to Django
-                const response =
-                    await fetch(
-                        window.location.href,
-                        {
-                            method: "POST",
-
-                            body:
-                                new FormData(
-                                    addTaskForm
-                                ),
-
-                            headers: {
-                                "X-Requested-With":
-                                    "XMLHttpRequest"
-                            }
-                        }
-                    );
-
-
-                // Convert Django response to JSON
-                const data =
-                    await response.json();
-
-
-                // Continue only if task was created successfully
-                if (data.success) {
-
-                    const todoList =
-                        document.querySelector(
-                            ".todo-list"
-                        );
-
-
-                    // Remove empty state
-                    const emptyState =
-                        todoList.querySelector(
-                            ".empty-state"
-                        );
-
-
-                    if (emptyState) {
-
-                        emptyState.remove();
-
-                    }
-
-
-                    // Create new task card
-                    const card =
-                        createTodoCard(data);
-
-
-                    // Add task to the beginning
-                    todoList.insertAdjacentHTML(
-                        "afterbegin",
-                        card
-                    );
-
-
-                    // Clear form
-                    addTaskForm.reset();
-
-
-                    // Update statistics
-                    updateStats();
-
+                // حذف حالت خالی
+                const emptyState = todoList.querySelector(".empty-state");
+                if (emptyState) {
+                    emptyState.remove();
                 }
 
+                // ساخت کارت جدید
+                const card = createTodoCard(data);
+
+                // افزودن به ابتدای لیست
+                todoList.insertAdjacentHTML("afterbegin", card);
+
+                // پاک کردن فرم
+                addTaskForm.reset();
+
+                // به‌روزرسانی آمار
+                updateStats();
             }
-
-            catch (error) {
-
-                console.error(
-                    "Error adding task:",
-                    error
-                );
-
-            }
-
+        } catch (error) {
+            console.error("Error adding task:", error);
         }
-    );
-
+    });
 }
-
 
 // ==================================================
 // FILTERS
 // ==================================================
 
-/*
-    Handles All / Active / Completed filters
-    without reloading the page.
-*/
+document.querySelectorAll(".filter-button").forEach((button) => {
+    button.addEventListener("click", async function (event) {
+        event.preventDefault();
 
-document
-    .querySelectorAll(
-        ".filter-button"
-    )
-    .forEach(button => {
+        const url = button.href;
 
-        button.addEventListener(
-            "click",
-            async function(event) {
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            });
 
-                // Prevent normal navigation
-                event.preventDefault();
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
 
+            const newTodoList = doc.querySelector(".todo-list");
+            const currentTodoList = document.querySelector(".todo-list");
 
-                const url =
-                    button.href;
+            currentTodoList.innerHTML = newTodoList.innerHTML;
 
+            // به‌روزرسانی دکمه فعال
+            document.querySelectorAll(".filter-button").forEach((btn) => {
+                btn.classList.remove("active");
+            });
+            button.classList.add("active");
 
-                try {
-
-                    // Request filtered page from Django
-                    const response =
-                        await fetch(
-                            url,
-                            {
-                                headers: {
-                                    "X-Requested-With":
-                                        "XMLHttpRequest"
-                                }
-                            }
-                        );
-
-
-                    // Get returned HTML
-                    const html =
-                        await response.text();
-
-
-                    // Convert HTML string to DOM document
-                    const parser =
-                        new DOMParser();
-
-
-                    const doc =
-                        parser.parseFromString(
-                            html,
-                            "text/html"
-                        );
-
-
-                    // Find task list in returned page
-                    const newTodoList =
-                        doc.querySelector(
-                            ".todo-list"
-                        );
-
-
-                    // Find current task list
-                    const currentTodoList =
-                        document.querySelector(
-                            ".todo-list"
-                        );
-
-
-                    // Replace current tasks
-                    currentTodoList.innerHTML =
-                        newTodoList.innerHTML;
-
-
-                    // ==================================================
-                    // UPDATE ACTIVE FILTER
-                    // ==================================================
-
-                    document
-                        .querySelectorAll(
-                            ".filter-button"
-                        )
-                        .forEach(btn => {
-
-                            btn.classList.remove(
-                                "active"
-                            );
-
-                        });
-
-
-                    button.classList.add(
-                        "active"
-                    );
-
-
-                    // ==================================================
-                    // UPDATE URL
-                    // ==================================================
-
-                    window.history.pushState(
-                        {},
-                        "",
-                        url
-                    );
-
-                }
-
-                catch (error) {
-
-                    console.error(
-                        "Error filtering tasks:",
-                        error
-                    );
-
-                }
-
-            }
-        );
-
+            // به‌روزرسانی URL
+            window.history.pushState({}, "", url);
+        } catch (error) {
+            console.error("Error filtering tasks:", error);
+        }
     });
-
+});
 
 // ==================================================
 // UPDATE STATISTICS
 // ==================================================
 
-/*
-    Calculates statistics based on the task cards
-    currently visible on the page.
-*/
-
 function updateStats() {
-
-    // Get all visible task cards
-    const cards =
-        document.querySelectorAll(
-            ".todo-card"
-        );
-
-
-    // Number of completed tasks
+    const cards = document.querySelectorAll(".todo-card");
     let completed = 0;
 
-
-    // Check every task
-    cards.forEach(card => {
-
-        const button =
-            card.querySelector(
-                ".complete-button"
-            );
-
-
-        if (
-            button &&
-            button.classList.contains(
-                "completed"
-            )
-        ) {
-
+    cards.forEach((card) => {
+        const button = card.querySelector(".complete-button");
+        if (button && button.classList.contains("completed")) {
             completed++;
-
         }
-
     });
 
+    const total = cards.length;
+    const remaining = total - completed;
 
-    // Total visible tasks
-    const total =
-        cards.length;
-
-
-    // Remaining tasks
-    const remaining =
-        total - completed;
-
-
-    // Get statistics elements
-    const statNumbers =
-        document.querySelectorAll(
-            ".stat-number"
-        );
-
-
-    // Make sure all three statistics exist
+    const statNumbers = document.querySelectorAll(".stat-number");
     if (statNumbers.length >= 3) {
-
-        // Total
-        statNumbers[0].textContent =
-            total;
-
-
-        // Completed
-        statNumbers[1].textContent =
-            completed;
-
-
-        // Remaining
-        statNumbers[2].textContent =
-            remaining;
-
+        statNumbers[0].textContent = total;
+        statNumbers[1].textContent = completed;
+        statNumbers[2].textContent = remaining;
     }
-
 }

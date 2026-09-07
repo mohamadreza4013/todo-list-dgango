@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+import jdatetime
 
 from ..models import Todo
 
@@ -8,81 +10,112 @@ from ..models import Todo
 # DASHBOARD / HOME
 # ==================================================
 
+#@login_required
 def home(request):
+    """
+    نمایش داشبورد و مدیریت افزودن تسک
+    """
 
-    # Handle the Add Task form submission
+    # =========================
+    # افزودن تسک جدید (AJAX)
+    # =========================
     if request.method == "POST":
-
-        # Get form data sent by the user
         title = request.POST.get("title")
         description = request.POST.get("description")
-        start_date = request.POST.get("start_date")
+        start_date_str = request.POST.get("start_date")   # تاریخ شمسی به‌صورت رشته
+        deadline_str = request.POST.get("deadline")       # تاریخ شمسی به‌صورت رشته
 
-        # Create a new todo in the database
+        # تبدیل رشته شمسی به jdatetime.date (بدون تبدیل به میلادی)
+        start_date = None
+        deadline = None
+
+        if start_date_str:
+            try:
+                iso_start = start_date_str.replace("/", "-")
+                start_date = jdatetime.date.fromisoformat(iso_start)
+            except ValueError:
+                start_date = None
+
+        if deadline_str:
+            try:
+                iso_deadline = deadline_str.replace("/", "-")
+                deadline = jdatetime.date.fromisoformat(iso_deadline)
+            except ValueError:
+                deadline = None
+
+        # ایجاد تسک جدید برای کاربر جاری
+        # فیلدهای start_date و deadline از نوع jmodels.jDateField هستند
+        # و به‌طور مستقیم شیء jdatetime.date را می‌پذیرند
         todo = Todo.objects.create(
+            #user=request.user,
             title=title,
             description=description,
-            start_date=start_date if start_date else None
+            start_date=start_date,   # jdatetime.date
+            deadline=deadline,       # jdatetime.date
         )
 
-        # Return the newly created todo as JSON
-        # so JavaScript can add it to the page
-        # without reloading the browser
+        # تبدیل تاریخ‌ها به رشته شمسی برای ارسال در JSON
+        start_date_jalali = (
+            todo.start_date.strftime("%d %b %Y")
+            if todo.start_date else ""
+        )
+        deadline_jalali = (
+            todo.deadline.strftime("%d %b %Y")
+            if todo.deadline else ""
+        )
+        created_at_jalali = jdatetime.datetime.fromgregorian(
+            datetime=todo.created_at
+        ).strftime("%d %b %Y")
+
         return JsonResponse({
             "success": True,
             "todo_id": todo.id,
             "title": todo.title,
             "description": todo.description,
-            "start_date": (
-                todo.start_date.strftime("%b %d, %Y")
-                if todo.start_date
-                else ""
-            ),
-            "created_at": todo.created_at.strftime("%b %d, %Y"),
+            "start_date": start_date_jalali,
+            "deadline": deadline_jalali,
+            "created_at": created_at_jalali,
         })
 
+    # =========================
+    # نمایش داشبورد
+    # =========================
 
-    # Get all todos from the database
-    # Newest todos appear first
-    todos = Todo.objects.all().order_by("-created_at")
-
-
-    # Calculate task statistics
+    # فقط تسک‌های کاربر جاری
+    #todos = Todo.objects.filter(user=request.user).order_by("-created_at")
+    todos = Todo.objects.order_by("-created_at")
+    # آمار
     total_tasks = todos.count()
+    completed_tasks = todos.filter(completed=True).count()
+    remaining_tasks = todos.filter(completed=False).count()
 
-    completed_tasks = todos.filter(
-        completed=True
-    ).count()
-
-    remaining_tasks = todos.filter(
-        completed=False
-    ).count()
-
-
-    # Get the selected filter from the URL
-    # Example:
-    # /?filter=active
-    # /?filter=completed
+    # فیلتر
     filter_type = request.GET.get("filter")
 
-
-    # Show only active tasks
     if filter_type == "active":
-
-        todos = todos.filter(
-            completed=False
-        )
-
-
-    # Show only completed tasks
+        todos = todos.filter(completed=False)
     elif filter_type == "completed":
+        todos = todos.filter(completed=True)
 
-        todos = todos.filter(
-            completed=True
-        )
+    # افزودن رشته‌های تاریخ شمسی به هر تسک برای نمایش در قالب
+    for todo in todos:
+        # تاریخ ایجاد (میلادی -> شمسی)
+        todo.created_at_jalali_str = jdatetime.datetime.fromgregorian(
+            datetime=todo.created_at
+        ).strftime("%d %b %Y")
 
+        # تاریخ شروع (شمسی)
+        if todo.start_date:
+            todo.start_date_jalali_str = todo.start_date.strftime("%d %b %Y")
+        else:
+            todo.start_date_jalali_str = None
 
-    # Data that will be sent to the HTML template
+        # مهلت (شمسی)
+        if todo.deadline:
+            todo.deadline_jalali_str = todo.deadline.strftime("%d %b %Y")
+        else:
+            todo.deadline_jalali_str = None
+
     context = {
         "todos": todos,
         "filter_type": filter_type,
@@ -91,11 +124,4 @@ def home(request):
         "remaining_tasks": remaining_tasks,
     }
 
-
-    # Render the dashboard HTML page
-    # and pass the context data to it
-    return render(
-        request,
-        "tasks/home.html",
-        context
-    )
+    return render(request, "tasks/home.html", context)

@@ -24,3 +24,10 @@ from .todo import (
 
 # Import the important tasks view
 from .important import important_tasks
+
+from .user import (
+register_view,
+login_view,
+logout_view,
+)
+

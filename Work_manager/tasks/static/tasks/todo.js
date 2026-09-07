@@ -1,7 +1,24 @@
 // ==================================================
 // TODO CARD
 // ==================================================
+// ==================================================
+// FORMAT DATE (Mimics Django's date:"M d, Y")
+// ==================================================
 
+function formatDate(dateString) {
+    if (!dateString) return '';
+
+    // اگر تاریخ به صورت ISO یا قابل parse باشد
+    const date = new Date(dateString);
+
+    // اگر تاریخ معتبر نبود، همان رشته را برگردان
+    if (isNaN(date.getTime())) {
+        return dateString;
+    }
+
+    const options = { month: 'short', day: '2-digit', year: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+}
 function createTodoCard(todo) {
 
     return `
@@ -116,13 +133,32 @@ function createTodoCard(todo) {
                 </form>
 
 
-                <!-- Date -->
-                <span class="todo-date">
-                    ${todo.created_at}
-                </span>
-
-            </div>
-
+                <!-- Task Dates -->
+                
+                <div class="todo-dates">
+                
+                    <!-- Task creation date -->
+                    <span class="todo-date">
+                        Created: ${formatDate(todo.created_at)}
+                    </span>
+                
+                    <!-- Task start date -->
+                    ${todo.start_date ? `
+                        <span class="todo-date">
+                            Start: ${formatDate(todo.start_date)}
+                        </span>
+                    ` : ""}
+                
+                    <!-- Task deadline -->
+                    ${todo.deadline ? `
+                        <span class="todo-date">
+                            Deadline: ${formatDate(todo.deadline)}
+                        </span>
+                    ` : ""}
+                
+                </div>
+                
+                </div>
         </div>
     `;
 }

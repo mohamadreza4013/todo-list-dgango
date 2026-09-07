@@ -515,16 +515,18 @@ body {
    TODO ACTIONS
 ========================================================= */
 
+
 .todo-actions {
     display: flex;
     align-items: center;
-
     gap: 8px;
 }
 
+/* Keep forms aligned with other action elements */
 .todo-actions form {
     margin: 0;
 }
+
 
 
 /* =========================================================
@@ -667,12 +669,20 @@ body {
    TODO DATE
 ========================================================= */
 
-.todo-date {
-    display: none;
+/* Container for all task dates */
+.todo-dates {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
 
+/* Individual task date */
+.todo-date {
     font-size: 11px;
     color: #9ca3af;
+    white-space: nowrap;
 }
+
 
 
 /* =========================================================
