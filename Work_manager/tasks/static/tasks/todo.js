@@ -145,14 +145,14 @@ function createTodoCard(todo) {
                     <!-- Task start date -->
                     ${todo.start_date ? `
                         <span class="todo-date">
-                            Start: ${formatDate(todo.start_date)}
+                            Start: ${todo.start_date}
                         </span>
                     ` : ""}
                 
                     <!-- Task deadline -->
                     ${todo.deadline ? `
                         <span class="todo-date">
-                            Deadline: ${formatDate(todo.deadline)}
+                            Deadline: ${todo.deadline}
                         </span>
                     ` : ""}
                 

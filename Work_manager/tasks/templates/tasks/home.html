@@ -1,33 +1,39 @@
 {% load static %}
 {% load jformat %}
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 
 <head>
 
-    <!-- Page character encoding -->
     <meta charset="UTF-8">
 
-    <!-- Make the page responsive on different screen sizes -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <!-- Browser tab title -->
     <title>TaskFlow</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'tasks/style.css' %}"
+    >
+
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <!-- Load the project's main CSS file -->
-    <link rel="stylesheet" href="{% static 'tasks/style.css' %}">
-    <!-- Persian Datepicker CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
-    <!-- Flatpickr CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     
-    <!-- Flatpickr JS -->
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css"
+    >
     
-    <!-- افزونه جلالی (Persian) -->
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fa.js"></script>
-    <!-- Persian Datepicker JS -->
-    <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+    <!-- Persian Date: dependency of Persian Datepicker -->
+   <script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script>
+    
+    <!-- Persian Datepicker -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"
+    ></script>
 </head>
 
 
@@ -236,20 +242,22 @@
                     <input
                         type="text"
                         name="start_date"
+                        id="start-date"
                         class="jalali-date-input"
                         placeholder="انتخاب تاریخ شروع"
                         autocomplete="off"
+                        readonly
                     >
                     
-                    <!-- Task deadline -->
                     <input
                         type="text"
                         name="deadline"
+                        id="deadline"
                         class="jalali-date-input"
                         placeholder="انتخاب مهلت"
                         autocomplete="off"
+                        readonly
                     >
-
                     <!-- Submit button -->
                     <button
                         type="submit"
@@ -657,47 +665,35 @@
 <!-- ==================================================
      JavaScript
      ================================================== -->
-<script>
-$(document).ready(function() {
-    $(".jalali-date-input").persianDatepicker({
-        formatDate: "YYYY/MM/DD",
-        autoClose: true,
-        viewMode: "day",
-        initialValue: false,
-        calendarType: 'persian',
-        responsive: true
-    });
-});
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    document.querySelectorAll(".jalali-date-input").forEach(function(input) {
-        new PwtDatepicker(input, {
-            format: 'YYYY/MM/DD',
-            autoClose: true,
-            calendarType: 'persian',
-            position: 'bottom'
-        });
-    });
-});
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // تنظیمات مشترک
-        const commonConfig = {
-            dateFormat: "Y/m/d",        // فرمت خروجی: 1402/05/15
-            locale: "fa",               // تقویم جلالی
-            allowInput: true,           // اجازه تایپ دستی (اختیاری)
-            clickOpens: true,           // با کلیک باز شود
-            disableMobile: true,
-        };
-
-        // اتصال به فیلدها
-        flatpickr(".jalali-date-input", commonConfig);
-    });
-</script>
 <script src="{% static 'tasks/todo.js' %}"></script>
 <script src="{% static 'tasks/home.js' %}"></script>
+
+<script>
+$(document).ready(function () {
+
+    $(".jalali-date-input").persianDatepicker({
+
+        formatDate: "YYYY/MM/DD",
+
+        autoClose: true,
+
+        initialValue: false,
+
+        calendarType: "persian",
+
+        responsive: true,
+
+        observer: true
+
+    });
+
+});
+</script>
+
+</body>
+</html>
+</body>
+</html>
 </body>
 
 </html>

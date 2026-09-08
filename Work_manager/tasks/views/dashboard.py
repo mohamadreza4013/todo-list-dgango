@@ -56,11 +56,12 @@ def home(request):
 
         # تبدیل تاریخ‌ها به رشته شمسی برای ارسال در JSON
         start_date_jalali = (
-            todo.start_date.strftime("%d %b %Y")
+            todo.start_date.strftime("%Y/%m/%d")
             if todo.start_date else ""
         )
+
         deadline_jalali = (
-            todo.deadline.strftime("%d %b %Y")
+            todo.deadline.strftime("%Y/%m/%d")
             if todo.deadline else ""
         )
         created_at_jalali = jdatetime.datetime.fromgregorian(
