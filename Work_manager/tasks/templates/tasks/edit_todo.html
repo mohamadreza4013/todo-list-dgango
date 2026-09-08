@@ -1,354 +1,353 @@
 {% load static %}
 
 <!DOCTYPE html>
-<html lang="en">
+
+<html lang="fa" dir="rtl">
 
 <head>
+    
+<!-- کدگذاری کاراکترهای صفحه -->
+<meta charset="UTF-8">
 
-    <!-- Page character encoding -->
-    <meta charset="UTF-8">
+<!-- واکنش‌گرا کردن صفحه -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Make the page responsive on different screen sizes -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- عنوان صفحه -->
+<title>ویرایش وظیفه - تسک‌فلو</title>
 
-    <!-- Browser tab title -->
-    <title>Edit Task - TaskFlow</title>
-
-    <!-- Load the project's main CSS file -->
-    <link rel="stylesheet" href="{% static 'tasks/style.css' %}">
+<!-- فایل CSS اصلی پروژه -->
+<link rel="stylesheet" href="{% static 'tasks/style.css' %}">
 
 </head>
-
 
 <body>
 
 <div class="app">
 
+<!-- =========================
+     نوار کناری
+     ========================= -->
+
+<aside class="sidebar">
+
+    <!-- لوگوی برنامه -->
+    <div class="logo">
+
+        <!-- آیکون لوگو -->
+        <div class="logo-icon">✓</div>
+
+        <!-- نام برنامه -->
+        <span>تسک‌فلو</span>
+
+    </div>
+
+
+    <!-- عنوان بخش نوار کناری -->
+    <div class="nav-title">
+        فضای کاری
+    </div>
+
+
+    <!-- منوی اصلی -->
+    <nav class="nav">
+
+        <!-- لینک داشبورد -->
+        <a href="{% url 'home' %}" class="nav-item">
+
+            <span>▦</span>
+
+            داشبورد
+
+        </a>
+
+
+        <!-- صفحه فعلی / وظایف من -->
+        <a href="#" class="nav-item active">
+
+            <span>✓</span>
+
+            وظایف من
+
+        </a>
+
+
+        <!-- وظایف مهم -->
+        <a href="#" class="nav-item">
+
+            <span>★</span>
+
+            مهم
+
+        </a>
+
+    </nav>
+
+
     <!-- =========================
-         Sidebar
+         بخش پایینی نوار کناری
          ========================= -->
 
-    <aside class="sidebar">
+    <div class="sidebar-bottom">
 
-        <!-- Application logo -->
-        <div class="logo">
+        <!-- منوی پایینی -->
+        <div class="nav">
 
-            <!-- Logo icon -->
-            <div class="logo-icon">✓</div>
-
-            <!-- Application name -->
-            <span>TaskFlow</span>
-
-        </div>
-
-
-        <!-- Sidebar section title -->
-        <div class="nav-title">
-            Workspace
-        </div>
-
-
-        <!-- Main navigation -->
-        <nav class="nav">
-
-            <!-- Dashboard link -->
-            <a href="{% url 'home' %}" class="nav-item">
-
-                <span>▦</span>
-
-                Dashboard
-
-            </a>
-
-
-            <!-- Current page / My Tasks -->
-            <a href="#" class="nav-item active">
-
-                <span>✓</span>
-
-                My Tasks
-
-            </a>
-
-
-            <!-- Important tasks -->
+            <!-- لینک تنظیمات -->
             <a href="#" class="nav-item">
 
-                <span>★</span>
+                <span>⚙</span>
 
-                Important
+                تنظیمات
 
             </a>
 
-        </nav>
+        </div>
 
 
         <!-- =========================
-             Sidebar Bottom
+             پروفایل کاربر
              ========================= -->
 
-        <div class="sidebar-bottom">
+        <div class="profile">
 
-            <!-- Bottom navigation -->
-            <div class="nav">
+            <!-- آواتار کاربر -->
+            <div class="avatar">
+                MR
+            </div>
 
-                <!-- Settings link -->
-                <a href="#" class="nav-item">
 
-                    <span>⚙</span>
+            <!-- اطلاعات کاربر -->
+            <div class="profile-info">
 
-                    Settings
+                <!-- نام کاربر -->
+                <span class="profile-name">
+                    محمدرضا
+                </span>
+
+                <!-- عنوان حساب کاربری -->
+                <span class="profile-email">
+                    حساب کاربری
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</aside>
+
+
+<!-- =========================
+     محتوای اصلی
+     ========================= -->
+
+<main class="main">
+
+
+    <!-- =========================
+         سربرگ صفحه
+         ========================= -->
+
+    <div class="page-header">
+
+        <!-- لینک بازگشت به داشبورد -->
+        <a href="{% url 'home' %}" class="back-link">
+
+            ← بازگشت به داشبورد
+
+        </a>
+
+
+        <!-- عنوان صفحه -->
+        <h1>
+            ویرایش وظیفه
+        </h1>
+
+
+        <!-- توضیح کوتاه صفحه -->
+        <p>
+            جزئیات وظیفه خود را به‌روزرسانی کنید.
+        </p>
+
+    </div>
+
+
+    <!-- =========================
+         کارت ویرایش وظیفه
+         ========================= -->
+
+    <div class="edit-card">
+
+
+        <!-- =========================
+             اطلاعات وظیفه
+             ========================= -->
+
+        <div class="task-info">
+
+
+            <!--
+                نمایش وضعیت فعلی وظیفه.
+
+                اگر todo.completed برابر True باشد:
+                → نمایش «انجام‌شده»
+                → افزودن کلاس completed
+
+                در غیر این صورت:
+                → نمایش «در انتظار»
+            -->
+            <span class="status {% if todo.completed %}completed{% endif %}">
+
+                {% if todo.completed %}
+
+                    انجام‌شده
+
+                {% else %}
+
+                    در انتظار
+
+                {% endif %}
+
+            </span>
+
+
+            <!-- نمایش شناسه وظیفه -->
+            <span class="task-id">
+
+                وظیفه شماره {{ todo.id }}
+
+            </span>
+
+        </div>
+
+
+        <!-- =========================
+             فرم ویرایش وظیفه
+             ========================= -->
+
+        <!--
+            این فرم اطلاعات ویرایش‌شده وظیفه را
+            با متد POST به ویوی edit_todo ارسال می‌کند.
+        -->
+        <form method="POST">
+
+            <!--
+                توکن محافظت CSRF جنگو.
+
+                برای درخواست‌های POST در Django ضروری است.
+            -->
+            {% csrf_token %}
+
+
+            <!-- =========================
+                 عنوان وظیفه
+                 ========================= -->
+
+            <div class="form-group">
+
+                <!-- برچسب فیلد عنوان -->
+                <label class="form-label" for="title">
+
+                    عنوان وظیفه
+
+                </label>
+
+
+                <!--
+                    فیلد عنوان وظیفه.
+
+                    مقدار todo.title باعث می‌شود
+                    عنوان فعلی وظیفه در فیلد نمایش داده شود.
+                -->
+                <input
+                    id="title"
+                    class="form-input"
+                    type="text"
+                    name="title"
+                    value="{{ todo.title }}"
+                    placeholder="چه کاری باید انجام دهید؟"
+                    required
+                >
+
+            </div>
+
+
+            <!-- =========================
+                 توضیحات وظیفه
+                 ========================= -->
+
+            <div class="form-group">
+
+                <!-- برچسب توضیحات -->
+                <label class="form-label" for="description">
+
+                    توضیحات
+
+                </label>
+
+
+                <!--
+                    فیلد ویرایش توضیحات وظیفه.
+
+                    Django توضیحات فعلی را
+                    بین تگ‌های textarea قرار می‌دهد.
+                -->
+                <textarea
+                    id="description"
+                    class="form-textarea"
+                    name="description"
+                    placeholder="توضیحات را اضافه کنید..."
+                >{{ todo.description }}</textarea>
+
+            </div>
+
+
+            <!-- =========================
+                 دکمه‌های فرم
+                 ========================= -->
+
+            <div class="form-actions">
+
+
+                <!--
+                    لغو ویرایش.
+
+                    کاربر را بدون ذخیره تغییرات
+                    به داشبورد برمی‌گرداند.
+                -->
+                <a
+                    href="{% url 'home' %}"
+                    class="cancel-button"
+                >
+
+                    لغو
 
                 </a>
 
-            </div>
-
-
-            <!-- =========================
-                 User Profile
-                 ========================= -->
-
-            <div class="profile">
-
-                <!-- User avatar -->
-                <div class="avatar">
-                    MR
-                </div>
-
-
-                <!-- User information -->
-                <div class="profile-info">
-
-                    <!-- User name -->
-                    <span class="profile-name">
-                        Mohammadreza
-                    </span>
-
-                    <!-- Account label -->
-                    <span class="profile-email">
-                        My account
-                    </span>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </aside>
-
-
-    <!-- =========================
-         Main Content
-         ========================= -->
-
-    <main class="main">
-
-
-        <!-- =========================
-             Page Header
-             ========================= -->
-
-        <div class="page-header">
-
-            <!-- Link back to dashboard -->
-            <a href="{% url 'home' %}" class="back-link">
-
-                ← Back to Dashboard
-
-            </a>
-
-
-            <!-- Page title -->
-            <h1>
-                Edit Task
-            </h1>
-
-
-            <!-- Short description of the page -->
-            <p>
-                Update the details of your task.
-            </p>
-
-        </div>
-
-
-        <!-- =========================
-             Edit Task Card
-             ========================= -->
-
-        <div class="edit-card">
-
-
-            <!-- =========================
-                 Task Information
-                 ========================= -->
-
-            <div class="task-info">
-
 
                 <!--
-                    Display the current task status.
+                    ذخیره تغییرات.
 
-                    If todo.completed is True:
-                    → show "Completed"
-                    → add the "completed" CSS class
-
-                    Otherwise:
-                    → show "Pending"
+                    مرورگر درخواست POST را با
+                    اطلاعات ویرایش‌شده ارسال می‌کند.
                 -->
-                <span class="status {% if todo.completed %}completed{% endif %}">
+                <button
+                    type="submit"
+                    class="save-button"
+                >
 
-                    {% if todo.completed %}
+                    ذخیره تغییرات
 
-                        Completed
-
-                    {% else %}
-
-                        Pending
-
-                    {% endif %}
-
-                </span>
-
-
-                <!-- Display the task database ID -->
-                <span class="task-id">
-
-                    Task #{{ todo.id }}
-
-                </span>
+                </button>
 
             </div>
 
+        </form>
 
-            <!-- =========================
-                 Edit Task Form
-                 ========================= -->
+    </div>
 
-            <!--
-                This form sends the edited task data
-                to the edit_todo view using POST.
-            -->
-            <form method="POST">
-
-                <!--
-                    Django CSRF protection token.
-
-                    Required for POST requests in Django.
-                -->
-                {% csrf_token %}
-
-
-                <!-- =========================
-                     Task Title
-                     ========================= -->
-
-                <div class="form-group">
-
-                    <!-- Label for title input -->
-                    <label class="form-label" for="title">
-
-                        Task title
-
-                    </label>
-
-
-                    <!--
-                        Task title input.
-
-                        value="{{ todo.title }}"
-                        means Django fills the input
-                        with the current task title.
-                    -->
-                    <input
-                        id="title"
-                        class="form-input"
-                        type="text"
-                        name="title"
-                        value="{{ todo.title }}"
-                        placeholder="What do you need to do?"
-                        required
-                    >
-
-                </div>
-
-
-                <!-- =========================
-                     Task Description
-                     ========================= -->
-
-                <div class="form-group">
-
-                    <!-- Label for description -->
-                    <label class="form-label" for="description">
-
-                        Description
-
-                    </label>
-
-
-                    <!--
-                        Textarea for editing the task description.
-
-                        Django places the existing description
-                        between the opening and closing textarea tags.
-                    -->
-                    <textarea
-                        id="description"
-                        class="form-textarea"
-                        name="description"
-                        placeholder="Add a description..."
-                    >{{ todo.description }}</textarea>
-
-                </div>
-
-
-                <!-- =========================
-                     Form Actions
-                     ========================= -->
-
-                <div class="form-actions">
-
-
-                    <!--
-                        Cancel editing.
-
-                        Returns the user to the dashboard
-                        without saving changes.
-                    -->
-                    <a
-                        href="{% url 'home' %}"
-                        class="cancel-button"
-                    >
-
-                        Cancel
-
-                    </a>
-
-
-                    <!--
-                        Submit the form.
-
-                        The browser sends a POST request
-                        containing the edited title and description.
-                    -->
-                    <button
-                        type="submit"
-                        class="save-button"
-                    >
-
-                        Save Changes
-
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </main>
+</main>
 
 </div>
 
