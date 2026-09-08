@@ -1,0 +1,259 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="fa" dir="rtl">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ثبت‌نام - تسک‌فلو</title>
+
+<link
+    rel="stylesheet"
+    href="{% static 'accounts/signup.css' %}"
+>
+```
+
+</head>
+
+<body>
+
+<div class="signup-page">
+
+```
+<div class="signup-wrapper">
+
+
+    <!-- لوگو -->
+
+    <div class="signup-logo">
+
+        <div class="signup-logo-icon">
+            ✓
+        </div>
+
+        <span>
+            تسک‌فلو
+        </span>
+
+    </div>
+
+
+    <!-- کارت ثبت‌نام -->
+
+    <div class="signup-card">
+
+
+        <!-- سربرگ -->
+
+        <div class="signup-header">
+
+            <h1>
+                ایجاد حساب کاربری
+            </h1>
+
+            <p>
+                برای شروع کار با تسک‌فلو حساب خود را بسازید.
+            </p>
+
+        </div>
+
+
+        <!-- فرم ثبت‌نام -->
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+
+            <!-- خطاهای کلی -->
+
+            {% if form.non_field_errors %}
+
+                <div class="signup-error">
+
+                    {{ form.non_field_errors }}
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- نام کاربری -->
+
+            <div class="signup-form-group">
+
+                <label
+                    for="{{ form.username.id_for_label }}"
+                    class="signup-label"
+                >
+                    نام کاربری
+                </label>
+
+                {{ form.username }}
+
+                {% if form.username.errors %}
+                    <div class="field-error">
+                        {{ form.username.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- نام -->
+
+            <div class="signup-form-group">
+
+                <label
+                    for="{{ form.first_name.id_for_label }}"
+                    class="signup-label"
+                >
+                    نام
+                </label>
+
+                {{ form.first_name }}
+
+                {% if form.first_name.errors %}
+                    <div class="field-error">
+                        {{ form.first_name.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- نام خانوادگی -->
+
+            <div class="signup-form-group">
+
+                <label
+                    for="{{ form.last_name.id_for_label }}"
+                    class="signup-label"
+                >
+                    نام خانوادگی
+                </label>
+
+                {{ form.last_name }}
+
+                {% if form.last_name.errors %}
+                    <div class="field-error">
+                        {{ form.last_name.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- ایمیل -->
+
+            <div class="signup-form-group">
+
+                <label
+                    for="{{ form.email.id_for_label }}"
+                    class="signup-label"
+                >
+                    ایمیل
+                </label>
+
+                {{ form.email }}
+
+                {% if form.email.errors %}
+                    <div class="field-error">
+                        {{ form.email.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- رمز عبور -->
+
+            <div class="signup-form-group">
+
+                <label
+                    for="{{ form.password1.id_for_label }}"
+                    class="signup-label"
+                >
+                    رمز عبور
+                </label>
+
+                {{ form.password1 }}
+
+                {% if form.password1.errors %}
+                    <div class="field-error">
+                        {{ form.password1.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- تکرار رمز عبور -->
+
+            <div class="signup-form-group">
+
+                <label
+                    for="{{ form.password2.id_for_label }}"
+                    class="signup-label"
+                >
+                    تکرار رمز عبور
+                </label>
+
+                {{ form.password2 }}
+
+                {% if form.password2.errors %}
+                    <div class="field-error">
+                        {{ form.password2.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- دکمه ثبت‌نام -->
+
+            <button
+                type="submit"
+                class="signup-button"
+            >
+                ایجاد حساب
+            </button>
+
+        </form>
+
+
+        <!-- لینک ورود -->
+
+        <div class="signup-login-link">
+
+            قبلاً حساب دارید؟
+
+            <a href="{% url 'login' %}">
+                وارد شوید
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- پایین صفحه -->
+
+    <div class="signup-footer">
+        مدیریت ساده و منظم وظایف با تسک‌فلو
+    </div>
+
+</div>
+```
+
+</div>
+
+</body>
+
+</html>

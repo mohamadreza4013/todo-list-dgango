@@ -26,7 +26,9 @@ SECRET_KEY = "django-insecure-zgaw)pqqb@wwl+so5i+oggt!783$bq#e0&a!p)zs@f)lc#8&+7
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 # Application definition
 
@@ -37,9 +39,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+
     'tasks',
     'django_jalali',
     'mycalendar',
+    'accounts',
 ]
 
 MIDDLEWARE = [

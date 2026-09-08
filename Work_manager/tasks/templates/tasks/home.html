@@ -131,6 +131,10 @@
                 مهم
 
             </a>
+            <a href="{% url 'logout_confirm' %}" class="nav-item">
+            <span>↪</span>
+            خروج
+            </a>
 
         </nav>
 
@@ -170,18 +174,36 @@
 
 
                 <div class="avatar">
-                    م‌ن
+
+                    {% if user.first_name and user.last_name %}
+                        {{ user.first_name|first }}{{ user.last_name|first }}
+                    {% elif user.first_name %} 
+                        {{ user.first_name|first }}
+                    {% else %} 
+                        {{ user.username|first }}
+                    {% endif %}
                 </div>
 
 
                 <div class="profile-info">
 
                     <span class="profile-name">
-                        محمدرضا
+                        {% if user.first_name %} 
+                            {{ user.first_name }}
+                            {% if user.last_name %}
+                                {{ user.last_name }}
+                            {% endif %} 
+                        {% else %}
+                            {{ user.username }}
+                        {% endif %}
                     </span>
 
                     <span class="profile-email">
-                        حساب کاربری
+                        {% if user.email %} 
+                            {{ user.email }}
+                        {% else %} 
+                            حساب کاربری
+                        {% endif %}
                     </span>
 
                 </div>

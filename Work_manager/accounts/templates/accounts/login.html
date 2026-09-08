@@ -1,0 +1,163 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html lang="fa" dir="rtl">
+
+<head>
+
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ورود - تسک‌فلو</title>
+
+<link rel="stylesheet" href="{% static 'accounts/login.css' %}">
+</head>
+
+<body>
+
+<div class="login-page">
+
+<div class="login-wrapper">
+
+
+    <!-- =========================
+         Logo
+         ========================= -->
+
+    <div class="login-logo">
+
+        <div class="login-logo-icon">
+            ✓
+        </div>
+
+        <span>
+            تسک‌فلو
+        </span>
+
+    </div>
+
+
+    <!-- =========================
+         Login Card
+         ========================= -->
+
+    <div class="login-card">
+
+
+        <!-- Header -->
+
+        <div class="login-header">
+
+            <h1>
+                خوش آمدید
+            </h1>
+
+            <p>
+                برای ورود به حساب کاربری خود، اطلاعاتتان را وارد کنید.
+            </p>
+
+        </div>
+
+
+        <!-- =========================
+             Login Form
+             ========================= -->
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+
+            <!-- Django Login Error -->
+
+            {% if form.errors %}
+
+                <div class="login-error">
+
+                    نام کاربری یا رمز عبور صحیح نیست.
+                    لطفاً اطلاعات واردشده را بررسی کنید.
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- Username -->
+
+            <div class="login-form-group">
+
+                <label
+                    for="username"
+                    class="login-label"
+                >
+                    نام کاربری
+                </label>
+
+                <input
+                    id="username"
+                    type="text"
+                    name="username"
+                    class="login-input"
+                    placeholder="نام کاربری خود را وارد کنید"
+                    autocomplete="username"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Password -->
+
+            <div class="login-form-group">
+
+                <label
+                    for="password"
+                    class="login-label"
+                >
+                    رمز عبور
+                </label>
+
+                <input
+                    id="password"
+                    type="password"
+                    name="password"
+                    class="login-input"
+                    placeholder="رمز عبور خود را وارد کنید"
+                    autocomplete="current-password"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Submit -->
+
+            <button
+                type="submit"
+                class="login-button"
+            >
+                ورود به حساب
+            </button>
+
+        </form>
+
+
+    </div>
+
+
+    <!-- Footer -->
+
+    <div class="login-footer">
+        مدیریت ساده و منظم وظایف با تسک‌فلو
+    </div>
+
+</div>
+```
+
+</div>
+
+</body>
+
+</html>

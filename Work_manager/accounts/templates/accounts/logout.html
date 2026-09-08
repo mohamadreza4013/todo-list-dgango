@@ -1,0 +1,117 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="fa" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>خروج از حساب - تسک‌فلو</title>
+
+<link
+    rel="stylesheet"
+    href="{% static 'accounts/logout.css' %}"
+>
+
+</head>
+
+<body>
+
+<div class="logout-page">
+
+<div class="logout-wrapper">
+
+
+    <!-- لوگو -->
+
+    <div class="logout-logo">
+
+        <div class="logout-logo-icon">
+            ✓
+        </div>
+
+        <span>
+            تسک‌فلو
+        </span>
+
+    </div>
+
+
+    <!-- کارت خروج -->
+
+    <div class="logout-card">
+
+
+        <div class="logout-icon">
+            ↪
+        </div>
+
+
+        <div class="logout-header">
+
+            <h1>
+                خروج از حساب
+            </h1>
+
+            <p>
+                آیا مطمئن هستید که می‌خواهید از حساب کاربری خود خارج شوید؟
+            </p>
+
+        </div>
+
+
+        <!-- فرم خروج -->
+
+        <form
+            method="POST"
+            action="{% url 'logout' %}"
+        >
+
+            {% csrf_token %}
+
+
+            <div class="logout-actions">
+
+                <!-- انصراف -->
+
+                <a
+                    href="{% url 'home' %}"
+                    class="cancel-button"
+                >
+                    انصراف
+                </a>
+
+
+                <!-- خروج -->
+
+                <button
+                    type="submit"
+                    class="logout-button"
+                >
+                    خروج از حساب
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- پایین صفحه -->
+
+    <div class="logout-footer">
+        مدیریت ساده و منظم وظایف با تسک‌فلو
+    </div>
+
+</div>
+
+</div>
+
+</body>
+
+</html>
