@@ -1,7 +1,6 @@
 {% load static %}
-{% load calendar_tags %}
-<!DOCTYPE html>
 
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 
 <head>
@@ -13,261 +12,83 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>
-        تقویم | TaskFlow
-    </title>
+    <title>My Calendar</title>
 
     <link
         rel="stylesheet"
-        href="{% static 'calendar/calendar.css' %}"
+        href="{% static 'mycalendar/calendar.css' %}"
     >
 
 </head>
-
 
 <body>
 
 <div class="calendar-page">
 
+    <div class="calendar-header">
 
-    <!-- ==========================================
-         HEADER
-    =========================================== -->
+        <h1>
+            My Calendar
+        </h1>
 
-    <header class="calendar-header">
+        <p>
+            تقویم شمسی
+        </p>
 
-        <div>
-
-            <h1>
-                تقویم
-            </h1>
-
-            <p>
-                برنامه‌ریزی کارهای TaskFlow
-            </p>
-
-        </div>
+    </div>
 
 
-        <a
-            href="{% url 'home' %}"
-            class="back-button"
-        >
-            بازگشت به داشبورد
-        </a>
-
-    </header>
-
-
-    <!-- ==========================================
-         CALENDAR CARD
-    =========================================== -->
-
-    <section class="calendar-card">
-
-
-        <!-- Month navigation -->
+    <div class="calendar">
 
         <div class="calendar-topbar">
 
-
-            <a
-                href="?year={{ previous_year }}&month={{ previous_month }}"
+            <button
+                id="previous-month"
                 class="month-button"
             >
                 ‹
-            </a>
+            </button>
 
+            <div
+                id="month-title"
+                class="month-title"
+            ></div>
 
-            <div class="month-title">
-
-                <h2>
-                    {{ month_name }}
-                    {{ year }}
-                </h2>
-
-            </div>
-
-
-            <a
-                href="?year={{ next_year }}&month={{ next_month }}"
+            <button
+                id="next-month"
                 class="month-button"
             >
                 ›
-            </a>
+            </button>
 
         </div>
 
 
-        <!-- ==========================================
-             WEEK DAYS
-        =========================================== -->
-
-        <div class="calendar-weekdays">
-
-            {% for weekday in weekdays %}
-
-                <div class="weekday">
-                    {{ weekday }}
-                </div>
-
-            {% endfor %}
-
-        </div>
+        <div
+            id="weekdays"
+            class="weekdays"
+        ></div>
 
 
-        <!-- ==========================================
-             DAYS
-        =========================================== -->
+        <div
+            id="calendar-grid"
+            class="calendar-grid"
+        ></div>
 
-        <div class="calendar-grid">
-
-
-            {% for day in calendar_days %}
+    </div>
 
 
-                {% if day %}
-
-                    <div
-                        class="
-                            calendar-day
-
-                            {% if day == today_day and month == today_month and year == today_year %}
-                                today
-                            {% endif %}
-
-                            {% if tasks_by_day.day %}
-                                has-tasks
-                            {% endif %}
-                        "
-                        data-day="{{ day }}"
-                    >
-
-
-                        <div class="day-number">
-
-                            {{ day }}
-
-                            {% if day == today_day and month == today_month and year == today_year %}
-
-                                <span class="today-label">
-                                    امروز
-                                </span>
-
-                            {% endif %}
-
-                        </div>
-
-
-                        <div class="day-tasks">
-
-
-                            {% for task in tasks_by_day|get_item:day %}
-
-                                <div
-                                    class="
-                                        mini-task
-                                        {% if task.completed %}
-                                            completed
-                                        {% endif %}
-
-                                        {% if task.important %}
-                                            important
-                                        {% endif %}
-                                    "
-                                    data-task-id="{{ task.id }}"
-                                    title="{{ task.title }}"
-                                >
-
-                                    {% if task.type == "start" %}
-
-                                        <span class="task-dot start-dot"></span>
-
-                                    {% else %}
-
-                                        <span class="task-dot deadline-dot"></span>
-
-                                    {% endif %}
-
-
-                                    <span class="task-title">
-
-                                        {{ task.title }}
-
-                                    </span>
-
-                                </div>
-
-                            {% endfor %}
-
-
-                        </div>
-
-                    </div>
-
-                {% else %}
-
-                    <div class="calendar-day empty-day"></div>
-
-                {% endif %}
-
-
-            {% endfor %}
-
-
-        </div>
-
-    </section>
-
-
-    <!-- ==========================================
-         SELECTED DAY
-    =========================================== -->
-
-    <section
-        id="selected-day-panel"
-        class="selected-day-panel"
+    <div
+        id="selected-date"
+        class="selected-date"
     >
-
-        <div class="selected-day-header">
-
-            <h2 id="selected-day-title">
-                یک روز را انتخاب کنید
-            </h2>
-
-        </div>
-
-
-        <div id="selected-day-tasks">
-
-            <p class="empty-message">
-                برای دیدن کارهای یک روز روی آن کلیک کنید.
-            </p>
-
-        </div>
-
-    </section>
-
+        تاریخی انتخاب نشده است
+    </div>
 
 </div>
 
 
-<script>
-
-    const tasksByDay =
-        {{ tasks_by_day|json_script:"tasks-data" }};
-
-    const currentYear = {{ year }};
-    const currentMonth = {{ month }};
-
-</script>
-
-
-<script
-    src="{% static 'calendar/calendar.js' %}"
-></script>
-
+<script src="{% static 'mycalendar/calendar.js' %}"></script>
 
 </body>
-
 </html>

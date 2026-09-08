@@ -14,26 +14,30 @@
     >
 
     <title>TaskFlow</title>
-
+   <link
+    rel="stylesheet"
+    href="{% static 'calendar/calendar.css' %}"
+    >
     <link
         rel="stylesheet"
         href="{% static 'tasks/style.css' %}"
     >
-
+<!--
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    
+
     <link
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css"
     >
-    
-    <!-- Persian Date: dependency of Persian Datepicker -->
+-->
+    <!-- Persian Date: dependency of Persian Datepicker
    <script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script>
-    
-    <!-- Persian Datepicker -->
+-->
+    <!-- Persian Datepicker
     <script
         src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"
     ></script>
+    -->
 </head>
 
 
@@ -248,7 +252,7 @@
                         autocomplete="off"
                         readonly
                     >
-                    
+
                     <input
                         type="text"
                         name="deadline"
@@ -659,15 +663,91 @@
     </main>
 
 </div>
+<div
+    id="calendar-picker-modal"
+    class="calendar-picker-modal"
+    hidden
+>
 
+    <div class="calendar-picker-overlay"></div>
+
+    <div class="calendar-picker-container">
+
+        <button
+            type="button"
+            id="calendar-picker-close"
+            class="calendar-picker-close"
+        >
+            ×
+        </button>
+
+        <div class="calendar-picker-header">
+
+            <h2>
+                انتخاب تاریخ
+            </h2>
+
+        </div>
+
+        <div class="calendar">
+
+            <div class="calendar-topbar">
+
+                <button
+                    type="button"
+                    id="previous-month"
+                    class="month-button"
+                >
+                    ‹
+                </button>
+
+                <div
+                    id="month-title"
+                    class="month-title"
+                ></div>
+
+                <button
+                    type="button"
+                    id="next-month"
+                    class="month-button"
+                >
+                    ›
+                </button>
+
+            </div>
+
+            <div
+                id="weekdays"
+                class="weekdays"
+            ></div>
+
+            <div
+                id="calendar-grid"
+                class="calendar-grid"
+            ></div>
+
+        </div>
+
+    </div>
+
+</div>
 
 
 <!-- ==================================================
      JavaScript
      ================================================== -->
-<script src="{% static 'tasks/todo.js' %}"></script>
-<script src="{% static 'tasks/home.js' %}"></script>
+<script
+    src="{% static 'calendar/calendar.js' %}"
+></script>
 
+<script
+    src="{% static 'tasks/todo.js' %}"
+></script>
+
+<script
+    src="{% static 'tasks/home.js' %}"
+></script>
+<!--
 <script>
 $(document).ready(function () {
 
@@ -689,7 +769,7 @@ $(document).ready(function () {
 
 });
 </script>
-
+-->
 </body>
 </html>
 </body>
