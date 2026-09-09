@@ -9,14 +9,22 @@ from ..models import Todo
 
 def important_tasks(request):
 
-    # Get only the tasks marked as important
-    # Newest tasks appear first
+    # Get important public tasks and personal tasks
+    # that belong to the current user
     todos = Todo.objects.filter(
+        category="public",
         important=True
-    ).order_by("-created_at")
+    ) | Todo.objects.filter(
+        category="personal",
+        user=request.user,
+        important=True
+    )
+
+    # Show the newest tasks first
+    todos = todos.order_by("-created_at")
 
 
-    # Calculate the total number of important tasks
+    # Calculate the total number of visible important tasks
     total_tasks = todos.count()
 
 
@@ -49,3 +57,4 @@ def important_tasks(request):
         "tasks/important.html",
         context
     )
+

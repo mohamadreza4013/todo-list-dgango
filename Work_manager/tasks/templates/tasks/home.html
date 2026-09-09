@@ -1,21 +1,31 @@
 {% load static %}
+{% load jformat %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 
 <head>
 
-    <!-- Page character encoding -->
     <meta charset="UTF-8">
 
-    <!-- Make the page responsive on different screen sizes -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <!-- Browser tab title -->
-    <title>TaskFlow</title>
+    <title>TaskFlow | مدیریت وظایف</title>
 
-    <!-- Load the project's main CSS file -->
-    <link rel="stylesheet" href="{% static 'tasks/style.css' %}">
+    <!-- TaskFlow CSS -->
+    <link
+        rel="stylesheet"
+        href="{% static 'tasks/style.css' %}"
+    >
+
+    <!-- Calendar CSS -->
+    <link
+        rel="stylesheet"
+        href="{% static 'calendar/calendar.css' %}"
+    >
 
 </head>
 
@@ -25,120 +35,198 @@
 <div class="app">
 
 
-    <!-- =========================
-         Sidebar
-         ========================= -->
+    <!-- ==================================================
+         SIDEBAR
+    ================================================== -->
 
     <aside class="sidebar">
 
-        <!-- Application logo -->
+
+        <!-- Logo -->
+
         <div class="logo">
 
-            <div class="logo-icon">✓</div>
+            <div class="logo-icon">
+                ✓
+            </div>
 
             <span>
-                TaskFlow
+                تسک‌فلو
             </span>
 
         </div>
 
 
-        <!-- Sidebar section title -->
+        <!-- Workspace navigation title -->
+
         <div class="nav-title">
-            Workspace
+            فضای کاری
         </div>
 
 
         <!-- Main navigation -->
+
         <nav class="nav">
 
+
             <!-- Dashboard -->
+
             <a
                 href="{% url 'home' %}"
-                class="nav-item"
+                class="nav-item active"
             >
 
-                <span>▦</span>
+                <span>
+                    ▦
+                </span>
 
-                Dashboard
+                داشبورد
 
             </a>
 
 
             <!-- My Tasks -->
+
             <a
                 href="#"
                 class="nav-item"
             >
 
-                <span>✓</span>
+                <span>
+                    ✓
+                </span>
 
-                My Tasks
+                وظایف من
 
             </a>
 
 
-            <!-- Important tasks -->
+            <!-- Calendar -->
+
+            <a
+                href="#"
+                class="nav-item"
+            >
+
+                <span>
+                    📅
+                </span>
+
+                تقویم
+
+            </a>
+
+
+            <!-- Important Tasks -->
+
             <a
                 href="{% url 'important_tasks' %}"
                 class="nav-item"
             >
 
-                <span>★</span>
+                <span>
+                    ★
+                </span>
 
-                Important
+                مهم
+
+            </a>
+
+
+            <!-- Logout -->
+
+            <a
+                href="{% url 'logout_confirm' %}"
+                class="nav-item"
+            >
+
+                <span>
+                    ↪
+                </span>
+
+                خروج
 
             </a>
 
         </nav>
 
 
-        <!-- =========================
-             Sidebar Bottom
-             ========================= -->
+
+        <!-- ==================================================
+             SIDEBAR BOTTOM
+    ================================================== -->
 
         <div class="sidebar-bottom">
 
 
-            <!-- Bottom navigation -->
             <div class="nav">
 
+
                 <!-- Settings -->
+
                 <a
                     href="#"
                     class="nav-item"
                 >
 
-                    <span>⚙</span>
+                    <span>
+                        ⚙
+                    </span>
 
-                    Settings
+                    تنظیمات
 
                 </a>
 
             </div>
 
 
-            <!-- =========================
-                 User Profile
-                 ========================= -->
+            <!-- User profile -->
 
             <div class="profile">
 
-                <!-- User avatar -->
+
                 <div class="avatar">
-                    MR
+
+                    {% if user.first_name and user.last_name %}
+                        {{ user.first_name|first }}{{ user.last_name|first }}
+                    {% elif user.first_name %}
+                        {{ user.first_name|first }}
+                    {% else %}
+                        {{ user.username|first }}
+                    {% endif %}
+
                 </div>
 
 
-                <!-- User information -->
                 <div class="profile-info">
 
                     <span class="profile-name">
-                        Mohammadreza
+
+                        {% if user.first_name %}
+
+                            {{ user.first_name }}
+
+                            {% if user.last_name %}
+                                {{ user.last_name }}
+                            {% endif %}
+
+                        {% else %}
+
+                            {{ user.username }}
+
+                        {% endif %}
+
                     </span>
 
+
                     <span class="profile-email">
-                        My account
+
+                        {% if user.email %}
+                            {{ user.email }}
+                        {% else %}
+                            حساب کاربری
+                        {% endif %}
+
                     </span>
 
                 </div>
@@ -151,51 +239,29 @@
 
 
 
-    <!-- =========================
-         Main Content
-         ========================= -->
+    <!-- ==================================================
+         MAIN CONTENT
+    ================================================== -->
 
     <main class="main">
 
 
-        <!-- =========================
-             Topbar
-             ========================= -->
+        <!-- ==================================================
+             TOPBAR
+        ================================================== -->
 
         <div class="topbar">
 
 
-            <!-- Welcome message -->
-            <div class="welcome">
+            <!-- ==================================================
+                 ADD TASK FORM
+            ================================================== -->
 
-                <h1>
-                    Good morning 👋
-                </h1>
-
-                <p>
-                    Let's get things done today.
-                </p>
-
-            </div>
-
-
-            <!-- =========================
-                 Add Task Form
-                 ========================= -->
-
-            <!--
-                Form used to create a new task.
-
-                JavaScript intercepts the submit event
-                and sends the request using fetch()
-                without reloading the page.
-            -->
             <form
                 method="POST"
                 class="add-task-form-container"
             >
 
-                <!-- Django CSRF protection -->
                 {% csrf_token %}
 
 
@@ -203,36 +269,79 @@
 
 
                     <!-- Task title -->
+
                     <input
                         type="text"
                         name="title"
-                        placeholder="What do you need to do?"
+                        placeholder="چه کاری باید انجام دهید؟"
                         required
                     >
 
 
                     <!-- Task description -->
+
                     <input
                         type="text"
                         name="description"
-                        placeholder="Add a description..."
+                        placeholder="توضیحات را اضافه کنید..."
                     >
 
 
-                    <!-- Optional task start date -->
+                    <!-- Task category -->
+
+                    <select
+                        name="category"
+                        class="task-category-input"
+                    >
+
+                        <option value="personal">
+                            شخصی
+                        </option>
+
+                        <option value="public">
+                            عمومی
+                        </option>
+
+                    </select>
+
+
+                    <!-- Task start date -->
+
                     <input
-                        type="date"
+                        type="text"
                         name="start_date"
+                        id="start-date"
+                        class="jalali-date-input"
+                        placeholder="انتخاب تاریخ شروع"
+                        autocomplete="off"
+                        readonly
                     >
 
 
-                    <!-- Submit button -->
+                    <!-- Task end date -->
+
+
+                    <!-- Task deadline -->
+
+                    <input
+                        type="text"
+                        name="deadline"
+                        id="deadline"
+                        class="jalali-date-input"
+                        placeholder="انتخاب مهلت"
+                        autocomplete="off"
+                        readonly
+                    >
+
+
+                    <!-- Submit task -->
+
                     <button
                         type="submit"
                         class="add-button"
                     >
 
-                        + Add Task
+                        + افزودن وظیفه
 
                     </button>
 
@@ -244,20 +353,21 @@
 
 
 
-        <!-- =========================
-             Statistics
-             ========================= -->
+        <!-- ==================================================
+             STATISTICS
+        ================================================== -->
 
         <section class="stats">
 
 
             <!-- Total tasks -->
+
             <div class="stat-card">
 
                 <div class="stat-header">
 
                     <span class="stat-title">
-                        Total Tasks
+                        کل وظایف
                     </span>
 
                     <div class="stat-icon">
@@ -267,10 +377,6 @@
                 </div>
 
 
-                <!--
-                    Value is calculated in the Django view
-                    and passed to the template through context.
-                -->
                 <div class="stat-number">
                     {{ total_tasks }}
                 </div>
@@ -280,12 +386,13 @@
 
 
             <!-- Completed tasks -->
+
             <div class="stat-card">
 
                 <div class="stat-header">
 
                     <span class="stat-title">
-                        Completed
+                        انجام‌شده
                     </span>
 
                     <div class="stat-icon">
@@ -293,6 +400,7 @@
                     </div>
 
                 </div>
+
 
                 <div class="stat-number">
                     {{ completed_tasks }}
@@ -303,12 +411,13 @@
 
 
             <!-- Remaining tasks -->
+
             <div class="stat-card">
 
                 <div class="stat-header">
 
                     <span class="stat-title">
-                        Remaining
+                        باقی‌مانده
                     </span>
 
                     <div class="stat-icon">
@@ -316,6 +425,7 @@
                     </div>
 
                 </div>
+
 
                 <div class="stat-number">
                     {{ remaining_tasks }}
@@ -327,78 +437,63 @@
 
 
 
-        <!-- =========================
-             Task Filters
-             ========================= -->
+        <!-- ==================================================
+             TASK FILTERS
+        ================================================== -->
 
         <div class="task-filters">
 
 
             <!-- Show all tasks -->
+
             <a
                 href="{% url 'home' %}"
                 class="filter-button {% if not filter_type %}active{% endif %}"
             >
-
-                All
-
+                همه
             </a>
 
 
-            <!-- Show only active tasks -->
+            <!-- Show active tasks -->
+
             <a
                 href="{% url 'home' %}?filter=active"
                 class="filter-button {% if filter_type == 'active' %}active{% endif %}"
             >
-
-                Active
-
+                در حال انجام
             </a>
 
 
-            <!-- Show only completed tasks -->
+            <!-- Show completed tasks -->
+
             <a
                 href="{% url 'home' %}?filter=completed"
                 class="filter-button {% if filter_type == 'completed' %}active{% endif %}"
             >
-
-                Completed
-
+                انجام‌شده
             </a>
 
         </div>
 
 
 
-        <!-- =========================
-             Todo List
-             ========================= -->
+        <!-- ==================================================
+             TODO LIST
+        ================================================== -->
 
         <section class="todo-list">
 
 
-            <!--
-                Loop through all tasks received
-                from the Django view.
-            -->
             {% for todo in todos %}
 
 
-                <!--
-                    Each task is represented by one card.
-
-                    data-todo-id stores the task ID
-                    so JavaScript can identify the card.
-                -->
                 <div
                     class="todo-card"
                     data-todo-id="{{ todo.id }}"
                 >
 
 
-                    <!-- =========================
-                         Complete / Toggle
-                         ========================= -->
+                    <!-- Complete / incomplete toggle -->
 
                     <form
                         method="POST"
@@ -408,15 +503,10 @@
 
                         {% csrf_token %}
 
-
-                        <!--
-                            Button used to change
-                            Pending ↔ Completed.
-                        -->
                         <button
                             type="submit"
                             class="complete-button {% if todo.completed %}completed{% endif %}"
-                            title="{% if todo.completed %}Mark as active{% else %}Mark as completed{% endif %}"
+                            title="{% if todo.completed %}علامت‌گذاری به‌عنوان انجام‌نشده{% else %}علامت‌گذاری به‌عنوان انجام‌شده{% endif %}"
                         >
 
                             {% if todo.completed %}
@@ -429,23 +519,20 @@
 
 
 
-                    <!-- =========================
-                         Task Content
-                         ========================= -->
+                    <!-- Task content -->
 
                     <div class="todo-content">
 
 
                         <!-- Task title -->
+
                         <div class="todo-title">
                             {{ todo.title }}
                         </div>
 
 
-                        <!--
-                            Display description only
-                            when one exists.
-                        -->
+                        <!-- Task description -->
+
                         {% if todo.description %}
 
                             <div class="todo-description">
@@ -454,42 +541,53 @@
 
                         {% endif %}
 
+
+                        <!-- Task category -->
+
+                        <div class="todo-category">
+
+                            {% if todo.category == "public" %}
+
+                                <span class="category-badge public">
+                                    عمومی
+                                </span>
+
+                            {% else %}
+
+                                <span class="category-badge personal">
+                                    شخصی
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
                     </div>
 
 
 
-                    <!-- =========================
-                         Task Actions
-                         ========================= -->
+                    <!-- Task actions -->
 
                     <div class="todo-actions">
 
 
-                        <!-- =========================
-                             Status
-                             ========================= -->
+                        <!-- Task status -->
 
                         <span
                             class="status {% if todo.completed %}completed{% endif %}"
                         >
 
                             {% if todo.completed %}
-
-                                Completed
-
+                                انجام‌شده
                             {% else %}
-
-                                Pending
-
+                                در انتظار
                             {% endif %}
 
                         </span>
 
 
 
-                        <!-- =========================
-                             Important
-                             ========================= -->
+                        <!-- Toggle important status -->
 
                         <form
                             method="POST"
@@ -499,17 +597,10 @@
 
                             {% csrf_token %}
 
-
-                            <!--
-                                Toggle task importance.
-
-                                JavaScript sends the request
-                                without reloading the page.
-                            -->
                             <button
                                 type="submit"
                                 class="important-button {% if todo.important %}important{% endif %}"
-                                title="{% if todo.important %}Remove from important{% else %}Mark as important{% endif %}"
+                                title="{% if todo.important %}حذف از وظایف مهم{% else %}افزودن به وظایف مهم{% endif %}"
                             >
 
                                 ★
@@ -520,29 +611,20 @@
 
 
 
-                        <!-- =========================
-                             Edit
-                             ========================= -->
+                        <!-- Edit task -->
 
-                        <!--
-                            Unlike the other actions,
-                            Edit currently navigates to
-                            a separate page.
-                        -->
                         <a
                             href="{% url 'edit_todo' todo.id %}"
                             class="edit-button"
                         >
 
-                            ✎ Edit
+                            ✎ ویرایش
 
                         </a>
 
 
 
-                        <!-- =========================
-                             Delete
-                             ========================= -->
+                        <!-- Delete task -->
 
                         <form
                             method="POST"
@@ -552,13 +634,12 @@
 
                             {% csrf_token %}
 
-
                             <button
                                 type="submit"
                                 class="delete-button"
                             >
 
-                                🗑 Delete
+                                🗑 حذف
 
                             </button>
 
@@ -566,29 +647,67 @@
 
 
 
-                        <!-- =========================
-                             Created Date
-                             ========================= -->
+                        <!-- Task dates -->
 
-                        <span class="todo-date">
-                            {{ todo.created_at|date:"M d, Y" }}
-                        </span>
+                        <div class="todo-dates">
+
+
+                            <!-- Creation date -->
+
+                            <span class="todo-date">
+                                ایجاد:
+                                {{ todo.created_at_jalali_str }}
+                            </span>
+
+
+                            <!-- Start date -->
+
+                            {% if todo.start_date_jalali_str %}
+
+                                <span class="todo-date">
+                                    شروع:
+                                    {{ todo.start_date_jalali_str }}
+                                </span>
+
+                            {% endif %}
+
+
+                            <!-- Completion date -->
+
+                            {% if todo.end_date_jalali_str %}
+
+                                <span class="todo-date">
+                                    اتمام:
+                                    {{ todo.end_date_jalali_str }}
+                                </span>
+
+                            {% endif %}
+
+
+                            <!-- Deadline -->
+
+                            {% if todo.deadline_jalali_str %}
+
+                                <span class="todo-date">
+                                    مهلت:
+                                    {{ todo.deadline_jalali_str }}
+                                </span>
+
+                            {% endif %}
+
+
+                        </div>
 
                     </div>
 
                 </div>
 
 
-            <!-- =========================
-                 Empty State
-                 ========================= -->
-
             {% empty %}
 
-                <!--
-                    Displayed when there are
-                    no tasks to show.
-                -->
+
+                <!-- Empty task list state -->
+
                 <div class="empty-state">
 
                     <div class="empty-icon">
@@ -596,15 +715,15 @@
                     </div>
 
                     <h3>
-                        No tasks yet
+                        هنوز وظیفه‌ای ندارید
                     </h3>
 
                     <p>
-                        You're all caught up!
-                        Create your first task to get started.
+                        اولین وظیفه خود را ایجاد کنید تا شروع کنیم.
                     </p>
 
                 </div>
+
 
             {% endfor %}
 
@@ -617,12 +736,136 @@
 
 
 <!-- ==================================================
-     JavaScript
-     ================================================== -->
+     CALENDAR PICKER MODAL
+================================================== -->
+
+<div
+    id="calendar-picker-modal"
+    class="calendar-picker-modal"
+    hidden
+>
+
+    <div class="calendar-picker-overlay"></div>
 
 
-<script src="{% static 'tasks/todo.js' %}"></script>
-<script src="{% static 'tasks/home.js' %}"></script>
+    <div class="calendar-picker-container">
+
+
+        <!-- Close calendar picker -->
+
+        <button
+            type="button"
+            id="calendar-picker-close"
+            class="calendar-picker-close"
+            aria-label="بستن تقویم"
+        >
+            ×
+        </button>
+
+
+        <!-- Calendar header -->
+
+        <div class="calendar-picker-header">
+
+            <h2>
+                انتخاب تاریخ
+            </h2>
+
+        </div>
+
+
+        <!-- Calendar -->
+
+        <div class="calendar">
+
+
+            <!-- Calendar navigation -->
+
+            <div class="calendar-topbar">
+
+
+                <!-- Previous month -->
+
+                <button
+                    type="button"
+                    id="previous-month"
+                    class="month-button"
+                    aria-label="ماه قبل"
+                >
+                    ‹
+                </button>
+
+
+                <!-- Current month title -->
+
+                <div
+                    id="month-title"
+                    class="month-title"
+                ></div>
+
+
+                <!-- Next month -->
+
+                <button
+                    type="button"
+                    id="next-month"
+                    class="month-button"
+                    aria-label="ماه بعد"
+                >
+                    ›
+                </button>
+
+            </div>
+
+
+            <!-- Weekday names -->
+
+            <div
+                id="weekdays"
+                class="weekdays"
+            ></div>
+
+
+            <!-- Calendar days -->
+
+            <div
+                id="calendar-grid"
+                class="calendar-grid"
+            ></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ==================================================
+     JAVASCRIPT
+================================================== -->
+
+<!-- Calendar JavaScript -->
+
+<script
+    src="{% static 'calendar/calendar.js' %}"
+></script>
+
+
+<!-- Todo JavaScript -->
+
+<script
+    src="{% static 'tasks/todo.js' %}"
+></script>
+
+
+<!-- Home page JavaScript -->
+
+<script
+    src="{% static 'tasks/home.js' %}"
+></script>
+
+
 </body>
 
 </html>

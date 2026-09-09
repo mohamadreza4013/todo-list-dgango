@@ -1,0 +1,150 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <!-- Set the character encoding -->
+    <meta charset="UTF-8">
+
+    <!-- Make the page responsive on different screen sizes -->
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <!-- Set the page title -->
+    <title>خروج از حساب - تسک‌فلو</title>
+
+    <!-- Load the logout page stylesheet -->
+    <link
+        rel="stylesheet"
+        href="{% static 'accounts/logout.css' %}"
+    >
+
+</head>
+
+<body>
+
+<!-- Main logout page container -->
+
+<div class="logout-page">
+
+<div class="logout-wrapper">
+
+
+    <!-- =========================
+         Logo
+         ========================= -->
+
+    <div class="logout-logo">
+
+        <!-- Logo icon -->
+
+        <div class="logout-logo-icon">
+            ✓
+        </div>
+
+        <!-- Application name -->
+
+        <span>
+            تسک‌فلو
+        </span>
+
+    </div>
+
+
+    <!-- =========================
+         Logout Card
+         ========================= -->
+
+    <div class="logout-card">
+
+
+        <!-- Logout icon -->
+
+        <div class="logout-icon">
+            ↪
+        </div>
+
+
+        <!-- Logout Header -->
+
+        <div class="logout-header">
+
+            <!-- Page heading -->
+
+            <h1>
+                خروج از حساب
+            </h1>
+
+            <!-- Logout confirmation message -->
+
+            <p>
+                آیا مطمئن هستید که می‌خواهید از حساب کاربری خود خارج شوید؟
+            </p>
+
+        </div>
+
+
+        <!-- =========================
+             Logout Form
+             ========================= -->
+
+        <form
+            method="POST"
+            action="{% url 'logout' %}"
+        >
+
+            <!-- Protect the form against CSRF attacks -->
+
+            {% csrf_token %}
+
+
+            <!-- Logout action buttons -->
+
+            <div class="logout-actions">
+
+                <!-- Cancel logout and return to the home page -->
+
+                <a
+                    href="{% url 'home' %}"
+                    class="cancel-button"
+                >
+                    انصراف
+                </a>
+
+
+                <!-- Submit the logout request -->
+
+                <button
+                    type="submit"
+                    class="logout-button"
+                >
+                    خروج از حساب
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- =========================
+         Footer
+         ========================= -->
+
+    <div class="logout-footer">
+        مدیریت ساده و منظم وظایف با تسک‌فلو
+    </div>
+
+</div>
+
+</div>
+
+</body>
+
+</html>

@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+import jdatetime
 
 from ..models import Todo
 
@@ -7,47 +9,191 @@ from ..models import Todo
 # ==================================================
 # DASHBOARD / HOME
 # ==================================================
-
+def to_persian_digits(value):
+    return str(value).translate(
+        str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹")
+    )
+@login_required
 def home(request):
+    """
+    Display the dashboard and handle task creation.
+    """
 
-    # Handle the Add Task form submission
+    # =========================
+    # Add a new task
+    # =========================
     if request.method == "POST":
 
-        # Get form data sent by the user
         title = request.POST.get("title")
         description = request.POST.get("description")
-        start_date = request.POST.get("start_date")
 
-        # Create a new todo in the database
-        todo = Todo.objects.create(
-            title=title,
-            description=description,
-            start_date=start_date if start_date else None
+        category = request.POST.get(
+            "category",
+            "personal"
         )
 
-        # Return the newly created todo as JSON
-        # so JavaScript can add it to the page
-        # without reloading the browser
+        start_date_str = request.POST.get("start_date")
+        deadline_str = request.POST.get("deadline")
+
+
+        # =========================
+        # Validate category
+        # =========================
+
+        if category not in ["personal", "public"]:
+            category = "personal"
+
+
+        # =========================
+        # Convert Jalali start date
+        # =========================
+
+        start_date = None
+
+        if start_date_str:
+
+            try:
+
+                iso_start = start_date_str.replace("/", "-")
+
+                start_date = jdatetime.date.fromisoformat(
+                    iso_start
+                )
+
+            except ValueError:
+
+                start_date = None
+
+
+        # =========================
+        # Convert Jalali deadline
+        # =========================
+
+        deadline = None
+
+        if deadline_str:
+
+            try:
+
+                iso_deadline = deadline_str.replace("/", "-")
+
+                deadline = jdatetime.date.fromisoformat(
+                    iso_deadline
+                )
+
+            except ValueError:
+
+                deadline = None
+
+
+        # =========================
+        # Create task
+        # =========================
+
+        todo = Todo.objects.create(
+
+            user=request.user,
+
+            title=title,
+
+            description=description,
+
+            category=category,
+
+            start_date=start_date,
+
+            deadline=deadline,
+        )
+
+
+        # =========================
+        # Convert dates to Jalali
+        # =========================
+
+        start_date_jalali = (
+
+            todo.start_date.strftime("%Y/%m/%d")
+
+            if todo.start_date
+
+            else ""
+
+        )
+
+
+        deadline_jalali = (
+
+            todo.deadline.strftime("%Y/%m/%d")
+
+            if todo.deadline
+
+            else ""
+
+        )
+
+
+        created_at_jalali = (
+
+            jdatetime.datetime.fromgregorian(
+                datetime=todo.created_at
+            ).strftime("%d %b %Y")
+
+        )
+
+
+        # =========================
+        # Return JSON response
+        # =========================
+
         return JsonResponse({
+
             "success": True,
+
             "todo_id": todo.id,
+
             "title": todo.title,
+
             "description": todo.description,
-            "start_date": (
-                todo.start_date.strftime("%b %d, %Y")
-                if todo.start_date
-                else ""
-            ),
-            "created_at": todo.created_at.strftime("%b %d, %Y"),
+
+            "category": todo.category,
+
+            "start_date": start_date_jalali,
+
+            "deadline": deadline_jalali,
+
+            "created_at": created_at_jalali,
         })
 
 
-    # Get all todos from the database
-    # Newest todos appear first
-    todos = Todo.objects.all().order_by("-created_at")
+    # =========================
+    # Display dashboard
+    # =========================
+
+    # Show:
+    # 1. Personal tasks belonging to the current user
+    # 2. Public tasks belonging to all users
+
+    todos = Todo.objects.filter(
+
+        category="public"
+
+    ) | Todo.objects.filter(
+
+        category="personal",
+        user=request.user
+
+    )
 
 
-    # Calculate task statistics
+    # Keep newest tasks first
+
+    todos = todos.order_by("-created_at")
+
+
+    # =========================
+    # Statistics
+    # =========================
+
     total_tasks = todos.count()
 
     completed_tasks = todos.filter(
@@ -59,14 +205,13 @@ def home(request):
     ).count()
 
 
-    # Get the selected filter from the URL
-    # Example:
-    # /?filter=active
-    # /?filter=completed
+    # =========================
+    # Task filters
+    # =========================
+
     filter_type = request.GET.get("filter")
 
 
-    # Show only active tasks
     if filter_type == "active":
 
         todos = todos.filter(
@@ -74,7 +219,6 @@ def home(request):
         )
 
 
-    # Show only completed tasks
     elif filter_type == "completed":
 
         todos = todos.filter(
@@ -82,18 +226,57 @@ def home(request):
         )
 
 
-    # Data that will be sent to the HTML template
+    # =========================
+    # Prepare Jalali dates
+    # =========================
+
+    for todo in todos:
+
+
+        # Creation date
+
+        todo.created_at_jalali_str = (
+            jdatetime.datetime.fromgregorian(
+                datetime=todo.created_at
+            ).strftime("%Y/%m/%d")
+        )
+
+        # Start date
+
+        if todo.start_date:
+            todo.start_date_jalali_str = todo.start_date.strftime("%Y/%m/%d")
+        else:
+            todo.start_date_jalali_str = None
+
+        if todo.end_date:
+            todo.end_date_jalali_str = todo.end_date.strftime("%Y/%m/%d")
+        else:
+            todo.end_date_jalali_str = None
+
+        if todo.deadline:
+            todo.deadline_jalali_str = todo.deadline.strftime("%Y/%m/%d")
+        else:
+            todo.deadline_jalali_str = None
+
+    # =========================
+    # Template context
+    # =========================
+
     context = {
+
         "todos": todos,
+
         "filter_type": filter_type,
+
         "total_tasks": total_tasks,
+
         "completed_tasks": completed_tasks,
+
         "remaining_tasks": remaining_tasks,
+
     }
 
 
-    # Render the dashboard HTML page
-    # and pass the context data to it
     return render(
         request,
         "tasks/home.html",

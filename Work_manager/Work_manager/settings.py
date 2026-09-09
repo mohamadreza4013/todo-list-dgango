@@ -26,7 +26,9 @@ SECRET_KEY = "django-insecure-zgaw)pqqb@wwl+so5i+oggt!783$bq#e0&a!p)zs@f)lc#8&+7
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 # Application definition
 
@@ -37,7 +39,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+
     'tasks',
+    'django_jalali',
+    'mycalendar',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -75,11 +82,14 @@ WSGI_APPLICATION = "Work_manager.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "taskflow_db",
+        "USER": "taskflow_user",
+        "PASSWORD": "TaskFlow123",
+        "HOST": "localhost",
+        "PORT": "5432",
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
@@ -103,14 +113,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
-
-TIME_ZONE = "UTC"
-
+LANGUAGE_CODE = 'fa-ir'
+TIME_ZONE = 'Asia/Tehran'
 USE_I18N = True
-
+USE_L10N = True
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
@@ -118,6 +125,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 
+LOGIN_URL = '/login/'
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 

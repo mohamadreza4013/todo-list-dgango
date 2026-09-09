@@ -1,0 +1,335 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <!-- Set the character encoding -->
+    <meta charset="UTF-8">
+
+    <!-- Make the page responsive on different screen sizes -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Set the page title -->
+    <title>ثبت‌نام - تسک‌فلو</title>
+
+    <!-- Load the signup page stylesheet -->
+    <link
+        rel="stylesheet"
+        href="{% static 'accounts/signup.css' %}"
+    >
+
+</head>
+
+<body>
+
+<div class="signup-page">
+
+    <div class="signup-wrapper">
+
+
+        <!-- =========================
+             Logo
+             ========================= -->
+
+        <div class="signup-logo">
+
+            <!-- Logo icon -->
+
+            <div class="signup-logo-icon">
+                ✓
+            </div>
+
+            <!-- Application name -->
+
+            <span>
+                تسک‌فلو
+            </span>
+
+        </div>
+
+
+        <!-- =========================
+             Signup Card
+             ========================= -->
+
+        <div class="signup-card">
+
+
+            <!-- Signup Header -->
+
+            <div class="signup-header">
+
+                <!-- Page heading -->
+
+                <h1>
+                    ایجاد حساب کاربری
+                </h1>
+
+                <!-- Signup description -->
+
+                <p>
+                    برای شروع کار با تسک‌فلو حساب خود را بسازید.
+                </p>
+
+            </div>
+
+
+            <!-- =========================
+                 Signup Form
+                 ========================= -->
+
+            <form method="POST">
+
+                <!-- Protect the form against CSRF attacks -->
+
+                {% csrf_token %}
+
+
+                <!-- =========================
+                     General Form Errors
+                     ========================= -->
+
+                {% if form.non_field_errors %}
+
+                    <div class="signup-error">
+
+                        {{ form.non_field_errors }}
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- =========================
+                     Username
+                     ========================= -->
+
+                <div class="signup-form-group">
+
+                    <!-- Username field label -->
+
+                    <label
+                        for="{{ form.username.id_for_label }}"
+                        class="signup-label"
+                    >
+                        نام کاربری
+                    </label>
+
+                    <!-- Username input -->
+
+                    {{ form.username }}
+
+                    <!-- Display username validation errors -->
+
+                    {% if form.username.errors %}
+                        <div class="field-error">
+                            {{ form.username.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- =========================
+                     First Name
+                     ========================= -->
+
+                <div class="signup-form-group">
+
+                    <!-- First name field label -->
+
+                    <label
+                        for="{{ form.first_name.id_for_label }}"
+                        class="signup-label"
+                    >
+                        نام
+                    </label>
+
+                    <!-- First name input -->
+
+                    {{ form.first_name }}
+
+                    <!-- Display first name validation errors -->
+
+                    {% if form.first_name.errors %}
+                        <div class="field-error">
+                            {{ form.first_name.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- =========================
+                     Last Name
+                     ========================= -->
+
+                <div class="signup-form-group">
+
+                    <!-- Last name field label -->
+
+                    <label
+                        for="{{ form.last_name.id_for_label }}"
+                        class="signup-label"
+                    >
+                        نام خانوادگی
+                    </label>
+
+                    <!-- Last name input -->
+
+                    {{ form.last_name }}
+
+                    <!-- Display last name validation errors -->
+
+                    {% if form.last_name.errors %}
+                        <div class="field-error">
+                            {{ form.last_name.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- =========================
+                     Email
+                     ========================= -->
+
+                <div class="signup-form-group">
+
+                    <!-- Email field label -->
+
+                    <label
+                        for="{{ form.email.id_for_label }}"
+                        class="signup-label"
+                    >
+                        ایمیل
+                    </label>
+
+                    <!-- Email input -->
+
+                    {{ form.email }}
+
+                    <!-- Display email validation errors -->
+
+                    {% if form.email.errors %}
+                        <div class="field-error">
+                            {{ form.email.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- =========================
+                     Password
+                     ========================= -->
+
+                <div class="signup-form-group">
+
+                    <!-- Password field label -->
+
+                    <label
+                        for="{{ form.password1.id_for_label }}"
+                        class="signup-label"
+                    >
+                        رمز عبور
+                    </label>
+
+                    <!-- Password input -->
+
+                    {{ form.password1 }}
+
+                    <!-- Display password validation errors -->
+
+                    {% if form.password1.errors %}
+                        <div class="field-error">
+                            {{ form.password1.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- =========================
+                     Password Confirmation
+                     ========================= -->
+
+                <div class="signup-form-group">
+
+                    <!-- Password confirmation field label -->
+
+                    <label
+                        for="{{ form.password2.id_for_label }}"
+                        class="signup-label"
+                    >
+                        تکرار رمز عبور
+                    </label>
+
+                    <!-- Password confirmation input -->
+
+                    {{ form.password2 }}
+
+                    <!-- Display password confirmation errors -->
+
+                    {% if form.password2.errors %}
+                        <div class="field-error">
+                            {{ form.password2.errors }}
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                <!-- =========================
+                     Signup Button
+                     ========================= -->
+
+                <button
+                    type="submit"
+                    class="signup-button"
+                >
+                    ایجاد حساب
+                </button>
+
+            </form>
+
+
+            <!-- =========================
+                 Login Link
+                 ========================= -->
+
+            <div class="signup-login-link">
+
+                <!-- Login prompt -->
+
+                قبلاً حساب دارید؟
+
+                <!-- Link to the login page -->
+
+                <a href="{% url 'login' %}">
+                    وارد شوید
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             Footer
+             ========================= -->
+
+        <div class="signup-footer">
+            مدیریت ساده و منظم وظایف با تسک‌فلو
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

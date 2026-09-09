@@ -1,5 +1,38 @@
+
 // ==================================================
 // TODO CARD
+// ==================================================
+
+
+// ==================================================
+// FORMAT DATE
+// ==================================================
+
+function formatDate(dateString) {
+
+    if (!dateString) {
+        return '';
+    }
+
+    const date = new Date(dateString);
+
+    // Return the original string if the date is invalid
+    if (isNaN(date.getTime())) {
+        return dateString;
+    }
+
+    const options = {
+        month: 'short',
+        day: '2-digit',
+        year: 'numeric'
+    };
+
+    return date.toLocaleDateString('fa-IR', options);
+}
+
+
+// ==================================================
+// CREATE TODO CARD
 // ==================================================
 
 function createTodoCard(todo) {
@@ -11,6 +44,7 @@ function createTodoCard(todo) {
         >
 
             <!-- Complete -->
+
             <form
                 method="POST"
                 action="/todo/${todo.todo_id}/toggle/"
@@ -25,14 +59,27 @@ function createTodoCard(todo) {
 
                 <button
                     type="submit"
-                    class="complete-button"
-                    title="Mark as completed"
-                ></button>
+                    class="complete-button ${
+                        todo.completed ? 'completed' : ''
+                    }"
+                    title="${
+                        todo.completed
+                            ? 'علامت‌گذاری به‌عنوان انجام‌نشده'
+                            : 'علامت‌گذاری به‌عنوان انجام‌شده'
+                    }"
+                >
+                    ${
+                        todo.completed
+                            ? '✓'
+                            : ''
+                    }
+                </button>
 
             </form>
 
 
             <!-- Todo Content -->
+
             <div class="todo-content">
 
                 <div class="todo-title">
@@ -49,18 +96,60 @@ function createTodoCard(todo) {
                         : ""
                 }
 
+
+                <!-- Category -->
+
+                ${
+                    todo.category
+                        ? `
+                            <div class="todo-category">
+
+                                ${
+                                    todo.category === "public"
+                                        ? `
+                                            <span class="category-badge public">
+                                                عمومی
+                                            </span>
+                                        `
+                                        : `
+                                            <span class="category-badge personal">
+                                                شخصی
+                                            </span>
+                                        `
+                                }
+
+                            </div>
+                        `
+                        : ""
+                }
+
             </div>
 
 
             <!-- Todo Actions -->
+
             <div class="todo-actions">
 
-                <span class="status">
-                    Pending
+
+                <!-- Status -->
+
+                <span
+                    class="status ${
+                        todo.completed
+                            ? 'completed'
+                            : ''
+                    }"
+                >
+                    ${
+                        todo.completed
+                            ? 'انجام‌شده'
+                            : 'در انتظار'
+                    }
                 </span>
 
 
                 <!-- Important -->
+
                 <form
                     method="POST"
                     action="/todo/${todo.todo_id}/toggle-important/"
@@ -75,8 +164,16 @@ function createTodoCard(todo) {
 
                     <button
                         type="submit"
-                        class="important-button"
-                        title="Mark as important"
+                        class="important-button ${
+                            todo.important
+                                ? 'important'
+                                : ''
+                        }"
+                        title="${
+                            todo.important
+                                ? 'حذف از وظایف مهم'
+                                : 'افزودن به وظایف مهم'
+                        }"
                     >
                         ★
                     </button>
@@ -85,15 +182,17 @@ function createTodoCard(todo) {
 
 
                 <!-- Edit -->
+
                 <a
                     href="/todo/${todo.todo_id}/edit/"
                     class="edit-button"
                 >
-                    ✎ Edit
+                    ✎ ویرایش
                 </a>
 
 
                 <!-- Delete -->
+
                 <form
                     method="POST"
                     action="/todo/${todo.todo_id}/delete/"
@@ -110,16 +209,67 @@ function createTodoCard(todo) {
                         type="submit"
                         class="delete-button"
                     >
-                        🗑 Delete
+                        🗑 حذف
                     </button>
 
                 </form>
 
 
-                <!-- Date -->
-                <span class="todo-date">
-                    ${todo.created_at}
-                </span>
+                <!-- Task Dates -->
+
+                <div class="todo-dates">
+
+
+                    <!-- Task creation date -->
+
+                    <span class="todo-date">
+                        ایجاد:
+                        ${formatDate(todo.created_at)}
+                    </span>
+
+
+                    <!-- Task start date -->
+
+                    ${
+                        todo.start_date
+                            ? `
+                                <span class="todo-date">
+                                    شروع:
+                                    ${todo.start_date}
+                                </span>
+                            `
+                            : ""
+                    }
+
+
+                    <!-- Task end date -->
+
+                    ${
+                        todo.end_date
+                            ? `
+                                <span class="todo-date">
+                                    اتمام:
+                                    ${todo.end_date}
+                                </span>
+                            `
+                            : ""
+                    }
+
+
+                    <!-- Task deadline -->
+
+                    ${
+                        todo.deadline
+                            ? `
+                                <span class="todo-date">
+                                    مهلت:
+                                    ${todo.deadline}
+                                </span>
+                            `
+                            : ""
+                    }
+
+                </div>
 
             </div>
 
@@ -190,9 +340,11 @@ document.addEventListener(
 
 
                 if (!response.ok) {
+
                     throw new Error(
                         `HTTP error: ${response.status}`
                     );
+
                 }
 
 
@@ -202,20 +354,30 @@ document.addEventListener(
 
                 if (data.success) {
 
+
+                    // ==================================================
+                    // UPDATE COMPLETE BUTTON
+                    // ==================================================
+
                     button.classList.toggle(
                         "completed",
                         data.completed
                     );
 
+
                     if (data.completed) {
 
                         button.textContent = "✓";
 
-                        button.title = "Mark as active";
+                        button.title =
+                            "علامت‌گذاری به‌عنوان انجام‌نشده";
 
-                        status.textContent = "Completed";
+                        status.textContent =
+                            "انجام‌شده";
 
-                        status.classList.add("completed");
+                        status.classList.add(
+                            "completed"
+                        );
 
                     }
 
@@ -223,26 +385,92 @@ document.addEventListener(
 
                         button.textContent = "";
 
-                        button.title = "Mark as completed";
+                        button.title =
+                            "علامت‌گذاری به‌عنوان انجام‌شده";
 
-                        status.textContent = "Pending";
+                        status.textContent =
+                            "در انتظار";
 
-                        status.classList.remove("completed");
+                        status.classList.remove(
+                            "completed"
+                        );
 
                     }
 
-                    // Update Important page statistics
-                    if (
-                        window.location.pathname === "/important/"
-                    ) {
-                        updateImportantStats();
+
+                    // ==================================================
+                    // UPDATE END DATE
+                    // ==================================================
+
+                    const datesContainer =
+                        card.querySelector(
+                            ".todo-dates"
+                        );
+
+
+                    // Remove the previous completion date
+                    const oldEndDate =
+                        datesContainer.querySelector(
+                            ".end-date"
+                        );
+
+
+                    if (oldEndDate) {
+
+                        oldEndDate.remove();
+
                     }
 
-                    // Update Dashboard statistics
+
+                    // Add the completion date if the task is completed
                     if (
-                        typeof updateStats === "function"
+                        data.completed &&
+                        data.end_date
                     ) {
+
+                        const endDateElement =
+                            document.createElement(
+                                "span"
+                            );
+
+                        endDateElement.className =
+                            "todo-date end-date";
+
+                        endDateElement.textContent =
+                            `اتمام: ${data.end_date}`;
+
+                        datesContainer.appendChild(
+                            endDateElement
+                        );
+
+                    }
+
+
+                    // ==================================================
+                    // UPDATE DASHBOARD STATISTICS
+                    // ==================================================
+
+                    if (
+                        typeof updateStats ===
+                        "function"
+                    ) {
+
                         updateStats();
+
+                    }
+
+
+                    // ==================================================
+                    // UPDATE IMPORTANT PAGE STATISTICS
+                    // ==================================================
+
+                    if (
+                        window.location.pathname ===
+                        "/important/"
+                    ) {
+
+                        updateImportantStats();
+
                     }
 
                 }
@@ -261,6 +489,7 @@ document.addEventListener(
 
             return;
         }
+
 
 
         // ==================================================
@@ -310,9 +539,11 @@ document.addEventListener(
 
 
                 if (!response.ok) {
+
                     throw new Error(
                         `HTTP error: ${response.status}`
                     );
+
                 }
 
 
@@ -330,27 +561,25 @@ document.addEventListener(
 
                     button.title =
                         data.important
-                            ? "Remove from important"
-                            : "Mark as important";
+                            ? "حذف از وظایف مهم"
+                            : "افزودن به وظایف مهم";
 
 
                     /*
                         If we are on the Important page
-                        and the task is no longer important,
-                        remove it immediately.
+                        and the Task is no longer important,
+                        remove the card.
                     */
 
                     if (
                         !data.important &&
-                        window.location.pathname
-                            === "/important/"
+                        window.location.pathname ===
+                            "/important/"
                     ) {
 
                         card.remove();
 
-
                         updateImportantStats();
-
 
                         showImportantEmptyState();
 
@@ -374,6 +603,7 @@ document.addEventListener(
         }
 
 
+
         // ==================================================
         // DELETE TODO
         // ==================================================
@@ -391,12 +621,14 @@ document.addEventListener(
 
             const confirmed =
                 confirm(
-                    "Are you sure you want to delete this task?"
+                    "آیا از حذف این وظیفه مطمئن هستید؟"
                 );
 
 
             if (!confirmed) {
+
                 return;
+
             }
 
 
@@ -426,9 +658,11 @@ document.addEventListener(
 
 
                 if (!response.ok) {
+
                     throw new Error(
                         `HTTP error: ${response.status}`
                     );
+
                 }
 
 
@@ -441,9 +675,8 @@ document.addEventListener(
                     card.remove();
 
 
-                    /*
-                        Dashboard statistics
-                    */
+                    // Dashboard statistics
+
                     if (
                         typeof updateStats ===
                         "function"
@@ -454,12 +687,11 @@ document.addEventListener(
                     }
 
 
-                    /*
-                        Important page statistics
-                    */
+                    // Important page statistics
+
                     if (
-                        window.location.pathname
-                            === "/important/"
+                        window.location.pathname ===
+                        "/important/"
                     ) {
 
                         updateImportantStats();
@@ -542,23 +774,20 @@ function updateImportantStats() {
 
     if (statNumbers.length >= 3) {
 
-        /*
-            Important Tasks
-        */
+        // Important Tasks
+
         statNumbers[0].textContent =
             total;
 
 
-        /*
-            Completed
-        */
+        // Completed
+
         statNumbers[1].textContent =
             completed;
 
 
-        /*
-            Remaining
-        */
+        // Remaining
+
         statNumbers[2].textContent =
             remaining;
 
@@ -580,7 +809,9 @@ function showImportantEmptyState() {
 
 
     if (!todoList) {
+
         return;
+
     }
 
 
@@ -600,12 +831,11 @@ function showImportantEmptyState() {
                 </div>
 
                 <h3>
-                    No important tasks
+                    وظیفه مهمی وجود ندارد
                 </h3>
 
                 <p>
-                    Mark a task as important
-                    and it will appear here.
+                    یک وظیفه را مهم کنید تا اینجا نمایش داده شود.
                 </p>
 
             </div>
