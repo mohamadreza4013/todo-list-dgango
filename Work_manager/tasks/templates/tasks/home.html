@@ -66,90 +66,75 @@
 
         <!-- Main navigation -->
 
+<!-- Main navigation -->
+        
         <nav class="nav">
-
-
+        
+        
             <!-- Dashboard -->
-
+        
             <a
                 href="{% url 'home' %}"
-                class="nav-item active"
+                class="nav-item {% if not my_tasks %}active{% endif %}"
             >
-
+        
                 <span>
                     ▦
                 </span>
-
+        
                 داشبورد
-
+        
             </a>
-
-
+        
+        
             <!-- My Tasks -->
-
+        
             <a
-                href="#"
-                class="nav-item"
+                href="{% url 'home' %}?scope=my"
+                class="nav-item {% if my_tasks %}active{% endif %}"
             >
-
+        
                 <span>
                     ✓
                 </span>
-
+        
                 وظایف من
-
+        
             </a>
-
-
-            <!-- Calendar -->
-
-            <a
-                href="#"
-                class="nav-item"
-            >
-
-                <span>
-                    📅
-                </span>
-
-                تقویم
-
-            </a>
-
-
+        
+        
             <!-- Important Tasks -->
-
+        
             <a
                 href="{% url 'important_tasks' %}"
                 class="nav-item"
             >
-
+        
                 <span>
                     ★
                 </span>
-
+        
                 مهم
-
+        
             </a>
-
-
+        
+        
             <!-- Logout -->
-
+        
             <a
                 href="{% url 'logout_confirm' %}"
                 class="nav-item"
             >
-
+        
                 <span>
                     ↪
                 </span>
-
+        
                 خروج
-
+        
             </a>
-
+        
         </nav>
-
 
 
         <!-- ==================================================
@@ -442,40 +427,38 @@
         ================================================== -->
 
         <div class="task-filters">
-
-
+        
+        
             <!-- Show all tasks -->
-
+        
             <a
-                href="{% url 'home' %}"
+                href="{% url 'home' %}{% if my_tasks %}?scope=my{% endif %}"
                 class="filter-button {% if not filter_type %}active{% endif %}"
             >
                 همه
             </a>
-
-
+        
+        
             <!-- Show active tasks -->
-
+        
             <a
-                href="{% url 'home' %}?filter=active"
+                href="{% url 'home' %}?{% if my_tasks %}scope=my&{% endif %}filter=active"
                 class="filter-button {% if filter_type == 'active' %}active{% endif %}"
             >
                 در حال انجام
             </a>
-
-
+        
+        
             <!-- Show completed tasks -->
-
+        
             <a
-                href="{% url 'home' %}?filter=completed"
+                href="{% url 'home' %}?{% if my_tasks %}scope=my&{% endif %}filter=completed"
                 class="filter-button {% if filter_type == 'completed' %}active{% endif %}"
             >
                 انجام‌شده
             </a>
-
+        
         </div>
-
-
 
         <!-- ==================================================
              TODO LIST
@@ -672,16 +655,7 @@
                             {% endif %}
 
 
-                            <!-- Completion date -->
 
-                            {% if todo.end_date_jalali_str %}
-
-                                <span class="todo-date">
-                                    اتمام:
-                                    {{ todo.end_date_jalali_str }}
-                                </span>
-
-                            {% endif %}
 
 
                             <!-- Deadline -->
@@ -694,7 +668,16 @@
                                 </span>
 
                             {% endif %}
+                            <!-- Completion date -->
 
+                            {% if todo.end_date_jalali_str %}
+
+                                <span class="todo-date end-date">
+                                    اتمام:
+                                    {{ todo.end_date_jalali_str }}
+                                </span>
+
+                            {% endif %}
 
                         </div>
 

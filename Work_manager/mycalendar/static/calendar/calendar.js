@@ -1,3 +1,7 @@
+// ==================================================
+// JALALI CALENDAR
+// ==================================================
+
 // Wait until the entire HTML document has been loaded
 // before running the calendar code.
 document.addEventListener("DOMContentLoaded", function () {
@@ -82,7 +86,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==================================================
 
     // Make sure all required calendar elements exist.
-    // Stop execution if any required element is missing.
     if (
         !modal ||
         !monthTitle ||
@@ -108,15 +111,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const today =
         getTodayJalali();
 
-    // Set the initially displayed year to the current Jalali year.
+    // Set the initially displayed Jalali year.
     let currentYear =
         today.year;
 
-    // Set the initially displayed month to the current Jalali month.
+    // Set the initially displayed Jalali month.
     let currentMonth =
         today.month;
 
-    // Store the input element currently using the calendar.
+    // Store the input currently connected to the calendar.
     let targetInput =
         null;
 
@@ -125,8 +128,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // PUBLIC API
     // ==================================================
 
-    // Expose public functions through the global MyCalendar object.
-    // Other JavaScript files can use these functions.
+    // Expose calendar functions globally.
     window.MyCalendar = {
 
         // Open the calendar for a specific input.
@@ -134,7 +136,7 @@ document.addEventListener("DOMContentLoaded", function () {
             openCalendar(input);
         },
 
-        // Close the currently opened calendar.
+        // Close the calendar.
         close: function () {
             closeCalendar();
         }
@@ -146,97 +148,60 @@ document.addEventListener("DOMContentLoaded", function () {
     // OPEN CALENDAR
     // ==================================================
 
-    // Open the calendar picker for the given input element.
     function openCalendar(input) {
 
-        // Do nothing if no input element was provided.
         if (!input) {
             return;
         }
 
-
-        // Store the input that will receive the selected date.
+        // Store the input that opened the calendar.
         targetInput = input;
 
+        // Get the current value from the input.
+        let value = input.value.trim();
 
-        // If the input already contains a date,
-        // open the calendar on that date's month.
-        const parts =
-            input.value.trim().split("/");
+        // Convert Persian digits to English digits.
+        value = persianToEnglishDigits(value);
 
+        // Support both "/" and "-" separators.
+        value = value.replace(/-/g, "/");
 
-        // Check whether the input contains
-        // three valid numeric date components.
-        if (
-            parts.length === 3 &&
-            isValidNumber(parts[0]) &&
-            isValidNumber(parts[1]) &&
-            isValidNumber(parts[2])
-        ) {
+        // Try to parse the existing date.
+        const selectedDate =
+            parseDateFromInput(value);
 
-            // Convert the year string to a number.
-            const year =
-                Number(parts[0]);
+        if (selectedDate) {
 
-            // Convert the month string to a number.
-            const month =
-                Number(parts[1]);
+            // Open calendar on the existing date.
+            currentYear =
+                selectedDate.year;
 
-            // Convert the day string to a number.
-            const day =
-                Number(parts[2]);
+            currentMonth =
+                selectedDate.month;
 
+        } else {
 
-            // Check whether the complete Jalali date is valid.
-            if (
-                isValidJalaaliDate(
-                    year,
-                    month,
-                    day
-                )
-            ) {
-
-                // Display the selected date's year.
-                currentYear =
-                    year;
-
-                // Display the selected date's month.
-                currentMonth =
-                    month;
-
-            }
-
-        }
-        else {
-
-            // If no valid date exists in the input,
-            // open the current Jalali year.
+            // If there is no valid date,
+            // open the current month.
             currentYear =
                 today.year;
 
-            // Open the current Jalali month.
             currentMonth =
                 today.month;
 
         }
 
-
-        // Render the calendar using the selected/current month.
+        // Render calendar.
         renderCalendar();
 
-
-        // Make the modal visible.
+        // Show modal.
         modal.hidden = false;
 
-
-        // Add a class to the body while the calendar is open.
+        // Add class to body.
         document.body.classList.add(
             "calendar-open"
         );
-
     }
-
-
     // ==================================================
     // CLOSE CALENDAR
     // ==================================================
@@ -244,13 +209,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // Close the calendar picker.
     function closeCalendar() {
 
-        // Hide the calendar modal.
+        // Hide the modal.
         modal.hidden = true;
 
-        // Remove the reference to the selected input.
+        // Remove the target input reference.
         targetInput = null;
 
-        // Remove the calendar-open class from the body.
+        // Remove calendar-open class.
         document.body.classList.remove(
             "calendar-open"
         );
@@ -262,33 +227,33 @@ document.addEventListener("DOMContentLoaded", function () {
     // WEEKDAYS
     // ==================================================
 
-    // Render the names of the weekdays.
+    // Render weekday names.
     function renderWeekdays() {
 
-        // Clear the existing weekday elements.
+        // Clear existing weekdays.
         weekdaysElement.innerHTML = "";
 
 
-        // Create one element for each weekday.
+        // Create weekday elements.
         WEEKDAYS.forEach(
             function (day) {
 
-                // Create a new div for the weekday.
+                // Create weekday element.
                 const element =
                     document.createElement("div");
 
 
-                // Assign the weekday CSS class.
+                // Add CSS class.
                 element.className =
                     "weekday";
 
 
-                // Set the displayed weekday name.
+                // Set weekday text.
                 element.textContent =
                     day;
 
 
-                // Add the weekday element to the container.
+                // Add element to calendar.
                 weekdaysElement.appendChild(
                     element
                 );
@@ -300,23 +265,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ==================================================
-    // CALENDAR
+    // RENDER CALENDAR
     // ==================================================
 
-    // Generate the calendar days for the current month.
+    // Generate the calendar for the current month.
     function renderCalendar() {
 
-        // Display the current Jalali month and year.
+        // Display month name and year.
         monthTitle.textContent =
-            `${MONTH_NAMES[currentMonth - 1]} ${currentYear}`;
+            `${MONTH_NAMES[currentMonth - 1]} ${toPersianDigits(currentYear)}`;
 
 
-        // Clear the previous calendar days.
+        // Clear existing calendar days.
         calendarGrid.innerHTML =
             "";
 
 
-        // Calculate the weekday on which the month starts.
+        // Calculate the weekday of the first day.
         const firstWeekday =
             getFirstWeekday(
                 currentYear,
@@ -324,7 +289,7 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
 
-        // Calculate the number of days in the current month.
+        // Calculate the number of days in the month.
         const daysInMonth =
             jalaaliMonthLength(
                 currentYear,
@@ -336,25 +301,24 @@ document.addEventListener("DOMContentLoaded", function () {
         // EMPTY CELLS
         // --------------------------------------------------
 
-        // Add empty cells before the first day of the month.
-        // These cells align the first day with the correct weekday.
+        // Add empty cells before the first day.
         for (
             let i = 0;
             i < firstWeekday;
             i++
         ) {
 
-            // Create an empty calendar cell.
+            // Create empty cell.
             const emptyCell =
                 document.createElement("div");
 
 
-            // Assign the calendar-day and empty CSS classes.
+            // Assign classes.
             emptyCell.className =
                 "calendar-day empty";
 
 
-            // Add the empty cell to the calendar grid.
+            // Add to calendar.
             calendarGrid.appendChild(
                 emptyCell
             );
@@ -366,34 +330,37 @@ document.addEventListener("DOMContentLoaded", function () {
         // DAYS
         // --------------------------------------------------
 
-        // Create all days of the current Jalali month.
+        // Create each day of the month.
         for (
             let day = 1;
             day <= daysInMonth;
             day++
         ) {
 
-            // Create a button for the day.
+            // Create day button.
             const button =
                 document.createElement("button");
 
 
-            // Prevent the button from submitting a form.
+            // Prevent form submission.
             button.type =
                 "button";
 
 
-            // Assign the calendar-day CSS class.
+            // Assign CSS class.
             button.className =
                 "calendar-day";
 
 
-            // Display the day number.
+            // Display Persian day number.
             button.textContent =
-                day;
+                toPersianDigits(day);
 
 
-            // Today
+            // --------------------------------------------------
+            // TODAY
+            // --------------------------------------------------
+
             // Highlight today's date.
             if (
                 day === today.day &&
@@ -408,28 +375,43 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
 
-            // Selected value
-            // Highlight the date currently stored in the input.
+            // --------------------------------------------------
+            // SELECTED DATE
+            // --------------------------------------------------
+
+            /*
+                Check whether this day is the date currently
+                stored in the input.
+
+                Example input:
+
+                ۱۴۰۵/۰۶/۱۸
+
+                It is converted to:
+
+                1405/06/18
+            */
+
             if (
                 targetInput &&
                 targetInput.value
             ) {
 
-                // Split the stored date into year, month, and day.
-                const selectedParts =
-                    targetInput.value.split("/");
+                const selectedDate =
+                    parseDateFromInput(
+                        targetInput.value
+                    );
 
 
-                // Check whether the current day matches
-                // the selected date.
+                // If the input contains a valid date,
+                // compare it with the current calendar day.
                 if (
-                    selectedParts.length === 3 &&
-                    Number(selectedParts[0]) === currentYear &&
-                    Number(selectedParts[1]) === currentMonth &&
-                    Number(selectedParts[2]) === day
+                    selectedDate &&
+                    selectedDate.year === currentYear &&
+                    selectedDate.month === currentMonth &&
+                    selectedDate.day === day
                 ) {
 
-                    // Add the selected CSS class.
                     button.classList.add(
                         "selected"
                     );
@@ -439,13 +421,15 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
 
-            // Add a click event to select this date.
+            // --------------------------------------------------
+            // SELECT DAY
+            // --------------------------------------------------
+
+            // Select this date when clicked.
             button.addEventListener(
                 "click",
                 function () {
 
-                    // Send the selected year, month, and day
-                    // to the date selection function.
                     selectDate(
                         currentYear,
                         currentMonth,
@@ -456,7 +440,7 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
 
-            // Add the day button to the calendar grid.
+            // Add button to calendar.
             calendarGrid.appendChild(
                 button
             );
@@ -470,30 +454,31 @@ document.addEventListener("DOMContentLoaded", function () {
     // SELECT DATE
     // ==================================================
 
-    // Store the selected Jalali date in the target input.
     function selectDate(
         year,
         month,
         day
     ) {
 
-        // Do nothing if there is no target input.
         if (!targetInput) {
             return;
         }
 
-
-        // Build the date string in YYYY/MM/DD format.
-        const value =
+        // Build English date.
+        const englishValue =
             `${year}/${pad(month)}/${pad(day)}`;
 
+        // Convert to Persian digits.
+        const persianValue =
+            toPersianDigits(
+                englishValue
+            );
 
-        // Put the selected date into the input field.
+        // Put selected date into input.
         targetInput.value =
-            value;
+            persianValue;
 
-
-        // Notify other JavaScript code that the input changed.
+        // Notify other JavaScript code.
         targetInput.dispatchEvent(
             new Event(
                 "change",
@@ -503,28 +488,23 @@ document.addEventListener("DOMContentLoaded", function () {
             )
         );
 
-
-        // Close the calendar after selecting a date.
+        // Close calendar.
         closeCalendar();
-
     }
-
 
     // ==================================================
     // PREVIOUS MONTH
     // ==================================================
 
-    // Handle the previous-month button.
+    // Move to previous month.
     previousMonthButton.addEventListener(
         "click",
         function () {
 
-            // Move one month backward.
             currentMonth--;
 
 
-            // If the current month becomes smaller than 1,
-            // move to Esfand of the previous year.
+            // Move to previous year if necessary.
             if (
                 currentMonth < 1
             ) {
@@ -537,7 +517,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
 
-            // Re-render the calendar.
+            // Re-render calendar.
             renderCalendar();
 
         }
@@ -548,17 +528,15 @@ document.addEventListener("DOMContentLoaded", function () {
     // NEXT MONTH
     // ==================================================
 
-    // Handle the next-month button.
+    // Move to next month.
     nextMonthButton.addEventListener(
         "click",
         function () {
 
-            // Move one month forward.
             currentMonth++;
 
 
-            // If the current month becomes larger than 12,
-            // move to Farvardin of the next year.
+            // Move to next year if necessary.
             if (
                 currentMonth > 12
             ) {
@@ -571,7 +549,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
 
-            // Re-render the calendar.
+            // Re-render calendar.
             renderCalendar();
 
         }
@@ -579,10 +557,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ==================================================
-    // CLOSE
+    // CLOSE BUTTON
     // ==================================================
 
-    // Add a click handler to the close button if it exists.
+    // Close the calendar when close button is clicked.
     if (closeButton) {
 
         closeButton.addEventListener(
@@ -593,7 +571,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // Close the calendar when the overlay is clicked.
+    // ==================================================
+    // OVERLAY
+    // ==================================================
+
+    // Close the calendar when overlay is clicked.
     if (overlay) {
 
         overlay.addEventListener(
@@ -608,13 +590,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // ESC KEY
     // ==================================================
 
-    // Listen for keyboard events.
+    // Close the calendar with Escape.
     document.addEventListener(
         "keydown",
         function (event) {
 
-            // Close the calendar when Escape is pressed
-            // while the modal is visible.
             if (
                 event.key === "Escape" &&
                 !modal.hidden
@@ -629,10 +609,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ==================================================
-    // CONNECT INPUTS
+    // CONNECT DATE INPUTS
     // ==================================================
 
-    // Find all inputs that use the Jalali date picker.
+    // Find all Jalali date inputs.
     document
         .querySelectorAll(
             ".jalali-date-input"
@@ -640,12 +620,11 @@ document.addEventListener("DOMContentLoaded", function () {
         .forEach(
             function (input) {
 
-                // Open the calendar when the input is clicked.
+                // Open calendar when input is clicked.
                 input.addEventListener(
                     "click",
                     function () {
 
-                        // Open the calendar for this input.
                         openCalendar(
                             this
                         );
@@ -658,13 +637,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ==================================================
-    // TODAY
+    // GET TODAY JALALI
     // ==================================================
 
-    // Get today's date using the browser's Persian calendar.
+    // Get today's date in Jalali calendar.
     function getTodayJalali() {
 
-        // Create a formatter that uses the Persian calendar.
+        // Create Persian calendar formatter.
         const formatter =
             new Intl.DateTimeFormat(
                 "en-US-u-ca-persian",
@@ -676,41 +655,49 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
 
-        // Convert the current Gregorian date
-        // into Persian calendar date parts.
+        // Convert current Gregorian date
+        // to Persian calendar parts.
         const parts =
             formatter.formatToParts(
                 new Date()
             );
 
 
-        // Return the extracted Jalali year, month, and day.
-        return {
-
-            // Extract the Jalali year.
-            year: Number(
+        // Extract year.
+        const year =
+            Number(
                 parts.find(
                     part =>
                         part.type === "year"
                 ).value
-            ),
+            );
 
-            // Extract the Jalali month.
-            month: Number(
+
+        // Extract month.
+        const month =
+            Number(
                 parts.find(
                     part =>
                         part.type === "month"
                 ).value
-            ),
+            );
 
-            // Extract the Jalali day.
-            day: Number(
+
+        // Extract day.
+        const day =
+            Number(
                 parts.find(
                     part =>
                         part.type === "day"
                 ).value
-            )
+            );
 
+
+        // Return Jalali date.
+        return {
+            year: year,
+            month: month,
+            day: day
         };
 
     }
@@ -720,8 +707,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // JALAALI CALENDAR BREAKS
     // ==================================================
 
-    // Define the year break points used by the
-    // Borkowski Jalali calendar calculation.
+    // Define the Jalali calendar break points.
     const JALAALI_BREAKS = [
         -61,
         9,
@@ -746,11 +732,11 @@ document.addEventListener("DOMContentLoaded", function () {
     ];
 
 
-// ==================================================
-// INTEGER DIVISION
-// ==================================================
+    // ==================================================
+    // INTEGER DIVISION
+    // ==================================================
 
-// Perform integer division by truncating toward zero.
+    // Perform integer division.
     function div(
         a,
         b
@@ -767,7 +753,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // MODULO
     // ==================================================
 
-    // Calculate the mathematical modulo value.
+    // Calculate mathematical modulo.
     function mod(
         a,
         b
@@ -782,37 +768,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ==================================================
-    // JALAALI CALENDAR CALCULATION
+    // JALAALI CALCULATION
     // ==================================================
 
-    // Calculate important Jalali calendar information
-    // for a given Jalali year.
+    // Calculate Jalali calendar information.
     function jalCal(
         jy,
         withoutLeap
     ) {
 
-        // Use the predefined Jalali year break points.
         const breaks =
             JALAALI_BREAKS;
 
-        // Get the number of break points.
         const bl =
             breaks.length;
 
-        // Convert the Jalali year to an approximate Gregorian year.
         let gy =
             jy + 621;
 
-        // Initial number of Jalali leap years.
         let leapJ =
             -14;
 
-        // Start from the first break point.
         let jp =
             breaks[0];
 
-        // Variables used during calendar calculations.
         let jm;
 
         let jump;
@@ -826,7 +805,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let n;
 
 
-        // Validate the supported Jalali year range.
+        // Validate Jalali year.
         if (
             jy < breaks[0] ||
             jy >= breaks[bl - 1]
@@ -839,24 +818,20 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // Find the calendar cycle containing the requested year.
+        // Find the current calendar cycle.
         for (
             let i = 1;
             i < bl;
             i++
         ) {
 
-            // Get the current break point.
             jm =
                 breaks[i];
 
-            // Calculate the distance between break points.
             jump =
                 jm - jp;
 
 
-            // Stop when the requested year
-            // is before the current break point.
             if (
                 jy < jm
             ) {
@@ -866,8 +841,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
 
-            // Add the leap-year information
-            // for the completed cycle.
             leapJ +=
                 div(
                     jump,
@@ -883,21 +856,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 );
 
 
-            // Move to the current break point.
             jp =
                 jm;
 
         }
 
 
-        // Calculate the number of years
-        // since the beginning of the current cycle.
+        // Number of years since the current break.
         n =
             jy - jp;
 
 
-        // Calculate additional leap years
-        // inside the current cycle.
+        // Calculate additional leap years.
         leapJ +=
             div(
                 n,
@@ -913,8 +883,7 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
 
-        // Handle the special leap-year case
-        // defined by the Borkowski algorithm.
+        // Special leap-year case.
         if (
             mod(
                 jump,
@@ -928,7 +897,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // Calculate the number of Gregorian leap years.
+        // Calculate Gregorian leap years.
         leapG =
             div(
                 gy,
@@ -948,16 +917,14 @@ document.addEventListener("DOMContentLoaded", function () {
             150;
 
 
-        // Calculate the Gregorian day of March
-        // on which Farvardin 1 begins.
+        // Calculate the Gregorian March day.
         march =
             20 +
             leapJ -
             leapG;
 
 
-        // Return only the Gregorian year and March day
-        // when leap-year information is not required.
+        // Return basic calendar information.
         if (
             withoutLeap
         ) {
@@ -970,7 +937,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // Calculate the position of the leap year.
+        // Calculate leap position.
         n =
             jy - breaks[0];
 
@@ -985,7 +952,7 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
 
-        // Convert -1 to 4 for the leap-year calculation.
+        // Convert -1 to 4.
         if (
             leap === -1
         ) {
@@ -996,7 +963,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // Return the complete calendar calculation.
+        // Return complete information.
         return {
             leap: leap,
             gy: gy,
@@ -1010,15 +977,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // JALAALI -> JULIAN DAY
     // ==================================================
 
-    // Convert a Jalali date into a Julian Day Number.
+    // Convert Jalali date to Julian Day Number.
     function j2d(
         jy,
         jm,
         jd
     ) {
 
-        // Calculate the Gregorian year and
-        // Farvardin 1 date for the Jalali year.
         const calendar =
             jalCal(
                 jy,
@@ -1026,7 +991,6 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
 
-        // Calculate the Julian Day Number.
         return (
             g2d(
                 calendar.gy,
@@ -1057,15 +1021,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // GREGORIAN -> JULIAN DAY
     // ==================================================
 
-    // Convert a Gregorian date into a Julian Day Number.
+    // Convert Gregorian date to Julian Day Number.
     function g2d(
         gy,
         gm,
         gd
     ) {
 
-        // Calculate the Julian Day Number
-        // using the Gregorian calendar formula.
         let d =
             div(
                 (
@@ -1092,7 +1054,6 @@ document.addEventListener("DOMContentLoaded", function () {
             34840408;
 
 
-        // Apply the Gregorian century correction.
         d =
             d -
             div(
@@ -1111,7 +1072,6 @@ document.addEventListener("DOMContentLoaded", function () {
             752;
 
 
-        // Return the calculated Julian Day Number.
         return d;
 
     }
@@ -1121,20 +1081,16 @@ document.addEventListener("DOMContentLoaded", function () {
     // JULIAN DAY -> GREGORIAN
     // ==================================================
 
-    // Convert a Julian Day Number back into
-    // a Gregorian year, month, and day.
+    // Convert Julian Day Number to Gregorian date.
     function d2g(
         jdn
     ) {
 
-        // Convert the Julian Day Number
-        // into the intermediate value used by the algorithm.
         let j =
             4 * jdn +
             139361631;
 
 
-        // Apply the Gregorian calendar correction.
         j =
             j +
             div(
@@ -1149,7 +1105,6 @@ document.addEventListener("DOMContentLoaded", function () {
             3908;
 
 
-        // Calculate the intermediate month/day value.
         const i =
             div(
                 mod(
@@ -1162,7 +1117,6 @@ document.addEventListener("DOMContentLoaded", function () {
             308;
 
 
-        // Calculate the Gregorian day.
         const gd =
             div(
                 mod(
@@ -1175,7 +1129,6 @@ document.addEventListener("DOMContentLoaded", function () {
             1;
 
 
-        // Calculate the Gregorian month.
         const gm =
             mod(
                 div(
@@ -1188,7 +1141,6 @@ document.addEventListener("DOMContentLoaded", function () {
             1;
 
 
-        // Calculate the Gregorian year.
         const gy =
             div(
                 j,
@@ -1203,15 +1155,10 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
 
-        // Return the Gregorian date.
         return {
-
             gy: gy,
-
             gm: gm,
-
             gd: gd
-
         };
 
     }
@@ -1221,17 +1168,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // JALAALI -> GREGORIAN
     // ==================================================
 
-    // Convert a Jalali date directly into
-    // a Gregorian date object.
+    // Convert Jalali date to Gregorian date.
     function jalaaliToGregorian(
         jy,
         jm,
         jd
     ) {
 
-        // First convert the Jalali date
-        // to a Julian Day Number,
-        // then convert that value to Gregorian.
         return d2g(
             j2d(
                 jy,
@@ -1247,14 +1190,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // FIRST WEEKDAY
     // ==================================================
 
-    // Calculate the weekday on which a Jalali month starts.
+    // Calculate the weekday of the first day of a Jalali month.
     function getFirstWeekday(
         jy,
         jm
     ) {
 
-        // Convert the first day of the Jalali month
-        // into a Gregorian date.
         const gregorian =
             jalaaliToGregorian(
                 jy,
@@ -1263,8 +1204,6 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
 
-        // Create a UTC JavaScript Date object
-        // from the converted Gregorian date.
         const date =
             new Date(
                 Date.UTC(
@@ -1276,20 +1215,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         /*
-        JavaScript:
-            Sunday = 0
-            Monday = 1
-            ...
-            Saturday = 6
+            JavaScript:
+                Sunday = 0
+                Monday = 1
+                ...
+                Saturday = 6
 
-        Calendar:
-            Saturday = 0
-            Sunday   = 1
-            ...
-            Friday   = 6
-
-        The formula below shifts the JavaScript
-        weekday numbering so Saturday becomes 0.
+            Calendar:
+                Saturday = 0
+                Sunday   = 1
+                ...
+                Friday   = 6
         */
 
         return (
@@ -1303,13 +1239,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // LEAP YEAR
     // ==================================================
 
-    // Determine whether the given Jalali year is a leap year.
+    // Determine whether a Jalali year is a leap year.
     function isLeapJalaaliYear(
         jy
     ) {
 
-        // Calculate the calendar information
-        // for the requested Jalali year.
         const calendar =
             jalCal(
                 jy,
@@ -1317,8 +1251,6 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
 
-        // A leap value of zero means
-        // the Jalali year contains 30 days in Esfand.
         return (
             calendar.leap === 0
         );
@@ -1336,7 +1268,7 @@ document.addEventListener("DOMContentLoaded", function () {
         jm
     ) {
 
-        // The first six Jalali months have 31 days.
+        // First six months have 31 days.
         if (
             jm >= 1 &&
             jm <= 6
@@ -1358,8 +1290,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // Esfand has either 29 or 30 days,
-        // depending on whether the year is a leap year.
+        // Esfand has 29 or 30 days.
         return isLeapJalaaliYear(
             jy
         )
@@ -1370,7 +1301,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ==================================================
-    // VALIDATION
+    // DATE VALIDATION
     // ==================================================
 
     // Validate a complete Jalali date.
@@ -1380,7 +1311,7 @@ document.addEventListener("DOMContentLoaded", function () {
         jd
     ) {
 
-        // Make sure year, month, and day are integers.
+        // Make sure all values are integers.
         if (
             !Number.isInteger(jy) ||
             !Number.isInteger(jm) ||
@@ -1392,7 +1323,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // Make sure the month is between 1 and 12.
+        // Make sure month is between 1 and 12.
         if (
             jm < 1 ||
             jm > 12
@@ -1403,8 +1334,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // Make sure the day is inside the valid
-        // range of the specified Jalali month.
+        // Make sure day is valid for the month.
         return (
             jd >= 1 &&
             jd <=
@@ -1418,19 +1348,166 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ==================================================
+    // PERSIAN -> ENGLISH DIGITS
+    // ==================================================
+
+    // Convert Persian digits to English digits.
+    function persianToEnglishDigits(
+        value
+    ) {
+
+        if (
+            value === null ||
+            value === undefined
+        ) {
+
+            return value;
+
+        }
+
+
+        return String(value).replace(
+            /[۰-۹]/g,
+            function (digit) {
+
+                return String(
+                    "۰۱۲۳۴۵۶۷۸۹".indexOf(
+                        digit
+                    )
+                );
+
+            }
+        );
+
+    }
+
+
+    // ==================================================
+    // ENGLISH -> PERSIAN DIGITS
+    // ==================================================
+
+    // Convert English digits to Persian digits.
+    function toPersianDigits(
+        value
+    ) {
+
+        if (
+            value === null ||
+            value === undefined
+        ) {
+
+            return value;
+
+        }
+
+
+        return String(value).replace(
+            /\d/g,
+            function (digit) {
+
+                return "۰۱۲۳۴۵۶۷۸۹"[digit];
+
+            }
+        );
+
+    }
+
+
+    // ==================================================
+    // PARSE DATE FROM INPUT
+    // ==================================================
+
+    // Read and parse a Jalali date from an input.
+
+    function parseDateFromInput(value) {
+
+        if (!value) {
+            return null;
+        }
+
+        // Convert Persian digits to English.
+        let englishValue =
+            persianToEnglishDigits(value);
+
+        // Support both "/" and "-" separators.
+        englishValue =
+            englishValue.replace(/-/g, "/");
+
+        // Remove extra spaces.
+        englishValue =
+            englishValue.trim();
+
+        // Split date.
+        const parts =
+            englishValue.split("/");
+
+        if (parts.length !== 3) {
+            return null;
+        }
+
+        const year =
+            Number(parts[0]);
+
+        const month =
+            Number(parts[1]);
+
+        const day =
+            Number(parts[2]);
+
+        if (
+            !Number.isInteger(year) ||
+            !Number.isInteger(month) ||
+            !Number.isInteger(day)
+        ) {
+            return null;
+        }
+
+        if (
+            !isValidJalaaliDate(
+                year,
+                month,
+                day
+            )
+        ) {
+            return null;
+        }
+
+        return {
+            year: year,
+            month: month,
+            day: day
+        };
+    }
+    // ==================================================
     // NUMBER VALIDATION
     // ==================================================
 
-    // Check whether a value is a valid numeric value.
+    // Check whether a value represents a valid number.
     function isValidNumber(
         value
     ) {
 
-        return (
-            value !== "" &&
-            !Number.isNaN(
-                Number(value)
-            )
+        if (
+            value === null ||
+            value === undefined ||
+            String(value).trim() === ""
+        ) {
+
+            return false;
+
+        }
+
+
+        // Convert Persian digits first.
+        const englishValue =
+            persianToEnglishDigits(
+                value
+            );
+
+
+        // Check numeric validity.
+        return !Number.isNaN(
+            Number(englishValue)
         );
 
     }
@@ -1459,7 +1536,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // INITIALIZE
     // ==================================================
 
-    // Render the weekday names when the calendar is initialized.
+    // Render weekday names.
     renderWeekdays();
 
 });

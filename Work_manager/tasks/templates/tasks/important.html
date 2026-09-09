@@ -1,575 +1,675 @@
-
 {% load static %}
 
 <!DOCTYPE html>
-
 <html lang="fa" dir="rtl">
 
 <head>
-    
-<!-- Page character encoding -->
-<meta charset="UTF-8">
 
-<!-- Make the page responsive on different screen sizes -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
 
-<!-- Page title -->
-<title>وظایف مهم - تسک‌فلو</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<!-- Main project CSS file -->
-<link rel="stylesheet" href="{% static 'tasks/style.css' %}">
+    <title>TaskFlow | وظایف مهم</title>
 
+    <!-- TaskFlow CSS -->
+
+    <link
+        rel="stylesheet"
+        href="{% static 'tasks/style.css' %}"
+    >
 
 </head>
+
 
 <body>
 
 <div class="app">
 
-<!-- =========================
-     Sidebar
-     ========================= -->
 
-<aside class="sidebar">
+    <!-- ==================================================
+         SIDEBAR
+    ================================================== -->
+
+    <aside class="sidebar">
 
 
-    <!-- Application logo -->
-    <div class="logo">
+        <!-- Logo -->
 
-        <div class="logo-icon">
-            ✓
+        <div class="logo">
+
+            <div class="logo-icon">
+                ✓
+            </div>
+
+            <span>
+                تسک‌فلو
+            </span>
+
         </div>
 
-        <span>
-            تسک‌فلو
-        </span>
 
-    </div>
+        <!-- Workspace navigation title -->
 
-
-    <!-- Sidebar section title -->
-    <div class="nav-title">
-        فضای کاری
-    </div>
+        <div class="nav-title">
+            فضای کاری
+        </div>
 
 
-    <!-- Main navigation -->
-    <nav class="nav">
+        <!-- Main navigation -->
+
+        <nav class="nav">
 
 
-        <!-- Dashboard -->
-        <a
-            href="{% url 'home' %}"
-            class="nav-item {% if page == 'dashboard' %}active{% endif %}"
-        >
+            <!-- Dashboard -->
 
-            <span>
-                ▦
-            </span>
-
-            داشبورد
-
-        </a>
-
-
-        <!-- My Tasks -->
-        <a
-            href="#"
-            class="nav-item"
-        >
-
-            <span>
-                ✓
-            </span>
-
-            وظایف من
-
-        </a>
-
-
-        <!-- Important Tasks -->
-        <a
-            href="{% url 'important_tasks' %}"
-            class="nav-item {% if page == 'important' %}active{% endif %}"
-        >
-
-            <span>
-                ★
-            </span>
-
-            مهم
-
-        </a>
-
-    </nav>
-
-
-    <!-- =========================
-         Sidebar Bottom Section
-         ========================= -->
-
-    <div class="sidebar-bottom">
-
-
-        <!-- Bottom navigation -->
-        <div class="nav">
-
-            <!-- Settings -->
             <a
-                href="#"
+                href="{% url 'home' %}"
                 class="nav-item"
             >
 
                 <span>
-                    ⚙
+                    ▦
                 </span>
 
-                تنظیمات
+                داشبورد
 
             </a>
 
-        </div>
 
+            <!-- My Tasks -->
 
-        <!-- =========================
-             User Profile
-             ========================= -->
+            <a
+                href="{% url 'home' %}?scope=my"
+                class="nav-item"
+            >
 
-        <div class="profile">
-
-
-            <!-- User avatar -->
-            <div class="avatar">
-                MR
-            </div>
-
-
-            <!-- User information -->
-            <div class="profile-info">
-
-                <span class="profile-name">
-                    محمدرضا
-                </span>
-
-                <span class="profile-email">
-                    حساب کاربری
-                </span>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</aside>
-
-
-
-<!-- =========================
-     Main Content
-     ========================= -->
-
-<main class="main">
-
-
-    <!-- =========================
-         Page Header
-         ========================= -->
-
-    <div class="topbar">
-
-        <div class="welcome">
-
-            <!-- Page title -->
-            <h1>
-                وظایف مهم ⭐
-            </h1>
-
-
-            <!-- Short page description -->
-            <p>
-                وظایفی که به عنوان مهم علامت‌گذاری کرده‌اید.
-            </p>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- =========================
-         Statistics
-         ========================= -->
-
-    <section class="stats">
-
-
-        <!-- =========================
-             Important Tasks Count
-             ========================= -->
-
-        <div class="stat-card">
-
-            <div class="stat-header">
-
-                <span class="stat-title">
-                    وظایف مهم
-                </span>
-
-                <div class="stat-icon">
-                    ★
-                </div>
-
-            </div>
-
-
-            <!--
-                Number of important tasks
-
-                The todos variable is passed
-                from the important_tasks view.
-            -->
-            <div class="stat-number">
-                {{ todos|length }}
-            </div>
-
-        </div>
-
-
-
-        <!-- =========================
-             Completed Tasks Count
-             ========================= -->
-
-        <div class="stat-card">
-
-            <div class="stat-header">
-
-                <span class="stat-title">
-                    انجام‌شده
-                </span>
-
-                <div class="stat-icon">
+                <span>
                     ✓
-                </div>
-
-            </div>
-
-
-            <!-- Number of completed important tasks -->
-            <div class="stat-number">
-                {{ completed_tasks }}
-            </div>
-
-        </div>
-
-
-
-        <!-- =========================
-             Remaining Tasks Count
-             ========================= -->
-
-        <div class="stat-card">
-
-            <div class="stat-header">
-
-                <span class="stat-title">
-                    باقی‌مانده
                 </span>
 
-                <div class="stat-icon">
-                    ○
-                </div>
+                وظایف من
+
+            </a>
+
+
+            <!-- Important Tasks -->
+
+            <a
+                href="{% url 'important_tasks' %}"
+                class="nav-item active"
+            >
+
+                <span>
+                    ★
+                </span>
+
+                مهم
+
+            </a>
+
+
+            <!-- Logout -->
+
+            <a
+                href="{% url 'logout_confirm' %}"
+                class="nav-item"
+            >
+
+                <span>
+                    ↪
+                </span>
+
+                خروج
+
+            </a>
+
+        </nav>
+
+
+        <!-- ==================================================
+             SIDEBAR BOTTOM
+        ================================================== -->
+
+        <div class="sidebar-bottom">
+
+
+            <div class="nav">
+
+
+                <!-- Settings -->
+
+                <a
+                    href="#"
+                    class="nav-item"
+                >
+
+                    <span>
+                        ⚙
+                    </span>
+
+                    تنظیمات
+
+                </a>
 
             </div>
 
 
-            <!-- Number of remaining important tasks -->
-            <div class="stat-number">
-                {{ remaining_tasks }}
-            </div>
+            <!-- User profile -->
 
-        </div>
-
-    </section>
+            <div class="profile">
 
 
+                <div class="avatar">
 
-    <!-- =========================
-         Task List Header
-         ========================= -->
+                    {% if user.first_name and user.last_name %}
 
-    <div class="tasks-header">
+                        {{ user.first_name|first }}{{ user.last_name|first }}
 
-        <h2>
-            وظایف مهم
-        </h2>
+                    {% elif user.first_name %}
 
-    </div>
+                        {{ user.first_name|first }}
 
+                    {% else %}
 
-
-    <!-- =========================
-         Important Tasks List
-         ========================= -->
-
-    <section class="todo-list">
-
-
-        <!--
-            Iterate through all important tasks
-            received from the Django view
-        -->
-        {% for todo in todos %}
-
-
-            <!-- Task card -->
-            <div class="todo-card"
-                 data-todo-id="{{ todo.id }}"
-                >
-
-
-                <!-- =========================
-                     Toggle Task Completion
-                     ========================= -->
-
-                <form
-                    method="POST"
-                    action="{% url 'toggle_todo' todo.id %}"
-                    class="complete-form toggle-complete-form"
-                >
-
-                    <!-- Django CSRF protection -->
-                    {% csrf_token %}
-
-
-                    <!--
-                        Toggle the task status between
-                        completed and pending
-                    -->
-                    <button
-                        type="submit"
-                        class="complete-button {% if todo.completed %}completed{% endif %}"
-                        title="{% if todo.completed %}علامت‌گذاری به عنوان در حال انجام{% else %}علامت‌گذاری به عنوان انجام‌شده{% endif %}"
-                    >
-
-                        {% if todo.completed %}
-                            ✓
-                        {% endif %}
-
-                    </button>
-
-                </form>
-
-
-
-                <!-- =========================
-                     Task Content
-                     ========================= -->
-
-                <div class="todo-content">
-
-
-                    <!-- Task title -->
-                    <div class="todo-title">
-                        {{ todo.title }}
-                    </div>
-
-
-                    <!--
-                        Display the description only
-                        if the task has a description
-                    -->
-                    {% if todo.description %}
-
-                        <div class="todo-description">
-                            {{ todo.description }}
-                        </div>
+                        {{ user.username|first }}
 
                     {% endif %}
 
                 </div>
 
 
-
-                <!-- =========================
-                     Task Actions
-                     ========================= -->
-
-                <div class="todo-actions">
+                <div class="profile-info">
 
 
-                    <!-- =========================
-                         Task Status
-                         ========================= -->
+                    <span class="profile-name">
 
-                    <span
-                        class="status {% if todo.completed %}completed{% endif %}"
-                    >
+                        {% if user.first_name %}
 
-                        {% if todo.completed %}
+                            {{ user.first_name }}
 
-                            انجام‌شده
+                            {% if user.last_name %}
+                                {{ user.last_name }}
+                            {% endif %}
 
                         {% else %}
 
-                            در انتظار
+                            {{ user.username }}
 
                         {% endif %}
 
                     </span>
 
 
+                    <span class="profile-email">
 
-                    <!-- =========================
-                         Toggle Important Status
-                         ========================= -->
+                        {% if user.email %}
 
-                    <form
-                        method="POST"
-                        action="{% url 'toggle_important' todo.id %}"
-                        class="toggle-important-form"
-                    >
+                            {{ user.email }}
 
-                        {% csrf_token %}
+                        {% else %}
 
+                            حساب کاربری
 
-                        <!--
-                            Since this page only contains
-                            important tasks, the star is
-                            displayed in the active state.
+                        {% endif %}
 
-                            Clicking it removes the task
-                            from the important tasks list.
-                        -->
-                        <button
-                            type="submit"
-                            class="important-button important"
-                            title="حذف از وظایف مهم"
-                        >
-
-                            ★
-
-                        </button>
-
-                    </form>
-
-
-
-                    <!-- =========================
-                         Edit Task
-                         ========================= -->
-
-                    <a
-                        href="{% url 'edit_todo' todo.id %}"
-                        class="edit-button"
-                    >
-
-                        ✎ ویرایش
-
-                    </a>
-
-
-
-                    <!-- =========================
-                         Delete Task
-                         ========================= -->
-
-                    <form
-                        method="POST"
-                        action="{% url 'delete_todo' todo.id %}"
-                        class="delete-form"
-                    >
-
-                        {% csrf_token %}
-
-
-                        <!-- Delete button -->
-                        <button
-                            type="submit"
-                            class="delete-button"
-                        >
-
-                            🗑 حذف
-
-                        </button>
-
-                    </form>
-
-
-
-                    <!-- =========================
-                         Creation Date
-                         ========================= -->
-                    <span class="todo-date">
-                        ایجاد: {{ todo.created_at|date:"M d, Y" }}
                     </span>
-                    
-                    <!-- =========================
-                         Start Date
-                         ========================= -->
-                    {% if todo.start_date %}
-                        <span class="todo-date">
-                            شروع: {{ todo.start_date|date:"M d, Y" }}
-                        </span>
-                    {% endif %}
-                    
-                    <!-- =========================
-                         Deadline
-                         ========================= -->
-                    {% if todo.deadline %}
-                        <span class="todo-date">
-                            مهلت: {{ todo.deadline|date:"M d, Y" }}
-                        </span>
-                    {% endif %}
+
 
                 </div>
 
             </div>
 
+        </div>
 
-        <!-- =========================
-             Empty State
-             ========================= -->
-
-        {% empty %}
+    </aside>
 
 
-            <!--
-                Displayed when there are
-                no important tasks
-            -->
-            <div class="empty-state">
+
+    <!-- ==================================================
+         MAIN CONTENT
+    ================================================== -->
+
+    <main class="main">
 
 
-                <!-- Empty state icon -->
-                <div class="empty-icon">
-                    ★
-                </div>
+        <!-- ==================================================
+             TOPBAR
+        ================================================== -->
+
+        <div class="topbar">
 
 
-                <!-- Empty state title -->
-                <h3>
-                    هیچ وظیفه مهمی وجود ندارد
-                </h3>
+            <div class="welcome">
 
 
-                <!-- Empty state description -->
+                <!-- Page title -->
+
+                <h1>
+                    وظایف مهم ⭐
+                </h1>
+
+
+                <!-- Page description -->
+
                 <p>
-                    یک وظیفه را به عنوان مهم علامت‌گذاری کنید تا در اینجا نمایش داده شود.
+                    وظایفی که به عنوان مهم علامت‌گذاری کرده‌اید.
                 </p>
 
+
             </div>
 
-        {% endfor %}
+        </div>
 
-    </section>
 
-</main>
+
+        <!-- ==================================================
+             STATISTICS
+        ================================================== -->
+
+        <section class="stats">
+
+
+            <!-- Important tasks -->
+
+            <div class="stat-card">
+
+
+                <div class="stat-header">
+
+                    <span class="stat-title">
+                        وظایف مهم
+                    </span>
+
+                    <div class="stat-icon">
+                        ★
+                    </div>
+
+                </div>
+
+
+                <div class="stat-number">
+                    {{ total_tasks }}
+                </div>
+
+
+            </div>
+
+
+
+            <!-- Completed important tasks -->
+
+            <div class="stat-card">
+
+
+                <div class="stat-header">
+
+                    <span class="stat-title">
+                        انجام‌شده
+                    </span>
+
+                    <div class="stat-icon">
+                        ✓
+                    </div>
+
+                </div>
+
+
+                <div class="stat-number">
+                    {{ completed_tasks }}
+                </div>
+
+
+            </div>
+
+
+
+            <!-- Remaining important tasks -->
+
+            <div class="stat-card">
+
+
+                <div class="stat-header">
+
+                    <span class="stat-title">
+                        باقی‌مانده
+                    </span>
+
+                    <div class="stat-icon">
+                        ○
+                    </div>
+
+                </div>
+
+
+                <div class="stat-number">
+                    {{ remaining_tasks }}
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- ==================================================
+             TASK LIST HEADER
+        ================================================== -->
+
+        <div class="tasks-header">
+
+
+            <h2>
+                وظایف مهم
+            </h2>
+
+
+        </div>
+
+
+
+        <!-- ==================================================
+             TODO LIST
+        ================================================== -->
+
+        <section class="todo-list">
+
+
+            {% for todo in todos %}
+
+
+                <div
+                    class="todo-card"
+                    data-todo-id="{{ todo.id }}"
+                >
+
+
+                    <!-- Complete / incomplete toggle -->
+
+                    <form
+                        method="POST"
+                        action="{% url 'toggle_todo' todo.id %}"
+                        class="complete-form toggle-complete-form"
+                    >
+
+                        {% csrf_token %}
+
+
+                        <button
+                            type="submit"
+                            class="complete-button {% if todo.completed %}completed{% endif %}"
+                            title="{% if todo.completed %}علامت‌گذاری به‌عنوان انجام‌نشده{% else %}علامت‌گذاری به‌عنوان انجام‌شده{% endif %}"
+                        >
+
+                            {% if todo.completed %}
+                                ✓
+                            {% endif %}
+
+                        </button>
+
+
+                    </form>
+
+
+
+                    <!-- Task content -->
+
+                    <div class="todo-content">
+
+
+                        <!-- Task title -->
+
+                        <div class="todo-title">
+                            {{ todo.title }}
+                        </div>
+
+
+                        <!-- Task description -->
+
+                        {% if todo.description %}
+
+                            <div class="todo-description">
+                                {{ todo.description }}
+                            </div>
+
+                        {% endif %}
+
+
+                        <!-- Task category -->
+
+                        <div class="todo-category">
+
+
+                            {% if todo.category == "public" %}
+
+                                <span class="category-badge public">
+                                    عمومی
+                                </span>
+
+                            {% else %}
+
+                                <span class="category-badge personal">
+                                    شخصی
+                                </span>
+
+                            {% endif %}
+
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- Task actions -->
+
+                    <div class="todo-actions">
+
+
+                        <!-- Task status -->
+
+                        <span
+                            class="status {% if todo.completed %}completed{% endif %}"
+                        >
+
+                            {% if todo.completed %}
+
+                                انجام‌شده
+
+                            {% else %}
+
+                                در انتظار
+
+                            {% endif %}
+
+                        </span>
+
+
+
+                        <!-- Toggle important status -->
+
+                        <form
+                            method="POST"
+                            action="{% url 'toggle_important' todo.id %}"
+                            class="toggle-important-form"
+                        >
+
+                            {% csrf_token %}
+
+
+                            <button
+                                type="submit"
+                                class="important-button important"
+                                title="حذف از وظایف مهم"
+                            >
+
+                                ★
+
+                            </button>
+
+
+                        </form>
+
+
+
+                        <!-- Edit task -->
+
+                        <a
+                            href="{% url 'edit_todo' todo.id %}"
+                            class="edit-button"
+                        >
+
+                            ✎ ویرایش
+
+                        </a>
+
+
+
+                        <!-- Delete task -->
+
+                        <form
+                            method="POST"
+                            action="{% url 'delete_todo' todo.id %}"
+                            class="delete-form"
+                        >
+
+                            {% csrf_token %}
+
+
+                            <button
+                                type="submit"
+                                class="delete-button"
+                            >
+
+                                🗑 حذف
+
+                            </button>
+
+
+                        </form>
+
+
+
+                        <!-- Task dates -->
+
+                        <div class="todo-dates">
+
+
+                            <!-- Creation date -->
+
+                            <span class="todo-date">
+
+                                ایجاد:
+                                {{ todo.created_at_jalali_str }}
+
+                            </span>
+
+
+                            <!-- Start date -->
+
+                            {% if todo.start_date_jalali_str %}
+
+                                <span class="todo-date">
+
+                                    شروع:
+                                    {{ todo.start_date_jalali_str }}
+
+                                </span>
+
+                            {% endif %}
+
+
+                            <!-- Deadline -->
+
+                            {% if todo.deadline_jalali_str %}
+
+                                <span class="todo-date">
+
+                                    مهلت:
+                                    {{ todo.deadline_jalali_str }}
+
+                                </span>
+
+                            {% endif %}
+
+
+                            <!-- Completion date -->
+
+                            {% if todo.end_date_jalali_str %}
+
+                                <span class="todo-date end-date">
+
+                                    اتمام:
+                                    {{ todo.end_date_jalali_str }}
+
+                                </span>
+
+                            {% endif %}
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            {% empty %}
+
+
+                <!-- Empty task list state -->
+
+                <div class="empty-state">
+
+
+                    <div class="empty-icon">
+                        ★
+                    </div>
+
+
+                    <h3>
+                        هیچ وظیفه مهمی وجود ندارد
+                    </h3>
+
+
+                    <p>
+                        یک وظیفه را به عنوان مهم علامت‌گذاری کنید تا در اینجا نمایش داده شود.
+                    </p>
+
+
+                </div>
+
+
+            {% endfor %}
+
+
+        </section>
+
+
+    </main>
+
 
 </div>
 
-<script src="{% static 'tasks/todo.js' %}"></script>
+
+
+<!-- ==================================================
+     JAVASCRIPT
+================================================== -->
+
+<!-- Todo JavaScript -->
+
+<script
+    src="{% static 'tasks/todo.js' %}"
+></script>
+
 
 </body>
 

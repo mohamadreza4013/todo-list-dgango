@@ -224,7 +224,7 @@ function createTodoCard(todo) {
 
                     <span class="todo-date">
                         ایجاد:
-                        ${formatDate(todo.created_at)}
+                       ${toPersianDigits(todo.created_at)}
                     </span>
 
 

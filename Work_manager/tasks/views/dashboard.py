@@ -9,19 +9,23 @@ from ..models import Todo
 # ==================================================
 # DASHBOARD / HOME
 # ==================================================
+
 def to_persian_digits(value):
     return str(value).translate(
         str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹")
     )
+
+
 @login_required
 def home(request):
     """
     Display the dashboard and handle task creation.
     """
 
-    # =========================
-    # Add a new task
-    # =========================
+    # ==================================================
+    # ADD NEW TASK
+    # ==================================================
+
     if request.method == "POST":
 
         title = request.POST.get("title")
@@ -36,17 +40,17 @@ def home(request):
         deadline_str = request.POST.get("deadline")
 
 
-        # =========================
-        # Validate category
-        # =========================
+        # ==================================================
+        # VALIDATE CATEGORY
+        # ==================================================
 
         if category not in ["personal", "public"]:
             category = "personal"
 
 
-        # =========================
-        # Convert Jalali start date
-        # =========================
+        # ==================================================
+        # CONVERT JALALI START DATE
+        # ==================================================
 
         start_date = None
 
@@ -65,9 +69,9 @@ def home(request):
                 start_date = None
 
 
-        # =========================
-        # Convert Jalali deadline
-        # =========================
+        # ==================================================
+        # CONVERT JALALI DEADLINE
+        # ==================================================
 
         deadline = None
 
@@ -86,9 +90,9 @@ def home(request):
                 deadline = None
 
 
-        # =========================
-        # Create task
-        # =========================
+        # ==================================================
+        # CREATE TASK
+        # ==================================================
 
         todo = Todo.objects.create(
 
@@ -106,9 +110,9 @@ def home(request):
         )
 
 
-        # =========================
-        # Convert dates to Jalali
-        # =========================
+        # ==================================================
+        # CONVERT DATES TO JALALI STRINGS
+        # ==================================================
 
         start_date_jalali = (
 
@@ -136,14 +140,14 @@ def home(request):
 
             jdatetime.datetime.fromgregorian(
                 datetime=todo.created_at
-            ).strftime("%d %b %Y")
+            ).strftime("%Y/%m/%d")
 
         )
 
 
-        # =========================
-        # Return JSON response
-        # =========================
+        # ==================================================
+        # RETURN JSON RESPONSE
+        # ==================================================
 
         return JsonResponse({
 
@@ -165,34 +169,90 @@ def home(request):
         })
 
 
-    # =========================
-    # Display dashboard
-    # =========================
+    # ==================================================
+    # GET FILTER PARAMETERS
+    # ==================================================
 
-    # Show:
-    # 1. Personal tasks belonging to the current user
-    # 2. Public tasks belonging to all users
+    # "my" means that only tasks belonging to
+    # the current user should be displayed.
+    scope = request.GET.get("scope")
 
-    todos = Todo.objects.filter(
+    # "active" and "completed" are status filters.
+    filter_type = request.GET.get("filter")
 
-        category="public"
 
-    ) | Todo.objects.filter(
+    # ==================================================
+    # TASK SCOPE
+    # ==================================================
 
-        category="personal",
-        user=request.user
+    if scope == "my":
 
+        # Show only tasks created by the current user.
+        todos = Todo.objects.filter(
+            user=request.user
+        )
+
+        # Used by the template to highlight
+        # the "My Tasks" navigation item.
+        my_tasks = True
+
+    else:
+
+        # Show all public tasks and
+        # personal tasks belonging to the current user.
+        todos = Todo.objects.filter(
+
+            category="public"
+
+        ) | Todo.objects.filter(
+
+            category="personal",
+            user=request.user
+
+        )
+
+        # Used by the template to highlight
+        # the dashboard navigation item.
+        my_tasks = False
+
+
+    # ==================================================
+    # TASK STATUS FILTER
+    # ==================================================
+
+    # Apply the status filter after the task scope.
+    # Therefore, when "My Tasks" is active,
+    # these filters only affect the user's own tasks.
+
+    if filter_type == "active":
+
+        todos = todos.filter(
+            completed=False
+        )
+
+    elif filter_type == "completed":
+
+        todos = todos.filter(
+            completed=True
+        )
+
+
+    # ==================================================
+    # ORDER TASKS
+    # ==================================================
+
+    # Keep newest tasks first.
+    todos = todos.order_by(
+        "-created_at"
     )
 
 
-    # Keep newest tasks first
+    # ==================================================
+    # STATISTICS
+    # ==================================================
 
-    todos = todos.order_by("-created_at")
-
-
-    # =========================
-    # Statistics
-    # =========================
+    # Calculate statistics after applying
+    # both the scope and status filter.
 
     total_tasks = todos.count()
 
@@ -205,68 +265,82 @@ def home(request):
     ).count()
 
 
-    # =========================
-    # Task filters
-    # =========================
-
-    filter_type = request.GET.get("filter")
-
-
-    if filter_type == "active":
-
-        todos = todos.filter(
-            completed=False
-        )
-
-
-    elif filter_type == "completed":
-
-        todos = todos.filter(
-            completed=True
-        )
-
-
-    # =========================
-    # Prepare Jalali dates
-    # =========================
+    # ==================================================
+    # PREPARE JALALI DATES
+    # ==================================================
 
     for todo in todos:
 
 
+        # --------------------------------------------------
         # Creation date
+        # --------------------------------------------------
 
         todo.created_at_jalali_str = (
+
             jdatetime.datetime.fromgregorian(
                 datetime=todo.created_at
             ).strftime("%Y/%m/%d")
+
         )
 
+
+        # --------------------------------------------------
         # Start date
+        # --------------------------------------------------
 
         if todo.start_date:
-            todo.start_date_jalali_str = todo.start_date.strftime("%Y/%m/%d")
+
+            todo.start_date_jalali_str = (
+                todo.start_date.strftime("%Y/%m/%d")
+            )
+
         else:
+
             todo.start_date_jalali_str = None
 
+
+        # --------------------------------------------------
+        # Completion date
+        # --------------------------------------------------
+
         if todo.end_date:
-            todo.end_date_jalali_str = todo.end_date.strftime("%Y/%m/%d")
+
+            todo.end_date_jalali_str = (
+                todo.end_date.strftime("%Y/%m/%d")
+            )
+
         else:
+
             todo.end_date_jalali_str = None
 
+
+        # --------------------------------------------------
+        # Deadline
+        # --------------------------------------------------
+
         if todo.deadline:
-            todo.deadline_jalali_str = todo.deadline.strftime("%Y/%m/%d")
+
+            todo.deadline_jalali_str = (
+                todo.deadline.strftime("%Y/%m/%d")
+            )
+
         else:
+
             todo.deadline_jalali_str = None
 
-    # =========================
-    # Template context
-    # =========================
+
+    # ==================================================
+    # TEMPLATE CONTEXT
+    # ==================================================
 
     context = {
 
         "todos": todos,
 
         "filter_type": filter_type,
+
+        "my_tasks": my_tasks,
 
         "total_tasks": total_tasks,
 
@@ -276,6 +350,10 @@ def home(request):
 
     }
 
+
+    # ==================================================
+    # RENDER HOME PAGE
+    # ==================================================
 
     return render(
         request,

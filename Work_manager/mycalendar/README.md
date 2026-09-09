@@ -1,37 +1,62 @@
 # My Calendar
 
-یک اپ مستقل **Django** برای نمایش و استفاده از **تقویم شمسی (Jalali)** در پروژه‌های Django.
+یک اپ مستقل **Django** برای نمایش و انتخاب تاریخ در **تقویم شمسی (Jalali)**.
 
-این اپ به‌صورت مستقل پیاده‌سازی شده و برای نمایش تقویم و همچنین استفاده به‌عنوان **Date Picker** در فرم‌های مختلف طراحی شده است.
+این اپ به‌صورت مستقل پیاده‌سازی شده و برای استفاده به‌عنوان **Jalali Date Picker** در فرم‌های Django طراحی شده است.
 
-تقویم هیچ وابستگی‌ای به `jQuery`، `flatpickr`، `persian-datepicker` یا `persian-date` ندارد.
+تقویم بدون استفاده از کتابخانه‌های خارجی مانند:
+
+- jQuery
+- Flatpickr
+- Persian Datepicker
+- Persian Date
+
+پیاده‌سازی شده و منطق تقویم شمسی به‌صورت اختصاصی در JavaScript قرار دارد.
 
 ---
 
 ## Features
 
-* نمایش تقویم شمسی
-* نمایش نام ماه‌های شمسی
-* نمایش روزهای هفته به زبان فارسی
-* جابه‌جایی بین ماه‌ها
-* تشخیص روز جاری
-* انتخاب تاریخ
-* نمایش تاریخ انتخاب‌شده
-* استفاده به‌صورت صفحه مستقل
-* استفاده به‌صورت Date Picker
-* اتصال یک Calendar به چند input
-* API جاوااسکریپت برای باز و بسته کردن تقویم
-* بدون نیاز به jQuery
-* بدون نیاز به Flatpickr
-* بدون نیاز به Persian Datepicker
-* بدون نیاز به Persian Date
-* استفاده از JavaScript و CSS اختصاصی
+- نمایش تقویم شمسی
+- نمایش نام ماه‌های شمسی به زبان فارسی
+- نمایش روزهای هفته به زبان فارسی
+- جابه‌جایی بین ماه‌ها
+- تشخیص و نمایش روز جاری
+- انتخاب تاریخ
+- نمایش تاریخ انتخاب‌شده
+- پشتیبانی از ارقام فارسی
+- پشتیبانی از ارقام انگلیسی در ورودی
+- پشتیبانی از جداکننده `/` و `-`
+- استفاده به‌عنوان Date Picker
+- اتصال یک Calendar به چند input
+- باز شدن Calendar با کلیک روی input
+- باز و بسته کردن Calendar از طریق JavaScript API
+- بستن Calendar با دکمه Close
+- بستن Calendar با کلیک روی Overlay
+- بستن Calendar با کلید `Escape`
+- مشخص کردن تاریخ انتخاب‌شده
+- پیاده‌سازی اختصاصی محاسبات تقویم Jalali
+- بدون نیاز به jQuery
+- بدون نیاز به Flatpickr
+- بدون نیاز به Persian Datepicker
+- بدون نیاز به Persian Date
+- استفاده از JavaScript و CSS اختصاصی
+
+---
+
+## Requirements
+
+این اپ برای استفاده در پروژه‌های Django طراحی شده است.
+
+برای اجرای بخش JavaScript، مرورگر باید از `Intl.DateTimeFormat` و تقویم Persian پشتیبانی کند.
+
+تقویم به هیچ کتابخانه JavaScript خارجی وابسته نیست.
 
 ---
 
 # Installation
 
-## 1. Create the app
+## 1. Create the App
 
 اگر اپ را هنوز ایجاد نکرده‌اید:
 
@@ -52,7 +77,7 @@ INSTALLED_APPS = [
 
 # Project Structure
 
-ساختار پیشنهادی:
+ساختار پیشنهادی اپ:
 
 ```text
 my_calendar/
@@ -76,13 +101,13 @@ my_calendar/
 └── views.py
 ```
 
-> نام پوشه داخل `static` عمداً `mycalendar` است و با نام اپ `my_calendar` یکسان نیست.
+> نام پوشه داخل `static` برابر `mycalendar` است و با نام Django App یعنی `my_calendar` متفاوت است.
 
 ---
 
 # URL Configuration
 
-## 1. App URLs
+## App URLs
 
 در فایل:
 
@@ -98,21 +123,30 @@ from . import views
 
 
 urlpatterns = [
-    path("", views.calendar_view, name="my_calendar"),
+    path(
+        "",
+        views.calendar_view,
+        name="my_calendar",
+    ),
 ]
 ```
 
-## 2. Project URLs
+---
+
+## Project URLs
 
 در `urls.py` اصلی پروژه:
 
 ```python
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
 
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path(
+        "admin/",
+        admin.site.urls,
+    ),
 
     path(
         "my-calendar/",
@@ -121,7 +155,7 @@ urlpatterns = [
 ]
 ```
 
-تقویم اکنون در این آدرس در دسترس است:
+تقویم اکنون از طریق این آدرس در دسترس است:
 
 ```text
 http://127.0.0.1:8000/my-calendar/
@@ -152,15 +186,15 @@ def calendar_view(request):
 
 ---
 
-# Loading Static Files
+# Static Files
 
-در template ابتدا:
+در Template ابتدا:
 
 ```django
 {% load static %}
 ```
 
-سپس CSS:
+سپس CSS را Load کنید:
 
 ```html
 <link
@@ -179,62 +213,9 @@ def calendar_view(request):
 
 ---
 
-# Standalone Calendar
-
-برای نمایش Calendar به‌صورت یک صفحه مستقل، template باید containerهای اصلی Calendar را داشته باشد.
-
-مثال:
-
-```html
-<div class="calendar">
-
-    <div class="calendar-topbar">
-
-        <button
-            type="button"
-            id="previous-month"
-            class="month-button"
-        >
-            ‹
-        </button>
-
-        <div
-            id="month-title"
-            class="month-title"
-        ></div>
-
-        <button
-            type="button"
-            id="next-month"
-            class="month-button"
-        >
-            ›
-        </button>
-
-    </div>
-
-
-    <div
-        id="weekdays"
-        class="weekdays"
-    ></div>
-
-
-    <div
-        id="calendar-grid"
-        class="calendar-grid"
-    ></div>
-
-</div>
-```
-
-JavaScript اپ این عناصر را پیدا کرده و Calendar را ایجاد می‌کند.
-
----
-
 # Date Picker
 
-یکی از کاربردهای اصلی `My Calendar` استفاده از آن برای انتخاب تاریخ در فرم‌ها است.
+کاربرد اصلی `My Calendar` انتخاب تاریخ شمسی در inputهای فرم است.
 
 هر input که کلاس زیر را داشته باشد:
 
@@ -242,7 +223,7 @@ JavaScript اپ این عناصر را پیدا کرده و Calendar را ایج
 jalali-date-input
 ```
 
-می‌تواند از Calendar استفاده کند.
+به Calendar متصل می‌شود.
 
 مثال:
 
@@ -258,7 +239,7 @@ jalali-date-input
 >
 ```
 
-یک input دیگر:
+Input دیگری:
 
 ```html
 <input
@@ -272,7 +253,7 @@ jalali-date-input
 >
 ```
 
-پس از Load شدن `calendar.js`، کلیک روی هر input باعث باز شدن Calendar می‌شود.
+پس از Load شدن `calendar.js`، کلیک روی هر یک از این inputها باعث باز شدن Calendar می‌شود.
 
 ---
 
@@ -283,26 +264,70 @@ jalali-date-input
 ```text
 User
   ↓
-Click input
+Click on date input
   ↓
 My Calendar opens
   ↓
 User selects a Jalali date
   ↓
 Selected date is written into the input
+  ↓
+Calendar closes
 ```
 
-مثلاً:
+مثلاً اگر کاربر تاریخ ۲۰ شهریور ۱۴۰۵ را انتخاب کند:
+
+```text
+۱۴۰۵/۰۶/۲۰
+```
+
+در input قرار می‌گیرد.
+
+---
+
+# Persian Digits
+
+تقویم از ارقام فارسی پشتیبانی می‌کند.
+
+خروجی Calendar با ارقام فارسی است:
+
+```text
+۱۴۰۵/۰۶/۲۰
+```
+
+اما هنگام پردازش تاریخ، JavaScript می‌تواند ارقام فارسی را به انگلیسی تبدیل کند:
+
+```text
+۱۴۰۵/۰۶/۲۰
+        ↓
+1405/06/20
+```
+
+بنابراین ورودی‌هایی مانند موارد زیر قابل پردازش هستند:
+
+```text
+۱۴۰۵/۰۶/۲۰
+```
+
+و:
 
 ```text
 1405/06/20
 ```
 
-داخل input قرار می‌گیرد.
+همچنین هر دو جداکننده پشتیبانی می‌شوند:
+
+```text
+1405/06/20
+```
+
+```text
+1405-06-20
+```
 
 ---
 
-# Using Multiple Inputs
+# Multiple Date Inputs
 
 یک Calendar می‌تواند برای چند input استفاده شود.
 
@@ -312,6 +337,7 @@ Selected date is written into the input
 <input
     type="text"
     name="start_date"
+    id="start-date"
     class="jalali-date-input"
     placeholder="تاریخ شروع"
     readonly
@@ -320,6 +346,7 @@ Selected date is written into the input
 <input
     type="text"
     name="deadline"
+    id="deadline"
     class="jalali-date-input"
     placeholder="مهلت"
     readonly
@@ -328,481 +355,47 @@ Selected date is written into the input
 <input
     type="text"
     name="meeting_date"
+    id="meeting-date"
     class="jalali-date-input"
     placeholder="تاریخ جلسه"
     readonly
 >
 ```
 
-Calendar تشخیص می‌دهد که کدام input کلیک شده و تاریخ انتخاب‌شده را در همان input قرار می‌دهد.
-
----
-
-# JavaScript API
-
-اپ `MyCalendar` یک API ساده در اختیار صفحه قرار می‌دهد.
-
-## Open
-
-برای باز کردن Calendar روی یک input:
-
-```javascript
-const input =
-    document.getElementById("start-date");
-
-MyCalendar.open(input);
-```
-
-## Close
-
-برای بستن Calendar:
-
-```javascript
-MyCalendar.close();
-```
-
----
-
-# Manual Trigger
-
-می‌توانید باز کردن Calendar را به یک button متصل کنید.
-
-مثال:
-
-```html
-<input
-    type="text"
-    id="start-date"
-    class="jalali-date-input"
-    readonly
->
-
-<button
-    type="button"
-    onclick="
-        MyCalendar.open(
-            document.getElementById('start-date')
-        )
-    "
->
-    انتخاب تاریخ
-</button>
-```
-
----
-
-# Using My Calendar in a Django Form
-
-مثال یک فرم ساده:
-
-```html
-{% load static %}
-
-<form method="POST">
-
-    {% csrf_token %}
-
-    <input
-        type="text"
-        name="title"
-        placeholder="عنوان Task"
-    >
-
-    <input
-        type="text"
-        name="start_date"
-        class="jalali-date-input"
-        placeholder="انتخاب تاریخ شروع"
-        readonly
-    >
-
-    <button type="submit">
-        ذخیره
-    </button>
-
-</form>
-
-
-<link
-    rel="stylesheet"
-    href="{% static 'mycalendar/calendar.css' %}"
->
-
-<script
-    src="{% static 'mycalendar/calendar.js' %}"
-></script>
-```
-
-پس از انتخاب تاریخ:
+JavaScript به‌صورت خودکار تمام inputهایی که کلاس:
 
 ```text
-1405/06/20
+jalali-date-input
 ```
 
-به عنوان مقدار input ارسال می‌شود.
+دارند پیدا می‌کند.
+
+وقتی کاربر روی یک input کلیک کند، همان input به‌عنوان `targetInput` انتخاب می‌شود.
+
+بنابراین تاریخ انتخاب‌شده فقط در همان input قرار می‌گیرد.
 
 ---
 
-# Receiving the Date in Django
+# Calendar Modal
 
-در View:
+Calendar به‌صورت یک Modal نمایش داده می‌شود.
 
-```python
-start_date_str = request.POST.get(
-    "start_date"
-)
-```
+Modal شامل:
 
-مثلاً مقدار:
-
-```text
-1405/06/20
-```
+- Header
+- عنوان ماه و سال
+- دکمه ماه قبل
+- دکمه ماه بعد
+- نام روزهای هفته
+- روزهای ماه
+- دکمه بستن
+- Overlay
 
 است.
 
----
-
-# Converting the Jalali Date
-
-برای تبدیل رشته به `jdatetime.date`:
-
-```python
-import jdatetime
-
-
-start_date = None
-
-
-if start_date_str:
-
-    try:
-
-        start_date = jdatetime.date.fromisoformat(
-            start_date_str.replace("/", "-")
-        )
-
-    except ValueError:
-
-        start_date = None
-```
-
-اکنون:
-
-```python
-start_date
-```
-
-یک شیء:
-
-```python
-jdatetime.date
-```
-
-است.
-
----
-
-# Using django-jalali
-
-اگر پروژه از `django-jalali` استفاده می‌کند:
-
-```python
-from django_jalali.db import models as jmodels
-
-
-class Todo(models.Model):
-
-    title = models.CharField(
-        max_length=200
-    )
-
-    start_date = jmodels.jDateField(
-        null=True,
-        blank=True
-    )
-
-    deadline = jmodels.jDateField(
-        null=True,
-        blank=True
-    )
-```
-
-بعد می‌توانید تاریخ تبدیل‌شده را ذخیره کنید:
-
-```python
-todo = Todo.objects.create(
-
-    title=title,
-
-    start_date=start_date,
-
-    deadline=deadline,
-
-)
-```
-
----
-
-# TaskFlow Example
-
-در TaskFlow می‌توانید Calendar را در Sidebar قرار دهید:
+ساختار اصلی Modal:
 
 ```html
-<a
-    href="{% url 'my_calendar' %}"
-    class="nav-item"
->
-    <span>📅</span>
-    Calendar
-</a>
-```
-
-و در فرم افزودن Task:
-
-```html
-<input
-    type="text"
-    name="start_date"
-    id="start-date"
-    class="jalali-date-input"
-    placeholder="انتخاب تاریخ شروع"
-    autocomplete="off"
-    readonly
->
-
-<input
-    type="text"
-    name="deadline"
-    id="deadline"
-    class="jalali-date-input"
-    placeholder="انتخاب مهلت"
-    autocomplete="off"
-    readonly
->
-```
-
-در این حالت:
-
-```text
-Home
- │
- ├── Start Date
- │      ↓
- │   My Calendar
- │      ↓
- │   1405/06/20
- │
- └── Deadline
-        ↓
-     My Calendar
-        ↓
-     1405/06/25
-```
-
----
-
-# Important: No External Datepicker
-
-`My Calendar` مستقل است.
-
-بنابراین برای استفاده از آن نباید این کتابخانه‌ها را همزمان Load کنید:
-
-```text
-flatpickr
-persian-datepicker
-persian-date
-PwtDatepicker
-```
-
-همچنین Calendar به `jQuery` وابسته نیست.
-
-فقط فایل‌های خود اپ کافی هستند:
-
-```text
-calendar.css
-calendar.js
-```
-
----
-
-# Static Path
-
-اگر ساختار فایل‌ها این باشد:
-
-```text
-my_calendar/
-└── static/
-    └── mycalendar/
-        ├── calendar.css
-        └── calendar.js
-```
-
-باید دقیقاً از این مسیرها استفاده کنید:
-
-```django
-{% static 'mycalendar/calendar.css' %}
-```
-
-و:
-
-```django
-{% static 'mycalendar/calendar.js' %}
-```
-
-مسیر زیر اشتباه است:
-
-```django
-{% static 'my_calendar/calendar.css' %}
-```
-
-چون نام پوشه Static:
-
-```text
-mycalendar
-```
-
-است.
-
----
-
-# Required HTML IDs
-
-اگر از Calendar به‌صورت مستقیم استفاده می‌کنید، این عناصر باید وجود داشته باشند:
-
-```text
-calendar-picker-modal
-calendar-picker-close
-previous-month
-next-month
-month-title
-weekdays
-calendar-grid
-```
-
-اگر یکی از این عناصر در HTML وجود نداشته باشد، بخش مربوط به آن قابلیت کار نخواهد کرد.
-
----
-
-# Troubleshooting
-
-## Calendar does not open
-
-ابتدا Developer Tools مرورگر را باز کنید:
-
-```text
-F12 → Console
-```
-
-سپس بررسی کنید `calendar.js` بدون خطا Load شده باشد.
-
----
-
-## 404 for CSS or JavaScript
-
-مسیر Static را بررسی کنید.
-
-ساختار:
-
-```text
-my_calendar/static/mycalendar/calendar.js
-```
-
-باید با:
-
-```django
-{% static 'mycalendar/calendar.js' %}
-```
-
-هماهنگ باشد.
-
----
-
-## Input does not open the calendar
-
-بررسی کنید input دارای این کلاس باشد:
-
-```html
-class="jalali-date-input"
-```
-
-و `calendar.js` در صفحه Load شده باشد.
-
----
-
-## Date is not written to the input
-
-بررسی کنید `MyCalendar.open()` با input صحیح اجرا شده باشد:
-
-```javascript
-MyCalendar.open(
-    document.getElementById("start-date")
-);
-```
-
----
-
-# Full Minimal Example
-
-```html
-{% load static %}
-
-<!DOCTYPE html>
-
-<html lang="fa" dir="rtl">
-
-<head>
-
-    <meta charset="UTF-8">
-
-    <title>
-        My Calendar Example
-    </title>
-
-    <link
-        rel="stylesheet"
-        href="{% static 'mycalendar/calendar.css' %}"
-    >
-
-</head>
-
-<body>
-
-<form method="POST">
-
-    {% csrf_token %}
-
-    <input
-        type="text"
-        name="title"
-        placeholder="عنوان"
-    >
-
-    <input
-        type="text"
-        name="start_date"
-        id="start-date"
-        class="jalali-date-input"
-        placeholder="انتخاب تاریخ شروع"
-        readonly
-    >
-
-    <input
-        type="text"
-        name="deadline"
-        id="deadline"
-        class="jalali-date-input"
-        placeholder="انتخاب مهلت"
-        readonly
-    >
-
-    <button type="submit">
-        ذخیره
-    </button>
-
-</form>
-
-
 <div
     id="calendar-picker-modal"
     class="calendar-picker-modal"
@@ -820,14 +413,6 @@ MyCalendar.open(
         >
             ×
         </button>
-
-        <div class="calendar-picker-header">
-
-            <h2>
-                انتخاب تاریخ
-            </h2>
-
-        </div>
 
         <div class="calendar">
 
@@ -871,6 +456,850 @@ MyCalendar.open(
     </div>
 
 </div>
+```
+
+---
+
+# Required HTML Elements
+
+برای اینکه `calendar.js` بتواند Calendar را اجرا کند، عناصر اصلی زیر باید در HTML وجود داشته باشند:
+
+```text
+calendar-picker-modal
+calendar-picker-close
+previous-month
+next-month
+month-title
+weekdays
+calendar-grid
+```
+
+همچنین برای استفاده از Date Picker، input باید دارای کلاس زیر باشد:
+
+```text
+jalali-date-input
+```
+
+---
+
+# Calendar Navigation
+
+کاربر می‌تواند با استفاده از دو دکمه زیر بین ماه‌ها جابه‌جا شود:
+
+```text
+previous-month
+```
+
+و:
+
+```text
+next-month
+```
+
+در هنگام رسیدن به:
+
+```text
+فروردین
+```
+
+با رفتن به ماه قبل، سال کاهش پیدا می‌کند.
+
+مثلاً:
+
+```text
+فروردین ۱۴۰۵
+      ↓
+اسفند ۱۴۰۴
+```
+
+همچنین بعد از:
+
+```text
+اسفند ۱۴۰۵
+```
+
+ماه بعد:
+
+```text
+فروردین ۱۴۰۶
+```
+
+خواهد بود.
+
+---
+
+# Current Date
+
+Calendar تاریخ امروز را به‌صورت خودکار تشخیص می‌دهد.
+
+تاریخ جاری با کلاس:
+
+```text
+today
+```
+
+مشخص می‌شود.
+
+مثال:
+
+```html
+<button class="calendar-day today">
+    ۲۰
+</button>
+```
+
+---
+
+# Selected Date
+
+اگر input از قبل دارای تاریخ باشد، هنگام باز شدن Calendar:
+
+1. تاریخ input خوانده می‌شود.
+2. ارقام فارسی به انگلیسی تبدیل می‌شوند.
+3. تاریخ Parse می‌شود.
+4. Calendar روی ماه و سال همان تاریخ باز می‌شود.
+5. روز انتخاب‌شده با کلاس `selected` مشخص می‌شود.
+
+مثلاً:
+
+```text
+۱۴۰۵/۰۶/۲۰
+```
+
+باعث می‌شود Calendar روی:
+
+```text
+شهریور ۱۴۰۵
+```
+
+باز شود و روز:
+
+```text
+۲۰
+```
+
+به‌عنوان تاریخ انتخاب‌شده نمایش داده شود.
+
+---
+
+# JavaScript API
+
+`My Calendar` یک API ساده JavaScript در اختیار صفحه قرار می‌دهد.
+
+API به صورت زیر در دسترس است:
+
+```javascript
+window.MyCalendar
+```
+
+---
+
+## Open Calendar
+
+برای باز کردن Calendar روی یک input:
+
+```javascript
+const input =
+    document.getElementById("start-date");
+
+MyCalendar.open(input);
+```
+
+---
+
+## Close Calendar
+
+برای بستن Calendar:
+
+```javascript
+MyCalendar.close();
+```
+
+---
+
+# Manual Trigger
+
+می‌توان باز کردن Calendar را به یک Button متصل کرد.
+
+مثال:
+
+```html
+<input
+    type="text"
+    id="start-date"
+    class="jalali-date-input"
+    readonly
+>
+
+<button
+    type="button"
+    onclick="
+        MyCalendar.open(
+            document.getElementById('start-date')
+        )
+    "
+>
+    انتخاب تاریخ
+</button>
+```
+
+---
+
+# Calendar Events
+
+پس از انتخاب تاریخ، مقدار input تغییر می‌کند.
+
+همچنین یک JavaScript `change` event برای input ارسال می‌شود:
+
+```javascript
+targetInput.dispatchEvent(
+    new Event(
+        "change",
+        {
+            bubbles: true
+        }
+    )
+);
+```
+
+بنابراین سایر بخش‌های JavaScript می‌توانند تغییر تاریخ را دریافت کنند.
+
+مثال:
+
+```javascript
+document
+    .getElementById("start-date")
+    .addEventListener(
+        "change",
+        function () {
+
+            console.log(
+                "Selected date:",
+                this.value
+            );
+
+        }
+    );
+```
+
+---
+
+# Closing the Calendar
+
+Calendar به سه روش بسته می‌شود.
+
+## Close Button
+
+با کلیک روی دکمه:
+
+```text
+calendar-picker-close
+```
+
+---
+
+## Overlay
+
+با کلیک روی قسمت Overlay:
+
+```text
+calendar-picker-overlay
+```
+
+---
+
+## Escape
+
+با فشار دادن کلید:
+
+```text
+Escape
+```
+
+Calendar بسته می‌شود.
+
+---
+
+# Using My Calendar in a Django Form
+
+مثال:
+
+```html
+{% load static %}
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    <input
+        type="text"
+        name="title"
+        placeholder="عنوان Task"
+    >
+
+    <input
+        type="text"
+        name="start_date"
+        id="start-date"
+        class="jalali-date-input"
+        placeholder="انتخاب تاریخ شروع"
+        autocomplete="off"
+        readonly
+    >
+
+    <input
+        type="text"
+        name="deadline"
+        id="deadline"
+        class="jalali-date-input"
+        placeholder="انتخاب مهلت"
+        autocomplete="off"
+        readonly
+    >
+
+    <button type="submit">
+        ذخیره
+    </button>
+
+</form>
+
+
+<link
+    rel="stylesheet"
+    href="{% static 'mycalendar/calendar.css' %}"
+>
+
+<script
+    src="{% static 'mycalendar/calendar.js' %}"
+></script>
+```
+
+پس از انتخاب تاریخ، مقدار input مثلاً:
+
+```text
+۱۴۰۵/۰۶/۲۰
+```
+
+خواهد بود.
+
+در نتیجه هنگام Submit فرم، همین مقدار به Django ارسال می‌شود.
+
+---
+
+# Receiving the Date in Django
+
+در View می‌توانید مقدار تاریخ را دریافت کنید:
+
+```python
+start_date_str = request.POST.get(
+    "start_date",
+)
+```
+
+مثلاً:
+
+```text
+۱۴۰۵/۰۶/۲۰
+```
+
+---
+
+# Converting the Date in Django
+
+برای تبدیل تاریخ Jalali به `jdatetime.date`:
+
+```python
+import jdatetime
+
+
+def to_english_digits(value):
+
+    return str(value).translate(
+        str.maketrans(
+            "۰۱۲۳۴۵۶۷۸۹",
+            "0123456789",
+        )
+    )
+
+
+start_date_str = to_english_digits(
+    start_date_str
+)
+
+start_date_str = (
+    start_date_str
+    .replace("/", "-")
+)
+
+try:
+
+    start_date = (
+        jdatetime.date
+        .fromisoformat(
+            start_date_str
+        )
+    )
+
+except ValueError:
+
+    start_date = None
+```
+
+---
+
+# Using django-jalali
+
+اگر پروژه از `django-jalali` استفاده می‌کند، می‌توانید از `jDateField` استفاده کنید:
+
+```python
+from django.db import models
+from django_jalali.db import models as jmodels
+
+
+class Todo(models.Model):
+
+    title = models.CharField(
+        max_length=200,
+    )
+
+    start_date = jmodels.jDateField(
+        null=True,
+        blank=True,
+    )
+
+    deadline = jmodels.jDateField(
+        null=True,
+        blank=True,
+    )
+```
+
+سپس تاریخ تبدیل‌شده را ذخیره کنید:
+
+```python
+todo.start_date = start_date
+todo.deadline = deadline
+
+todo.save()
+```
+
+---
+
+# TaskFlow Example
+
+`My Calendar` می‌تواند در پروژه‌هایی مانند TaskFlow برای انتخاب تاریخ شروع و Deadline استفاده شود.
+
+مثال:
+
+```html
+<input
+    type="text"
+    name="start_date"
+    id="start-date"
+    class="jalali-date-input"
+    placeholder="انتخاب تاریخ شروع"
+    autocomplete="off"
+    readonly
+>
+
+<input
+    type="text"
+    name="deadline"
+    id="deadline"
+    class="jalali-date-input"
+    placeholder="انتخاب مهلت"
+    autocomplete="off"
+    readonly
+>
+```
+
+فرآیند:
+
+```text
+Start Date
+    ↓
+Click input
+    ↓
+My Calendar
+    ↓
+Select Jalali Date
+    ↓
+۱۴۰۵/۰۶/۲۰
+    ↓
+Django Form
+```
+
+برای Deadline نیز همین فرآیند انجام می‌شود.
+
+---
+
+# Calendar Algorithm
+
+منطق محاسبات تقویم Jalali در `calendar.js` به‌صورت مستقل پیاده‌سازی شده است.
+
+این بخش شامل توابعی برای:
+
+- محاسبه سال‌های کبیسه
+- محاسبه طول ماه
+- اعتبارسنجی تاریخ
+- تبدیل Jalali به Gregorian
+- تبدیل Gregorian به Julian Day
+- تبدیل Julian Day به Gregorian
+- محاسبه روز هفته
+- تعیین اولین روز ماه
+
+است.
+
+توابع اصلی شامل موارد زیر هستند:
+
+```javascript
+jalCal()
+```
+
+```javascript
+j2d()
+```
+
+```javascript
+g2d()
+```
+
+```javascript
+d2g()
+```
+
+```javascript
+jalaaliToGregorian()
+```
+
+```javascript
+getFirstWeekday()
+```
+
+```javascript
+jalaaliMonthLength()
+```
+
+```javascript
+isValidJalaaliDate()
+```
+
+---
+
+# Supported Jalali Date Range
+
+منطق محاسبات Jalali بر اساس مجموعه Break Pointهای تقویم Jalaali پیاده‌سازی شده است.
+
+سال Jalali باید در محدوده پشتیبانی‌شده الگوریتم قرار داشته باشد.
+
+برای استفاده معمول در تاریخ‌های معاصر مانند:
+
+```text
+۱۴۰۰
+۱۴۰۱
+۱۴۰۲
+۱۴۰۳
+۱۴۰۴
+۱۴۰۵
+۱۴۰۶
+```
+
+محدوده مناسب است.
+
+---
+
+# File Structure
+
+فایل‌های اصلی Calendar:
+
+```text
+my_calendar/
+│
+├── templates/
+│   └── my_calendar/
+│       └── calendar.html
+│
+└── static/
+    └── mycalendar/
+        ├── calendar.css
+        └── calendar.js
+```
+
+---
+
+# Static Paths
+
+با توجه به ساختار بالا، مسیر CSS:
+
+```django
+{% static 'mycalendar/calendar.css' %}
+```
+
+و مسیر JavaScript:
+
+```django
+{% static 'mycalendar/calendar.js' %}
+```
+
+است.
+
+مسیر زیر صحیح نیست:
+
+```django
+{% static 'my_calendar/calendar.js' %}
+```
+
+زیرا نام پوشه Static:
+
+```text
+mycalendar
+```
+
+است.
+
+---
+
+# Troubleshooting
+
+## Calendar Does Not Open
+
+Developer Tools مرورگر را باز کنید:
+
+```text
+F12 → Console
+```
+
+سپس بررسی کنید `calendar.js` بدون خطا Load شده باشد.
+
+همچنین بررسی کنید input دارای کلاس زیر باشد:
+
+```html
+class="jalali-date-input"
+```
+
+---
+
+## Calendar Modal Does Not Appear
+
+بررسی کنید عنصر زیر در HTML وجود داشته باشد:
+
+```html
+<div
+    id="calendar-picker-modal"
+    hidden
+>
+```
+
+همچنین عناصر اصلی Calendar را بررسی کنید:
+
+```text
+calendar-picker-modal
+previous-month
+next-month
+month-title
+weekdays
+calendar-grid
+```
+
+---
+
+## Input Does Not Open Calendar
+
+بررسی کنید input دارای این کلاس باشد:
+
+```html
+class="jalali-date-input"
+```
+
+و `calendar.js` در صفحه Load شده باشد.
+
+مثال:
+
+```html
+<script
+    src="{% static 'mycalendar/calendar.js' %}"
+    defer
+></script>
+```
+
+---
+
+## Date Is Not Written to the Input
+
+بررسی کنید input دارای `target` صحیح باشد و Calendar از طریق:
+
+```javascript
+MyCalendar.open(input);
+```
+
+یا کلیک روی:
+
+```text
+jalali-date-input
+```
+
+باز شده باشد.
+
+---
+
+## Static Files Return 404
+
+ساختار فایل‌ها را بررسی کنید:
+
+```text
+my_calendar/
+└── static/
+    └── mycalendar/
+        ├── calendar.css
+        └── calendar.js
+```
+
+و در Template:
+
+```django
+{% load static %}
+```
+
+وجود داشته باشد.
+
+---
+
+# Full Minimal Example
+
+```html
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>
+        My Calendar
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'mycalendar/calendar.css' %}"
+    >
+
+</head>
+
+<body>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    <input
+        type="text"
+        name="title"
+        placeholder="عنوان"
+    >
+
+    <input
+        type="text"
+        name="start_date"
+        id="start-date"
+        class="jalali-date-input"
+        placeholder="انتخاب تاریخ شروع"
+        autocomplete="off"
+        readonly
+    >
+
+    <input
+        type="text"
+        name="deadline"
+        id="deadline"
+        class="jalali-date-input"
+        placeholder="انتخاب مهلت"
+        autocomplete="off"
+        readonly
+    >
+
+    <button type="submit">
+        ذخیره
+    </button>
+
+</form>
+
+
+<!-- ============================================= -->
+<!-- CALENDAR MODAL -->
+<!-- ============================================= -->
+
+<div
+    id="calendar-picker-modal"
+    class="calendar-picker-modal"
+    hidden
+>
+
+    <div
+        class="calendar-picker-overlay"
+    ></div>
+
+
+    <div
+        class="calendar-picker-container"
+    >
+
+        <button
+            type="button"
+            id="calendar-picker-close"
+            class="calendar-picker-close"
+        >
+            ×
+        </button>
+
+
+        <div class="calendar">
+
+            <div class="calendar-topbar">
+
+                <button
+                    type="button"
+                    id="previous-month"
+                    class="month-button"
+                >
+                    ‹
+                </button>
+
+
+                <div
+                    id="month-title"
+                    class="month-title"
+                ></div>
+
+
+                <button
+                    type="button"
+                    id="next-month"
+                    class="month-button"
+                >
+                    ›
+                </button>
+
+            </div>
+
+
+            <div
+                id="weekdays"
+                class="weekdays"
+            ></div>
+
+
+            <div
+                id="calendar-grid"
+                class="calendar-grid"
+            ></div>
+
+        </div>
+
+    </div>
+
+</div>
 
 
 <script
@@ -889,28 +1318,30 @@ MyCalendar.open(
 برای استفاده از `My Calendar`:
 
 ```text
-1. Add my_calendar to INSTALLED_APPS
-2. Configure my_calendar URLs
-3. Load calendar.css
-4. Load calendar.js
-5. Add class="jalali-date-input" to date inputs
-6. User clicks the input
-7. My Calendar opens
-8. User selects a Jalali date
-9. Selected date is written into the input
-10. Django receives the Jalali date
+1. Create the Django app
+2. Add my_calendar to INSTALLED_APPS
+3. Configure app URLs
+4. Load calendar.css
+5. Load calendar.js
+6. Add the calendar modal HTML
+7. Add jalali-date-input to date inputs
+8. Click an input
+9. Select a Jalali date
+10. The selected date is written to the input
+11. Submit the Django form
+12. Receive the Jalali date in Django
 ```
 
-فرمت خروجی:
+فرمت تاریخ خروجی:
 
 ```text
 YYYY/MM/DD
 ```
 
-مثال:
+با ارقام فارسی:
 
 ```text
-1405/06/20
+۱۴۰۵/۰۶/۲۰
 ```
 
-`My Calendar` مستقل از datepickerهای خارجی است و می‌تواند در هر فرم Django که نیاز به انتخاب تاریخ شمسی دارد استفاده شود.
+`My Calendar` یک Jalali Date Picker مستقل است که بدون jQuery و بدون کتابخانه‌های خارجی Date Picker کار می‌کند.

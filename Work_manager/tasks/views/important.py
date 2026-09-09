@@ -1,12 +1,34 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
+import jdatetime
+
 from ..models import Todo
+
+
+# ==================================================
+# DIGIT CONVERSION
+# ==================================================
+
+def to_persian_digits(value):
+    """Convert English digits to Persian digits."""
+
+    if value is None:
+        return ""
+
+    return str(value).translate(
+        str.maketrans(
+            "0123456789",
+            "۰۱۲۳۴۵۶۷۸۹"
+        )
+    )
 
 
 # ==================================================
 # IMPORTANT TASKS
 # ==================================================
 
+@login_required
 def important_tasks(request):
 
     # Get important public tasks and personal tasks
@@ -24,37 +46,129 @@ def important_tasks(request):
     todos = todos.order_by("-created_at")
 
 
-    # Calculate the total number of visible important tasks
+    # ==================================================
+    # CALCULATE TASK STATISTICS
+    # ==================================================
+
     total_tasks = todos.count()
 
-
-    # Calculate the number of completed important tasks
     completed_tasks = todos.filter(
         completed=True
     ).count()
 
-
-    # Calculate the number of remaining important tasks
     remaining_tasks = todos.filter(
         completed=False
     ).count()
 
 
-    # Data that will be sent to the HTML template
+    # ==================================================
+    # FORMAT STATISTICS WITH PERSIAN DIGITS
+    # ==================================================
+
+    total_tasks_display = to_persian_digits(
+        total_tasks
+    )
+
+    completed_tasks_display = to_persian_digits(
+        completed_tasks
+    )
+
+    remaining_tasks_display = to_persian_digits(
+        remaining_tasks
+    )
+
+
+    # ==================================================
+    # FORMAT JALALI DATES
+    # ==================================================
+
+    for todo in todos:
+
+        # Creation date
+
+        created_at_jalali = (
+            jdatetime.datetime.fromgregorian(
+                datetime=todo.created_at
+            ).strftime("%Y/%m/%d")
+        )
+
+        todo.created_at_jalali_str = to_persian_digits(
+            created_at_jalali
+        )
+
+
+        # Start date
+
+        if todo.start_date:
+
+            start_date_jalali = (
+                todo.start_date.strftime("%Y/%m/%d")
+            )
+
+            todo.start_date_jalali_str = to_persian_digits(
+                start_date_jalali
+            )
+
+        else:
+
+            todo.start_date_jalali_str = None
+
+
+        # End date
+
+        if todo.end_date:
+
+            end_date_jalali = (
+                todo.end_date.strftime("%Y/%m/%d")
+            )
+
+            todo.end_date_jalali_str = to_persian_digits(
+                end_date_jalali
+            )
+
+        else:
+
+            todo.end_date_jalali_str = None
+
+
+        # Deadline
+
+        if todo.deadline:
+
+            deadline_jalali = (
+                todo.deadline.strftime("%Y/%m/%d")
+            )
+
+            todo.deadline_jalali_str = to_persian_digits(
+                deadline_jalali
+            )
+
+        else:
+
+            todo.deadline_jalali_str = None
+
+
+    # ==================================================
+    # CONTEXT
+    # ==================================================
+
     context = {
         "todos": todos,
-        "total_tasks": total_tasks,
-        "completed_tasks": completed_tasks,
-        "remaining_tasks": remaining_tasks,
-        "page": "important",
+
+        "total_tasks": total_tasks_display,
+
+        "completed_tasks": completed_tasks_display,
+
+        "remaining_tasks": remaining_tasks_display,
     }
 
 
-    # Render the Important Tasks page
-    # and pass the context data to the template
+    # ==================================================
+    # RENDER PAGE
+    # ==================================================
+
     return render(
         request,
         "tasks/important.html",
         context
     )
-

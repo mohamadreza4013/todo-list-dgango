@@ -1,4 +1,3 @@
-
 {% load static %}
 
 <!DOCTYPE html>
@@ -6,167 +5,79 @@
 <html lang="fa" dir="rtl">
 
 <head>
-    
-<!-- Page character encoding -->
-<meta charset="UTF-8">
 
-<!-- Make the page responsive -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ==================================================
+         DOCUMENT SETTINGS
+    ================================================== -->
 
-<!-- Page title -->
-<title>ویرایش وظیفه - تسک‌فلو</title>
+    <!-- Page character encoding -->
+    <meta charset="UTF-8">
 
-<!-- Main project CSS file -->
-<link rel="stylesheet" href="{% static 'tasks/style.css' %}">
+
+    <!-- Make the page responsive -->
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+
+    <!-- Page title -->
+    <title>
+        ویرایش وظیفه - تسک‌فلو
+    </title>
+
+
+    <!-- ==================================================
+         CSS
+    ================================================== -->
+
+    <!-- Main project CSS -->
+    <link
+        rel="stylesheet"
+        href="{% static 'tasks/style.css' %}"
+    >
+
+
+    <!-- Calendar CSS -->
+    <link
+        rel="stylesheet"
+        href="{% static 'calendar/calendar.css' %}"
+    >
 
 </head>
 
+
 <body>
 
-<div class="app">
-
-<!-- =========================
-     Sidebar
-     ========================= -->
-
-<aside class="sidebar">
-
-    <!-- Application logo -->
-    <div class="logo">
-
-        <!-- Logo icon -->
-        <div class="logo-icon">✓</div>
-
-        <!-- Application name -->
-        <span>تسک‌فلو</span>
-
-    </div>
+<div class="edit-page">
 
 
-    <!-- Sidebar section title -->
-    <div class="nav-title">
-        فضای کاری
-    </div>
-
-
-    <!-- Main navigation -->
-    <nav class="nav">
-
-        <!-- Dashboard link -->
-        <a href="{% url 'home' %}" class="nav-item">
-
-            <span>▦</span>
-
-            داشبورد
-
-        </a>
-
-
-        <!-- Current page / My Tasks -->
-        <a href="#" class="nav-item active">
-
-            <span>✓</span>
-
-            وظایف من
-
-        </a>
-
-
-        <!-- Important Tasks -->
-        <a href="#" class="nav-item">
-
-            <span>★</span>
-
-            مهم
-
-        </a>
-
-    </nav>
-
-
-    <!-- =========================
-         Sidebar Bottom Section
-         ========================= -->
-
-    <div class="sidebar-bottom">
-
-        <!-- Bottom navigation -->
-        <div class="nav">
-
-            <!-- Settings link -->
-            <a href="#" class="nav-item">
-
-                <span>⚙</span>
-
-                تنظیمات
-
-            </a>
-
-        </div>
-
-
-        <!-- =========================
-             User Profile
-             ========================= -->
-
-        <div class="profile">
-
-            <!-- User avatar -->
-            <div class="avatar">
-                MR
-            </div>
-
-
-            <!-- User information -->
-            <div class="profile-info">
-
-                <!-- User name -->
-                <span class="profile-name">
-                    محمدرضا
-                </span>
-
-                <!-- User account title -->
-                <span class="profile-email">
-                    حساب کاربری
-                </span>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</aside>
-
-
-<!-- =========================
-     Main Content
-     ========================= -->
-
-<main class="main">
-
-
-    <!-- =========================
-         Page Header
-         ========================= -->
+    <!-- ==================================================
+         PAGE HEADER
+    ================================================== -->
 
     <div class="page-header">
 
-        <!-- Link back to dashboard -->
-        <a href="{% url 'home' %}" class="back-link">
 
+        <!-- Back to dashboard -->
+
+        <a
+            href="{% url 'home' %}"
+            class="back-link"
+        >
             ← بازگشت به داشبورد
-
         </a>
 
 
         <!-- Page title -->
+
         <h1>
             ویرایش وظیفه
         </h1>
 
 
-        <!-- Short page description -->
+        <!-- Page description -->
+
         <p>
             جزئیات وظیفه خود را به‌روزرسانی کنید.
         </p>
@@ -174,31 +85,25 @@
     </div>
 
 
-    <!-- =========================
-         Edit Task Card
-         ========================= -->
+    <!-- ==================================================
+         EDIT TASK CARD
+    ================================================== -->
 
     <div class="edit-card">
 
 
-        <!-- =========================
-             Task Information
-             ========================= -->
+        <!-- ==================================================
+             TASK INFORMATION
+        ================================================== -->
 
         <div class="task-info">
 
 
-            <!--
-                Display the current task status.
+            <!-- Task status -->
 
-                If todo.completed is True:
-                → Display "Completed"
-                → Add the completed class
-
-                Otherwise:
-                → Display "Pending"
-            -->
-            <span class="status {% if todo.completed %}completed{% endif %}">
+            <span
+                class="status {% if todo.completed %}completed{% endif %}"
+            >
 
                 {% if todo.completed %}
 
@@ -213,7 +118,8 @@
             </span>
 
 
-            <!-- Display the task ID -->
+            <!-- Task ID -->
+
             <span class="task-id">
 
                 وظیفه شماره {{ todo.id }}
@@ -223,44 +129,31 @@
         </div>
 
 
-        <!-- =========================
-             Task Edit Form
-             ========================= -->
+        <!-- ==================================================
+             EDIT FORM
+        ================================================== -->
 
-        <!--
-            This form sends the edited task data
-            to the edit_todo view using POST.
-        -->
-        <form method="POST">
+        <form
+            method="POST"
+        >
 
-            <!--
-                Django CSRF protection token.
-
-                Required for POST requests in Django.
-            -->
             {% csrf_token %}
 
 
-            <!-- =========================
-                 Task Title
-                 ========================= -->
+            <!-- ==================================================
+                 TITLE
+            ================================================== -->
 
             <div class="form-group">
 
-                <!-- Title field label -->
-                <label class="form-label" for="title">
-
+                <label
+                    class="form-label"
+                    for="title"
+                >
                     عنوان وظیفه
-
                 </label>
 
 
-                <!--
-                    Task title field.
-
-                    todo.title displays the current
-                    task title inside the input.
-                -->
                 <input
                     id="title"
                     class="form-input"
@@ -274,26 +167,20 @@
             </div>
 
 
-            <!-- =========================
-                 Task Description
-                 ========================= -->
+            <!-- ==================================================
+                 DESCRIPTION
+            ================================================== -->
 
             <div class="form-group">
 
-                <!-- Description field label -->
-                <label class="form-label" for="description">
-
+                <label
+                    class="form-label"
+                    for="description"
+                >
                     توضیحات
-
                 </label>
 
 
-                <!--
-                    Task description edit field.
-
-                    Django places the current description
-                    between the textarea tags.
-                -->
                 <textarea
                     id="description"
                     class="form-textarea"
@@ -304,42 +191,130 @@
             </div>
 
 
-            <!-- =========================
-                 Form Buttons
-                 ========================= -->
+            <!-- ==================================================
+                 CATEGORY
+            ================================================== -->
+
+            <div class="form-group">
+
+                <label
+                    class="form-label"
+                    for="category"
+                >
+                    نوع وظیفه
+                </label>
+
+
+                <select
+                    id="category"
+                    class="form-input task-category-input"
+                    name="category"
+                >
+
+                    <!-- Personal -->
+
+                    <option
+                        value="personal"
+                        {% if todo.category == "personal" %}selected{% endif %}
+                    >
+                        شخصی
+                    </option>
+
+
+                    <!-- Public -->
+
+                    <option
+                        value="public"
+                        {% if todo.category == "public" %}selected{% endif %}
+                    >
+                        عمومی
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- ==================================================
+                 START DATE
+            ================================================== -->
+
+            <div class="form-group">
+
+                <label
+                    class="form-label"
+                    for="start-date"
+                >
+                    تاریخ شروع
+                </label>
+
+
+                <input
+                    type="text"
+                    id="start-date"
+                    class="form-input jalali-date-input"
+                    name="start_date"
+                    value="{{ start_date_jalali }}"
+                    placeholder="انتخاب تاریخ شروع"
+                    autocomplete="off"
+                    readonly
+                >
+
+            </div>
+
+
+            <!-- ==================================================
+                 DEADLINE
+            ================================================== -->
+
+            <div class="form-group">
+
+                <label
+                    class="form-label"
+                    for="deadline"
+                >
+                    مهلت انجام
+                </label>
+
+
+                <input
+                    type="text"
+                    id="deadline"
+                    class="form-input jalali-date-input"
+                    name="deadline"
+                    value="{{ deadline_jalali }}"
+                    placeholder="انتخاب مهلت"
+                    autocomplete="off"
+                    readonly
+                >
+
+            </div>
+
+
+            <!-- ==================================================
+                 FORM ACTIONS
+            ================================================== -->
 
             <div class="form-actions">
 
 
-                <!--
-                    Cancel editing.
+                <!-- Cancel -->
 
-                    Returns the user to the dashboard
-                    without saving changes.
-                -->
                 <a
                     href="{% url 'home' %}"
                     class="cancel-button"
                 >
-
                     لغو
-
                 </a>
 
 
-                <!--
-                    Save changes.
+                <!-- Save -->
 
-                    The browser sends a POST request
-                    with the edited task information.
-                -->
                 <button
                     type="submit"
                     class="save-button"
                 >
-
                     ذخیره تغییرات
-
                 </button>
 
             </div>
@@ -348,9 +323,150 @@
 
     </div>
 
-</main>
+</div>
+
+
+<!-- ==================================================
+     CALENDAR PICKER MODAL
+================================================== -->
+
+<div
+    id="calendar-picker-modal"
+    class="calendar-picker-modal"
+    hidden
+>
+
+
+    <!-- ==================================================
+         CALENDAR OVERLAY
+    ================================================== -->
+
+    <div
+        class="calendar-picker-overlay"
+    ></div>
+
+
+    <!-- ==================================================
+         CALENDAR CONTAINER
+    ================================================== -->
+
+    <div
+        class="calendar-picker-container"
+    >
+
+
+        <!-- Close calendar -->
+
+        <button
+            type="button"
+            id="calendar-picker-close"
+            class="calendar-picker-close"
+            aria-label="بستن تقویم"
+        >
+            ×
+        </button>
+
+
+        <!-- ==================================================
+             CALENDAR HEADER
+        ================================================== -->
+
+        <div
+            class="calendar-picker-header"
+        >
+
+            <h2>
+                انتخاب تاریخ
+            </h2>
+
+        </div>
+
+
+        <!-- ==================================================
+             CALENDAR
+        ================================================== -->
+
+        <div class="calendar">
+
+
+            <!-- ==================================================
+                 CALENDAR NAVIGATION
+            ================================================== -->
+
+            <div
+                class="calendar-topbar"
+            >
+
+
+                <!-- Previous month -->
+
+                <button
+                    type="button"
+                    id="previous-month"
+                    class="month-button"
+                    aria-label="ماه قبل"
+                >
+                    ‹
+                </button>
+
+
+                <!-- Current month -->
+
+                <div
+                    id="month-title"
+                    class="month-title"
+                ></div>
+
+
+                <!-- Next month -->
+
+                <button
+                    type="button"
+                    id="next-month"
+                    class="month-button"
+                    aria-label="ماه بعد"
+                >
+                    ›
+                </button>
+
+            </div>
+
+
+            <!-- ==================================================
+                 WEEKDAYS
+            ================================================== -->
+
+            <div
+                id="weekdays"
+                class="weekdays"
+            ></div>
+
+
+            <!-- ==================================================
+                 CALENDAR DAYS
+            ================================================== -->
+
+            <div
+                id="calendar-grid"
+                class="calendar-grid"
+            ></div>
+
+        </div>
+
+    </div>
 
 </div>
+
+
+<!-- ==================================================
+     JAVASCRIPT
+================================================== -->
+
+<!-- Jalali calendar -->
+<script
+    src="{% static 'calendar/calendar.js' %}"
+></script>
+
 
 </body>
 
