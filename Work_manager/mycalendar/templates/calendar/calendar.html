@@ -5,15 +5,19 @@
 
 <head>
 
+    <!-- Set the character encoding -->
     <meta charset="UTF-8">
 
+    <!-- Make the page responsive on different screen sizes -->
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
 
+    <!-- Set the page title -->
     <title>My Calendar</title>
 
+    <!-- Load the calendar page stylesheet -->
     <link
         rel="stylesheet"
         href="{% static 'mycalendar/calendar.css' %}"
@@ -23,13 +27,23 @@
 
 <body>
 
+<!-- Main calendar page container -->
+
 <div class="calendar-page">
 
+    <!-- =========================
+         Calendar Header
+         ========================= -->
+
     <div class="calendar-header">
+
+        <!-- Calendar page title -->
 
         <h1>
             My Calendar
         </h1>
+
+        <!-- Calendar description -->
 
         <p>
             تقویم شمسی
@@ -38,9 +52,17 @@
     </div>
 
 
+    <!-- =========================
+         Calendar
+         ========================= -->
+
     <div class="calendar">
 
+        <!-- Calendar navigation bar -->
+
         <div class="calendar-topbar">
+
+            <!-- Button for navigating to the previous month -->
 
             <button
                 id="previous-month"
@@ -49,10 +71,14 @@
                 ‹
             </button>
 
+            <!-- Display the current month and year -->
+
             <div
                 id="month-title"
                 class="month-title"
             ></div>
+
+            <!-- Button for navigating to the next month -->
 
             <button
                 id="next-month"
@@ -64,11 +90,23 @@
         </div>
 
 
+        <!-- =========================
+             Weekdays
+             ========================= -->
+
+        <!-- JavaScript dynamically generates the weekday names here -->
+
         <div
             id="weekdays"
             class="weekdays"
         ></div>
 
+
+        <!-- =========================
+             Calendar Grid
+             ========================= -->
+
+        <!-- JavaScript dynamically generates the calendar days here -->
 
         <div
             id="calendar-grid"
@@ -77,6 +115,12 @@
 
     </div>
 
+
+    <!-- =========================
+         Selected Date
+         ========================= -->
+
+    <!-- Displays the date selected by the user -->
 
     <div
         id="selected-date"
@@ -87,6 +131,8 @@
 
 </div>
 
+
+<!-- Load the JavaScript file responsible for calendar functionality -->
 
 <script src="{% static 'mycalendar/calendar.js' %}"></script>
 

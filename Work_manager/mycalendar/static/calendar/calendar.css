@@ -1,11 +1,21 @@
+/* Apply border-box sizing to all elements
+   so padding and border are included in
+   the element's total width and height. */
 * {
     box-sizing: border-box;
 }
+
+
+/* Hide the calendar modal when the hidden
+   attribute is present. */
 .calendar-picker-modal[hidden] {
     display: none;
 }
 
 
+/* Main modal wrapper.
+   Covers the entire viewport and centers
+   the calendar picker in the middle of the screen. */
 .calendar-picker-modal {
     position: fixed;
 
@@ -21,6 +31,8 @@
 }
 
 
+/* Semi-transparent background overlay
+   displayed behind the calendar modal. */
 .calendar-picker-overlay {
     position: absolute;
 
@@ -35,6 +47,9 @@
 }
 
 
+/* Calendar picker modal container.
+   Defines its size, appearance, scrolling behavior,
+   and visual styling. */
 .calendar-picker-container {
     position: relative;
 
@@ -60,6 +75,9 @@
 }
 
 
+/* Layout for the modal header.
+   Places the title and other header elements
+   on opposite sides. */
 .calendar-picker-header {
     display: flex;
 
@@ -71,6 +89,8 @@
 }
 
 
+/* Remove the default heading margin
+   and define the modal title size. */
 .calendar-picker-header h2 {
     margin: 0;
 
@@ -78,6 +98,8 @@
 }
 
 
+/* Close button for the calendar picker.
+   Positioned in the top-left corner of the modal. */
 .calendar-picker-close {
     position: absolute;
 
@@ -101,16 +123,24 @@
 }
 
 
+/* Change the close button background
+   when the user hovers over it. */
 .calendar-picker-close:hover {
     background: #e5e7eb;
 }
 
 
+/* Remove the default shadow from the calendar
+   when it is displayed inside the date-picker modal. */
 .calendar-picker-container
 .calendar {
     box-shadow: none;
 }
 
+
+/* Global page styling.
+   Defines the default margin, font family,
+   background color, and text color. */
 body {
     margin: 0;
 
@@ -125,6 +155,8 @@ body {
 }
 
 
+/* Main calendar page container.
+   Limits the calendar width and centers it horizontally. */
 .calendar-page {
     width: min(1000px, 92%);
 
@@ -132,21 +164,28 @@ body {
 }
 
 
+/* Header section above the calendar. */
 .calendar-header {
     margin-bottom: 25px;
 }
 
 
+/* Remove the default top margin from the main heading
+   and add a small space below it. */
 .calendar-header h1 {
     margin: 0 0 8px;
 }
 
 
+/* Style the descriptive text below the calendar title. */
 .calendar-header p {
     color: #6b7280;
 }
 
 
+/* Main calendar card.
+   Provides the white background, border,
+   rounded corners, and clipping for its contents. */
 .calendar {
     background: white;
 
@@ -159,6 +198,8 @@ body {
 }
 
 
+/* Top section of the calendar containing
+   the month title and navigation buttons. */
 .calendar-topbar {
     display: flex;
 
@@ -173,6 +214,7 @@ body {
 }
 
 
+/* Style the currently displayed month title. */
 .month-title {
     font-size: 22px;
 
@@ -180,6 +222,7 @@ body {
 }
 
 
+/* Previous/next month navigation buttons. */
 .month-button {
     width: 42px;
 
@@ -197,11 +240,15 @@ body {
 }
 
 
+/* Change the month button background
+   when the user hovers over it. */
 .month-button:hover {
     background: #e5e7eb;
 }
 
 
+/* Create a seven-column grid for both
+   weekday labels and calendar days. */
 .weekdays,
 .calendar-grid {
     display: grid;
@@ -211,6 +258,8 @@ body {
 }
 
 
+/* Style the weekday names displayed
+   above the calendar grid. */
 .weekday {
     padding: 14px 5px;
 
@@ -229,6 +278,9 @@ body {
 }
 
 
+/* Individual calendar day cell.
+   Defines its size, alignment, borders,
+   background, and interaction behavior. */
 .calendar-day {
     min-height: 110px;
 
@@ -252,11 +304,15 @@ body {
 }
 
 
+/* Highlight a calendar day when
+   the user moves the mouse over it. */
 .calendar-day:hover {
     background: #f8faff;
 }
 
 
+/* Style the current day differently
+   so it can be identified easily. */
 .calendar-day.today {
     color: #4f46e5;
 
@@ -264,6 +320,9 @@ body {
 }
 
 
+/* Style the currently selected date.
+   Adds a light background and an inner border
+   to make the selected day visually distinct. */
 .calendar-day.selected {
     background: #eef2ff;
 
@@ -274,6 +333,8 @@ body {
 }
 
 
+/* Empty cells are used for the days before
+   the first day or after the last day of a month. */
 .calendar-day.empty {
     background: #fafafa;
 
@@ -281,6 +342,7 @@ body {
 }
 
 
+/* Display the selected date below the calendar. */
 .selected-date {
     margin-top: 20px;
 
@@ -299,8 +361,11 @@ body {
 }
 
 
+/* Responsive styles for smaller screens. */
 @media (max-width: 700px) {
 
+    /* Reduce calendar cell height,
+       padding, and font size on mobile devices. */
     .calendar-day {
         min-height: 70px;
 
@@ -309,6 +374,8 @@ body {
         font-size: 12px;
     }
 
+    /* Reduce weekday label size
+       on smaller screens. */
     .weekday {
         font-size: 10px;
     }
