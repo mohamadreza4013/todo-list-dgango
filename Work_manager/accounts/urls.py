@@ -18,5 +18,7 @@ urlpatterns = [
         "signup/",
         views.signup,
         name="signup" ),
-    path("logout-confirm/", views.logout_confirm, name="logout_confirm"),
+    path("logout-confirm/",
+         views.logout_confirm,
+         name="logout_confirm"),
 ]

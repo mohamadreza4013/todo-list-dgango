@@ -1,19 +1,24 @@
 {% load static %}
+
 <!DOCTYPE html>
 
 <html lang="fa" dir="rtl">
 
 <head>
 
+    <!-- Set the character encoding -->
     <meta charset="UTF-8">
 
+    <!-- Make the page responsive on different screen sizes -->
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
 
+    <!-- Set the page title -->
     <title>ورود - تسک‌فلو</title>
 
+    <!-- Load the login page stylesheet -->
     <link
         rel="stylesheet"
         href="{% static 'accounts/login.css' %}"
@@ -22,6 +27,8 @@
 </head>
 
 <body>
+
+<!-- Main login page container -->
 
 <div class="login-page">
 
@@ -34,9 +41,13 @@
 
     <div class="login-logo">
 
+        <!-- Logo icon -->
+
         <div class="login-logo-icon">
             ✓
         </div>
+
+        <!-- Application name -->
 
         <span>
             تسک‌فلو
@@ -52,13 +63,19 @@
     <div class="login-card">
 
 
-        <!-- Header -->
+        <!-- =========================
+             Login Header
+             ========================= -->
 
         <div class="login-header">
+
+            <!-- Page heading -->
 
             <h1>
                 خوش آمدید
             </h1>
+
+            <!-- Login description -->
 
             <p>
                 برای ورود به حساب کاربری خود، اطلاعاتتان را وارد کنید.
@@ -73,12 +90,18 @@
 
         <form method="POST">
 
+            <!-- Protect the form against CSRF attacks -->
+
             {% csrf_token %}
 
 
-            <!-- Django Login Error -->
+            <!-- =========================
+                 Django Login Error
+                 ========================= -->
 
             {% if form.errors %}
+
+                <!-- Display an error when login credentials are invalid -->
 
                 <div class="login-error">
 
@@ -90,9 +113,13 @@
             {% endif %}
 
 
-            <!-- Username -->
+            <!-- =========================
+                 Username
+                 ========================= -->
 
             <div class="login-form-group">
+
+                <!-- Username field label -->
 
                 <label
                     for="username"
@@ -100,6 +127,8 @@
                 >
                     نام کاربری
                 </label>
+
+                <!-- Username input -->
 
                 <input
                     id="username"
@@ -114,9 +143,13 @@
             </div>
 
 
-            <!-- Password -->
+            <!-- =========================
+                 Password
+                 ========================= -->
 
             <div class="login-form-group">
+
+                <!-- Password field label -->
 
                 <label
                     for="password"
@@ -124,6 +157,8 @@
                 >
                     رمز عبور
                 </label>
+
+                <!-- Password input -->
 
                 <input
                     id="password"
@@ -138,7 +173,9 @@
             </div>
 
 
-            <!-- Submit -->
+            <!-- =========================
+                 Submit Button
+                 ========================= -->
 
             <button
                 type="submit"
@@ -156,9 +193,13 @@
 
         <div class="signup-link">
 
+            <!-- Text shown to users without an account -->
+
             <span>
                 حساب کاربری ندارید؟
             </span>
+
+            <!-- Link to the signup page -->
 
             <a href="{% url 'signup' %}">
                 ثبت‌نام کنید
@@ -170,7 +211,9 @@
     </div>
 
 
-    <!-- Footer -->
+    <!-- =========================
+         Footer
+         ========================= -->
 
     <div class="login-footer">
         مدیریت ساده و منظم وظایف با تسک‌فلو
