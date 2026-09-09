@@ -10,119 +10,309 @@ from ..models import Todo
 # DASHBOARD / HOME
 # ==================================================
 
-#@login_required
+@login_required
 def home(request):
     """
-    نمایش داشبورد و مدیریت افزودن تسک
+    Display the dashboard and handle task creation.
     """
 
     # =========================
-    # افزودن تسک جدید (AJAX)
+    # Add a new task
     # =========================
     if request.method == "POST":
+
         title = request.POST.get("title")
         description = request.POST.get("description")
-        start_date_str = request.POST.get("start_date")   # تاریخ شمسی به‌صورت رشته
-        deadline_str = request.POST.get("deadline")       # تاریخ شمسی به‌صورت رشته
 
-        # تبدیل رشته شمسی به jdatetime.date (بدون تبدیل به میلادی)
+        category = request.POST.get(
+            "category",
+            "personal"
+        )
+
+        start_date_str = request.POST.get("start_date")
+        deadline_str = request.POST.get("deadline")
+
+
+        # =========================
+        # Validate category
+        # =========================
+
+        if category not in ["personal", "public"]:
+            category = "personal"
+
+
+        # =========================
+        # Convert Jalali start date
+        # =========================
+
         start_date = None
-        deadline = None
 
         if start_date_str:
+
             try:
+
                 iso_start = start_date_str.replace("/", "-")
-                start_date = jdatetime.date.fromisoformat(iso_start)
+
+                start_date = jdatetime.date.fromisoformat(
+                    iso_start
+                )
+
             except ValueError:
+
                 start_date = None
 
+
+        # =========================
+        # Convert Jalali deadline
+        # =========================
+
+        deadline = None
+
         if deadline_str:
+
             try:
+
                 iso_deadline = deadline_str.replace("/", "-")
-                deadline = jdatetime.date.fromisoformat(iso_deadline)
+
+                deadline = jdatetime.date.fromisoformat(
+                    iso_deadline
+                )
+
             except ValueError:
+
                 deadline = None
 
-        # ایجاد تسک جدید برای کاربر جاری
-        # فیلدهای start_date و deadline از نوع jmodels.jDateField هستند
-        # و به‌طور مستقیم شیء jdatetime.date را می‌پذیرند
+
+        # =========================
+        # Create task
+        # =========================
+
         todo = Todo.objects.create(
-            #user=request.user,
+
+            user=request.user,
+
             title=title,
+
             description=description,
-            start_date=start_date,   # jdatetime.date
-            deadline=deadline,       # jdatetime.date
+
+            category=category,
+
+            start_date=start_date,
+
+            deadline=deadline,
         )
 
-        # تبدیل تاریخ‌ها به رشته شمسی برای ارسال در JSON
+
+        # =========================
+        # Convert dates to Jalali
+        # =========================
+
         start_date_jalali = (
+
             todo.start_date.strftime("%Y/%m/%d")
-            if todo.start_date else ""
+
+            if todo.start_date
+
+            else ""
+
         )
+
 
         deadline_jalali = (
+
             todo.deadline.strftime("%Y/%m/%d")
-            if todo.deadline else ""
+
+            if todo.deadline
+
+            else ""
+
         )
-        created_at_jalali = jdatetime.datetime.fromgregorian(
-            datetime=todo.created_at
-        ).strftime("%d %b %Y")
+
+
+        created_at_jalali = (
+
+            jdatetime.datetime.fromgregorian(
+                datetime=todo.created_at
+            ).strftime("%d %b %Y")
+
+        )
+
+
+        # =========================
+        # Return JSON response
+        # =========================
 
         return JsonResponse({
+
             "success": True,
+
             "todo_id": todo.id,
+
             "title": todo.title,
+
             "description": todo.description,
+
+            "category": todo.category,
+
             "start_date": start_date_jalali,
+
             "deadline": deadline_jalali,
+
             "created_at": created_at_jalali,
         })
 
+
     # =========================
-    # نمایش داشبورد
+    # Display dashboard
     # =========================
 
-    # فقط تسک‌های کاربر جاری
-    #todos = Todo.objects.filter(user=request.user).order_by("-created_at")
-    todos = Todo.objects.order_by("-created_at")
-    # آمار
+    # Show:
+    # 1. Personal tasks belonging to the current user
+    # 2. Public tasks belonging to all users
+
+    todos = Todo.objects.filter(
+
+        category="public"
+
+    ) | Todo.objects.filter(
+
+        category="personal",
+        user=request.user
+
+    )
+
+
+    # Keep newest tasks first
+
+    todos = todos.order_by("-created_at")
+
+
+    # =========================
+    # Statistics
+    # =========================
+
     total_tasks = todos.count()
-    completed_tasks = todos.filter(completed=True).count()
-    remaining_tasks = todos.filter(completed=False).count()
 
-    # فیلتر
+    completed_tasks = todos.filter(
+        completed=True
+    ).count()
+
+    remaining_tasks = todos.filter(
+        completed=False
+    ).count()
+
+
+    # =========================
+    # Task filters
+    # =========================
+
     filter_type = request.GET.get("filter")
 
+
     if filter_type == "active":
-        todos = todos.filter(completed=False)
+
+        todos = todos.filter(
+            completed=False
+        )
+
+
     elif filter_type == "completed":
-        todos = todos.filter(completed=True)
 
-    # افزودن رشته‌های تاریخ شمسی به هر تسک برای نمایش در قالب
+        todos = todos.filter(
+            completed=True
+        )
+
+
+    # =========================
+    # Prepare Jalali dates
+    # =========================
+
     for todo in todos:
-        # تاریخ ایجاد (میلادی -> شمسی)
-        todo.created_at_jalali_str = jdatetime.datetime.fromgregorian(
-            datetime=todo.created_at
-        ).strftime("%d %b %Y")
 
-        # تاریخ شروع (شمسی)
+
+        # Creation date
+
+        todo.created_at_jalali_str = (
+
+            jdatetime.datetime.fromgregorian(
+                datetime=todo.created_at
+            ).strftime("%d %b %Y")
+
+        )
+
+
+        # Start date
+
         if todo.start_date:
-            todo.start_date_jalali_str = todo.start_date.strftime("%d %b %Y")
+
+            todo.start_date_jalali_str = (
+
+                todo.start_date.strftime(
+                    "%d %b %Y"
+                )
+
+            )
+
         else:
+
             todo.start_date_jalali_str = None
 
-        # مهلت (شمسی)
-        if todo.deadline:
-            todo.deadline_jalali_str = todo.deadline.strftime("%d %b %Y")
+
+        # Completion date
+
+        if todo.end_date:
+
+            todo.end_date_jalali_str = (
+
+                todo.end_date.strftime(
+                    "%d %b %Y"
+                )
+
+            )
+
         else:
+
+            todo.end_date_jalali_str = None
+
+
+        # Deadline
+
+        if todo.deadline:
+
+            todo.deadline_jalali_str = (
+
+                todo.deadline.strftime(
+                    "%d %b %Y"
+                )
+
+            )
+
+        else:
+
             todo.deadline_jalali_str = None
 
+
+    # =========================
+    # Template context
+    # =========================
+
     context = {
+
         "todos": todos,
+
         "filter_type": filter_type,
+
         "total_tasks": total_tasks,
+
         "completed_tasks": completed_tasks,
+
         "remaining_tasks": remaining_tasks,
+
     }
 
-    return render(request, "tasks/home.html", context)
+
+    return render(
+        request,
+        "tasks/home.html",
+        context
+    )
