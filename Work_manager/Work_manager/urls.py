@@ -74,6 +74,12 @@ urlpatterns = [
         important_tasks,
         name="important_tasks"
     ),
-    path("calendar/", include("mycalendar.urls")),
-    path('accounts/', include('accounts.urls')),
+    path("calendar/",
+         include("mycalendar.urls"),
+         name="mycalendarurls"
+    ),
+    path('accounts/',
+         include('accounts.urls'),
+         name="accountsurls"
+         ),
 ]

@@ -5,14 +5,20 @@
 
 <head>
 
+    <meta charset="UTF-8">
 
-<meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود - تسک‌فلو</title>
 
-<title>ورود - تسک‌فلو</title>
+    <link
+        rel="stylesheet"
+        href="{% static 'accounts/login.css' %}"
+    >
 
-<link rel="stylesheet" href="{% static 'accounts/login.css' %}">
 </head>
 
 <body>
@@ -144,6 +150,23 @@
         </form>
 
 
+        <!-- =========================
+             Sign Up Link
+             ========================= -->
+
+        <div class="signup-link">
+
+            <span>
+                حساب کاربری ندارید؟
+            </span>
+
+            <a href="{% url 'signup' %}">
+                ثبت‌نام کنید
+            </a>
+
+        </div>
+
+
     </div>
 
 
@@ -154,7 +177,6 @@
     </div>
 
 </div>
-```
 
 </div>
 

@@ -16,7 +16,7 @@ function formatDate(dateString) {
 
     const date = new Date(dateString);
 
-    // اگر تاریخ معتبر نبود، همان رشته را برگردان
+    // Return the original string if the date is invalid
     if (isNaN(date.getTime())) {
         return dateString;
     }
@@ -408,7 +408,7 @@ document.addEventListener(
                         );
 
 
-                    // حذف تاریخ اتمام قبلی
+                    // Remove the previous completion date
                     const oldEndDate =
                         datesContainer.querySelector(
                             ".end-date"
@@ -422,8 +422,7 @@ document.addEventListener(
                     }
 
 
-                    // اگر Task کامل شده،
-                    // تاریخ اتمام را اضافه کن
+                    // Add the completion date if the task is completed
                     if (
                         data.completed &&
                         data.end_date
@@ -567,9 +566,9 @@ document.addEventListener(
 
 
                     /*
-                        اگر در صفحه مهم هستیم
-                        و Task دیگر مهم نیست،
-                        کارت را حذف کن.
+                        If we are on the Important page
+                        and the Task is no longer important,
+                        remove the card.
                     */
 
                     if (

@@ -9,7 +9,10 @@ from ..models import Todo
 # ==================================================
 # DASHBOARD / HOME
 # ==================================================
-
+def to_persian_digits(value):
+    return str(value).translate(
+        str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹")
+    )
 @login_required
 def home(request):
     """
@@ -233,64 +236,27 @@ def home(request):
         # Creation date
 
         todo.created_at_jalali_str = (
-
             jdatetime.datetime.fromgregorian(
                 datetime=todo.created_at
-            ).strftime("%d %b %Y")
-
+            ).strftime("%Y/%m/%d")
         )
-
 
         # Start date
 
         if todo.start_date:
-
-            todo.start_date_jalali_str = (
-
-                todo.start_date.strftime(
-                    "%d %b %Y"
-                )
-
-            )
-
+            todo.start_date_jalali_str = todo.start_date.strftime("%Y/%m/%d")
         else:
-
             todo.start_date_jalali_str = None
 
-
-        # Completion date
-
         if todo.end_date:
-
-            todo.end_date_jalali_str = (
-
-                todo.end_date.strftime(
-                    "%d %b %Y"
-                )
-
-            )
-
+            todo.end_date_jalali_str = todo.end_date.strftime("%Y/%m/%d")
         else:
-
             todo.end_date_jalali_str = None
 
-
-        # Deadline
-
         if todo.deadline:
-
-            todo.deadline_jalali_str = (
-
-                todo.deadline.strftime(
-                    "%d %b %Y"
-                )
-
-            )
-
+            todo.deadline_jalali_str = todo.deadline.strftime("%Y/%m/%d")
         else:
-
             todo.deadline_jalali_str = None
-
 
     # =========================
     # Template context

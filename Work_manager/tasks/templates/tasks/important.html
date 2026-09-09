@@ -1,3 +1,4 @@
+
 {% load static %}
 
 <!DOCTYPE html>
@@ -6,16 +7,16 @@
 
 <head>
     
-<!-- کدگذاری کاراکترهای صفحه -->
+<!-- Page character encoding -->
 <meta charset="UTF-8">
 
-<!-- واکنش‌گرا کردن صفحه در اندازه‌های مختلف -->
+<!-- Make the page responsive on different screen sizes -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- عنوان صفحه -->
+<!-- Page title -->
 <title>وظایف مهم - تسک‌فلو</title>
 
-<!-- فایل CSS اصلی پروژه -->
+<!-- Main project CSS file -->
 <link rel="stylesheet" href="{% static 'tasks/style.css' %}">
 
 
@@ -26,13 +27,13 @@
 <div class="app">
 
 <!-- =========================
-     نوار کناری
+     Sidebar
      ========================= -->
 
 <aside class="sidebar">
 
 
-    <!-- لوگوی برنامه -->
+    <!-- Application logo -->
     <div class="logo">
 
         <div class="logo-icon">
@@ -46,17 +47,17 @@
     </div>
 
 
-    <!-- عنوان بخش نوار کناری -->
+    <!-- Sidebar section title -->
     <div class="nav-title">
         فضای کاری
     </div>
 
 
-    <!-- منوی اصلی -->
+    <!-- Main navigation -->
     <nav class="nav">
 
 
-        <!-- داشبورد -->
+        <!-- Dashboard -->
         <a
             href="{% url 'home' %}"
             class="nav-item {% if page == 'dashboard' %}active{% endif %}"
@@ -71,7 +72,7 @@
         </a>
 
 
-        <!-- وظایف من -->
+        <!-- My Tasks -->
         <a
             href="#"
             class="nav-item"
@@ -86,7 +87,7 @@
         </a>
 
 
-        <!-- وظایف مهم -->
+        <!-- Important Tasks -->
         <a
             href="{% url 'important_tasks' %}"
             class="nav-item {% if page == 'important' %}active{% endif %}"
@@ -104,16 +105,16 @@
 
 
     <!-- =========================
-         بخش پایینی نوار کناری
+         Sidebar Bottom Section
          ========================= -->
 
     <div class="sidebar-bottom">
 
 
-        <!-- منوی پایینی -->
+        <!-- Bottom navigation -->
         <div class="nav">
 
-            <!-- تنظیمات -->
+            <!-- Settings -->
             <a
                 href="#"
                 class="nav-item"
@@ -131,19 +132,19 @@
 
 
         <!-- =========================
-             پروفایل کاربر
+             User Profile
              ========================= -->
 
         <div class="profile">
 
 
-            <!-- آواتار کاربر -->
+            <!-- User avatar -->
             <div class="avatar">
                 MR
             </div>
 
 
-            <!-- اطلاعات کاربر -->
+            <!-- User information -->
             <div class="profile-info">
 
                 <span class="profile-name">
@@ -165,27 +166,27 @@
 
 
 <!-- =========================
-     محتوای اصلی
+     Main Content
      ========================= -->
 
 <main class="main">
 
 
     <!-- =========================
-         سربرگ صفحه
+         Page Header
          ========================= -->
 
     <div class="topbar">
 
         <div class="welcome">
 
-            <!-- عنوان صفحه -->
+            <!-- Page title -->
             <h1>
                 وظایف مهم ⭐
             </h1>
 
 
-            <!-- توضیح کوتاه صفحه -->
+            <!-- Short page description -->
             <p>
                 وظایفی که به عنوان مهم علامت‌گذاری کرده‌اید.
             </p>
@@ -197,14 +198,14 @@
 
 
     <!-- =========================
-         آمار
+         Statistics
          ========================= -->
 
     <section class="stats">
 
 
         <!-- =========================
-             تعداد وظایف مهم
+             Important Tasks Count
              ========================= -->
 
         <div class="stat-card">
@@ -223,10 +224,10 @@
 
 
             <!--
-                تعداد وظایف مهم
+                Number of important tasks
 
-                متغیر todos توسط ویوی
-                important_tasks ارسال می‌شود.
+                The todos variable is passed
+                from the important_tasks view.
             -->
             <div class="stat-number">
                 {{ todos|length }}
@@ -237,7 +238,7 @@
 
 
         <!-- =========================
-             تعداد انجام‌شده
+             Completed Tasks Count
              ========================= -->
 
         <div class="stat-card">
@@ -255,7 +256,7 @@
             </div>
 
 
-            <!-- تعداد وظایف مهم انجام‌شده -->
+            <!-- Number of completed important tasks -->
             <div class="stat-number">
                 {{ completed_tasks }}
             </div>
@@ -265,7 +266,7 @@
 
 
         <!-- =========================
-             تعداد باقی‌مانده
+             Remaining Tasks Count
              ========================= -->
 
         <div class="stat-card">
@@ -283,7 +284,7 @@
             </div>
 
 
-            <!-- تعداد وظایف مهم باقی‌مانده -->
+            <!-- Number of remaining important tasks -->
             <div class="stat-number">
                 {{ remaining_tasks }}
             </div>
@@ -295,7 +296,7 @@
 
 
     <!-- =========================
-         سربرگ لیست وظایف
+         Task List Header
          ========================= -->
 
     <div class="tasks-header">
@@ -309,27 +310,27 @@
 
 
     <!-- =========================
-         لیست وظایف مهم
+         Important Tasks List
          ========================= -->
 
     <section class="todo-list">
 
 
         <!--
-            پیمایش تمام وظایف مهم
-            دریافت‌شده از ویوی Django
+            Iterate through all important tasks
+            received from the Django view
         -->
         {% for todo in todos %}
 
 
-            <!-- کارت هر وظیفه -->
+            <!-- Task card -->
             <div class="todo-card"
                  data-todo-id="{{ todo.id }}"
                 >
 
 
                 <!-- =========================
-                     تغییر وضعیت انجام وظیفه
+                     Toggle Task Completion
                      ========================= -->
 
                 <form
@@ -338,13 +339,13 @@
                     class="complete-form toggle-complete-form"
                 >
 
-                    <!-- محافظت CSRF جنگو -->
+                    <!-- Django CSRF protection -->
                     {% csrf_token %}
 
 
                     <!--
-                        تغییر وضعیت وظیفه بین
-                        انجام‌شده و در انتظار
+                        Toggle the task status between
+                        completed and pending
                     -->
                     <button
                         type="submit"
@@ -363,21 +364,21 @@
 
 
                 <!-- =========================
-                     محتوای وظیفه
+                     Task Content
                      ========================= -->
 
                 <div class="todo-content">
 
 
-                    <!-- عنوان وظیفه -->
+                    <!-- Task title -->
                     <div class="todo-title">
                         {{ todo.title }}
                     </div>
 
 
                     <!--
-                        نمایش توضیحات فقط در صورتی
-                        که وظیفه توضیح داشته باشد
+                        Display the description only
+                        if the task has a description
                     -->
                     {% if todo.description %}
 
@@ -392,14 +393,14 @@
 
 
                 <!-- =========================
-                     عملیات وظیفه
+                     Task Actions
                      ========================= -->
 
                 <div class="todo-actions">
 
 
                     <!-- =========================
-                         وضعیت وظیفه
+                         Task Status
                          ========================= -->
 
                     <span
@@ -421,7 +422,7 @@
 
 
                     <!-- =========================
-                         تغییر وضعیت مهم بودن
+                         Toggle Important Status
                          ========================= -->
 
                     <form
@@ -434,12 +435,12 @@
 
 
                         <!--
-                            چون این صفحه فقط شامل
-                            وظایف مهم است، ستاره در
-                            حالت مهم قرار دارد.
+                            Since this page only contains
+                            important tasks, the star is
+                            displayed in the active state.
 
-                            با کلیک روی آن، وظیفه
-                            از لیست مهم حذف می‌شود.
+                            Clicking it removes the task
+                            from the important tasks list.
                         -->
                         <button
                             type="submit"
@@ -456,7 +457,7 @@
 
 
                     <!-- =========================
-                         ویرایش وظیفه
+                         Edit Task
                          ========================= -->
 
                     <a
@@ -471,7 +472,7 @@
 
 
                     <!-- =========================
-                         حذف وظیفه
+                         Delete Task
                          ========================= -->
 
                     <form
@@ -483,7 +484,7 @@
                         {% csrf_token %}
 
 
-                        <!-- دکمه حذف -->
+                        <!-- Delete button -->
                         <button
                             type="submit"
                             class="delete-button"
@@ -498,14 +499,14 @@
 
 
                     <!-- =========================
-                         تاریخ ایجاد
+                         Creation Date
                          ========================= -->
                     <span class="todo-date">
                         ایجاد: {{ todo.created_at|date:"M d, Y" }}
                     </span>
                     
                     <!-- =========================
-                         تاریخ شروع
+                         Start Date
                          ========================= -->
                     {% if todo.start_date %}
                         <span class="todo-date">
@@ -514,7 +515,7 @@
                     {% endif %}
                     
                     <!-- =========================
-                         مهلت انجام
+                         Deadline
                          ========================= -->
                     {% if todo.deadline %}
                         <span class="todo-date">
@@ -528,32 +529,32 @@
 
 
         <!-- =========================
-             حالت خالی
+             Empty State
              ========================= -->
 
         {% empty %}
 
 
             <!--
-                زمانی نمایش داده می‌شود که
-                هیچ وظیفه مهمی وجود نداشته باشد.
+                Displayed when there are
+                no important tasks
             -->
             <div class="empty-state">
 
 
-                <!-- آیکون حالت خالی -->
+                <!-- Empty state icon -->
                 <div class="empty-icon">
                     ★
                 </div>
 
 
-                <!-- عنوان حالت خالی -->
+                <!-- Empty state title -->
                 <h3>
                     هیچ وظیفه مهمی وجود ندارد
                 </h3>
 
 
-                <!-- توضیح حالت خالی -->
+                <!-- Empty state description -->
                 <p>
                     یک وظیفه را به عنوان مهم علامت‌گذاری کنید تا در اینجا نمایش داده شود.
                 </p>

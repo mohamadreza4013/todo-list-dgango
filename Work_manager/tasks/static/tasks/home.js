@@ -111,3 +111,112 @@ function updateStats() {
         statNumbers[2].textContent = remaining;
     }
 }
+// ==================================================
+// CONVERT ENGLISH DIGITS TO PERSIAN DIGITS
+// ==================================================
+
+function toPersianDigits(value) {
+
+    if (value === null || value === undefined) {
+        return value;
+    }
+
+    return String(value).replace(/\d/g, function (digit) {
+        return "۰۱۲۳۴۵۶۷۸۹"[digit];
+    });
+}
+
+
+// ==================================================
+// CONVERT NUMBERS IN THE PAGE
+// ==================================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const walker = document.createTreeWalker(
+        document.body,
+        NodeFilter.SHOW_TEXT
+    );
+
+    const textNodes = [];
+
+    while (walker.nextNode()) {
+        textNodes.push(walker.currentNode);
+    }
+
+    textNodes.forEach(function (node) {
+
+        node.nodeValue = toPersianDigits(
+            node.nodeValue
+        );
+
+    });
+
+});
+// ==================================================
+// CONVERT DYNAMIC NUMBERS TO PERSIAN DIGITS
+// ==================================================
+
+function toPersianDigits(value) {
+
+    if (value === null || value === undefined) {
+        return value;
+    }
+
+    return String(value).replace(/\d/g, function (digit) {
+        return "۰۱۲۳۴۵۶۷۸۹"[digit];
+    });
+}
+
+
+function convertTextNodesToPersianDigits(element) {
+
+    const walker = document.createTreeWalker(
+        element,
+        NodeFilter.SHOW_TEXT
+    );
+
+    const textNodes = [];
+
+    while (walker.nextNode()) {
+        textNodes.push(walker.currentNode);
+    }
+
+    textNodes.forEach(function (node) {
+        node.nodeValue = toPersianDigits(node.nodeValue);
+    });
+}
+
+
+// Convert existing numbers
+document.addEventListener("DOMContentLoaded", function () {
+    convertTextNodesToPersianDigits(document.body);
+});
+
+
+// Convert numbers added dynamically
+const observer = new MutationObserver(function (mutations) {
+
+    mutations.forEach(function (mutation) {
+
+        mutation.addedNodes.forEach(function (node) {
+
+            if (node.nodeType === Node.TEXT_NODE) {
+                node.nodeValue = toPersianDigits(node.nodeValue);
+            }
+
+            else if (node.nodeType === Node.ELEMENT_NODE) {
+                convertTextNodesToPersianDigits(node);
+            }
+
+        });
+
+    });
+
+});
+
+
+observer.observe(document.body, {
+    childList: true,
+    subtree: true
+});

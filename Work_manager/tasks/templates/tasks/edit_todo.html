@@ -1,3 +1,4 @@
+
 {% load static %}
 
 <!DOCTYPE html>
@@ -6,16 +7,16 @@
 
 <head>
     
-<!-- کدگذاری کاراکترهای صفحه -->
+<!-- Page character encoding -->
 <meta charset="UTF-8">
 
-<!-- واکنش‌گرا کردن صفحه -->
+<!-- Make the page responsive -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- عنوان صفحه -->
+<!-- Page title -->
 <title>ویرایش وظیفه - تسک‌فلو</title>
 
-<!-- فایل CSS اصلی پروژه -->
+<!-- Main project CSS file -->
 <link rel="stylesheet" href="{% static 'tasks/style.css' %}">
 
 </head>
@@ -25,33 +26,33 @@
 <div class="app">
 
 <!-- =========================
-     نوار کناری
+     Sidebar
      ========================= -->
 
 <aside class="sidebar">
 
-    <!-- لوگوی برنامه -->
+    <!-- Application logo -->
     <div class="logo">
 
-        <!-- آیکون لوگو -->
+        <!-- Logo icon -->
         <div class="logo-icon">✓</div>
 
-        <!-- نام برنامه -->
+        <!-- Application name -->
         <span>تسک‌فلو</span>
 
     </div>
 
 
-    <!-- عنوان بخش نوار کناری -->
+    <!-- Sidebar section title -->
     <div class="nav-title">
         فضای کاری
     </div>
 
 
-    <!-- منوی اصلی -->
+    <!-- Main navigation -->
     <nav class="nav">
 
-        <!-- لینک داشبورد -->
+        <!-- Dashboard link -->
         <a href="{% url 'home' %}" class="nav-item">
 
             <span>▦</span>
@@ -61,7 +62,7 @@
         </a>
 
 
-        <!-- صفحه فعلی / وظایف من -->
+        <!-- Current page / My Tasks -->
         <a href="#" class="nav-item active">
 
             <span>✓</span>
@@ -71,7 +72,7 @@
         </a>
 
 
-        <!-- وظایف مهم -->
+        <!-- Important Tasks -->
         <a href="#" class="nav-item">
 
             <span>★</span>
@@ -84,15 +85,15 @@
 
 
     <!-- =========================
-         بخش پایینی نوار کناری
+         Sidebar Bottom Section
          ========================= -->
 
     <div class="sidebar-bottom">
 
-        <!-- منوی پایینی -->
+        <!-- Bottom navigation -->
         <div class="nav">
 
-            <!-- لینک تنظیمات -->
+            <!-- Settings link -->
             <a href="#" class="nav-item">
 
                 <span>⚙</span>
@@ -105,26 +106,26 @@
 
 
         <!-- =========================
-             پروفایل کاربر
+             User Profile
              ========================= -->
 
         <div class="profile">
 
-            <!-- آواتار کاربر -->
+            <!-- User avatar -->
             <div class="avatar">
                 MR
             </div>
 
 
-            <!-- اطلاعات کاربر -->
+            <!-- User information -->
             <div class="profile-info">
 
-                <!-- نام کاربر -->
+                <!-- User name -->
                 <span class="profile-name">
                     محمدرضا
                 </span>
 
-                <!-- عنوان حساب کاربری -->
+                <!-- User account title -->
                 <span class="profile-email">
                     حساب کاربری
                 </span>
@@ -139,19 +140,19 @@
 
 
 <!-- =========================
-     محتوای اصلی
+     Main Content
      ========================= -->
 
 <main class="main">
 
 
     <!-- =========================
-         سربرگ صفحه
+         Page Header
          ========================= -->
 
     <div class="page-header">
 
-        <!-- لینک بازگشت به داشبورد -->
+        <!-- Link back to dashboard -->
         <a href="{% url 'home' %}" class="back-link">
 
             ← بازگشت به داشبورد
@@ -159,13 +160,13 @@
         </a>
 
 
-        <!-- عنوان صفحه -->
+        <!-- Page title -->
         <h1>
             ویرایش وظیفه
         </h1>
 
 
-        <!-- توضیح کوتاه صفحه -->
+        <!-- Short page description -->
         <p>
             جزئیات وظیفه خود را به‌روزرسانی کنید.
         </p>
@@ -174,28 +175,28 @@
 
 
     <!-- =========================
-         کارت ویرایش وظیفه
+         Edit Task Card
          ========================= -->
 
     <div class="edit-card">
 
 
         <!-- =========================
-             اطلاعات وظیفه
+             Task Information
              ========================= -->
 
         <div class="task-info">
 
 
             <!--
-                نمایش وضعیت فعلی وظیفه.
+                Display the current task status.
 
-                اگر todo.completed برابر True باشد:
-                → نمایش «انجام‌شده»
-                → افزودن کلاس completed
+                If todo.completed is True:
+                → Display "Completed"
+                → Add the completed class
 
-                در غیر این صورت:
-                → نمایش «در انتظار»
+                Otherwise:
+                → Display "Pending"
             -->
             <span class="status {% if todo.completed %}completed{% endif %}">
 
@@ -212,7 +213,7 @@
             </span>
 
 
-            <!-- نمایش شناسه وظیفه -->
+            <!-- Display the task ID -->
             <span class="task-id">
 
                 وظیفه شماره {{ todo.id }}
@@ -223,30 +224,30 @@
 
 
         <!-- =========================
-             فرم ویرایش وظیفه
+             Task Edit Form
              ========================= -->
 
         <!--
-            این فرم اطلاعات ویرایش‌شده وظیفه را
-            با متد POST به ویوی edit_todo ارسال می‌کند.
+            This form sends the edited task data
+            to the edit_todo view using POST.
         -->
         <form method="POST">
 
             <!--
-                توکن محافظت CSRF جنگو.
+                Django CSRF protection token.
 
-                برای درخواست‌های POST در Django ضروری است.
+                Required for POST requests in Django.
             -->
             {% csrf_token %}
 
 
             <!-- =========================
-                 عنوان وظیفه
+                 Task Title
                  ========================= -->
 
             <div class="form-group">
 
-                <!-- برچسب فیلد عنوان -->
+                <!-- Title field label -->
                 <label class="form-label" for="title">
 
                     عنوان وظیفه
@@ -255,10 +256,10 @@
 
 
                 <!--
-                    فیلد عنوان وظیفه.
+                    Task title field.
 
-                    مقدار todo.title باعث می‌شود
-                    عنوان فعلی وظیفه در فیلد نمایش داده شود.
+                    todo.title displays the current
+                    task title inside the input.
                 -->
                 <input
                     id="title"
@@ -274,12 +275,12 @@
 
 
             <!-- =========================
-                 توضیحات وظیفه
+                 Task Description
                  ========================= -->
 
             <div class="form-group">
 
-                <!-- برچسب توضیحات -->
+                <!-- Description field label -->
                 <label class="form-label" for="description">
 
                     توضیحات
@@ -288,10 +289,10 @@
 
 
                 <!--
-                    فیلد ویرایش توضیحات وظیفه.
+                    Task description edit field.
 
-                    Django توضیحات فعلی را
-                    بین تگ‌های textarea قرار می‌دهد.
+                    Django places the current description
+                    between the textarea tags.
                 -->
                 <textarea
                     id="description"
@@ -304,17 +305,17 @@
 
 
             <!-- =========================
-                 دکمه‌های فرم
+                 Form Buttons
                  ========================= -->
 
             <div class="form-actions">
 
 
                 <!--
-                    لغو ویرایش.
+                    Cancel editing.
 
-                    کاربر را بدون ذخیره تغییرات
-                    به داشبورد برمی‌گرداند.
+                    Returns the user to the dashboard
+                    without saving changes.
                 -->
                 <a
                     href="{% url 'home' %}"
@@ -327,10 +328,10 @@
 
 
                 <!--
-                    ذخیره تغییرات.
+                    Save changes.
 
-                    مرورگر درخواست POST را با
-                    اطلاعات ویرایش‌شده ارسال می‌کند.
+                    The browser sends a POST request
+                    with the edited task information.
                 -->
                 <button
                     type="submit"

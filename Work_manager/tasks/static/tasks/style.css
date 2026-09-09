@@ -10,156 +10,101 @@
 }
 
 body {
-    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        Roboto, Arial, sans-serif;
-
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     background: #f5f7fb;
     color: #1f2937;
-
     direction: rtl;
 }
-
-
-/* =========================================================
-   LAYOUT
-========================================================= */
 
 .app {
     display: flex;
-
-    min-height: 100vh;
-
     width: 100%;
-
+    min-height: 100vh;
     direction: rtl;
 }
+
+
 /* =========================================================
-   TASK CATEGORY BADGES
+   SHARED INPUTS
+========================================================= */
+
+.add-task-form input,
+.task-category-input,
+.form-input,
+.form-textarea {
+    border: 1px solid #e5e7eb;
+    border-radius: 9px;
+    background: white;
+    color: #1f2937;
+    font-family: inherit;
+    outline: none;
+    direction: rtl;
+    text-align: right;
+    transition: 0.2s;
+}
+
+.add-task-form input:focus,
+.task-category-input:focus,
+.form-input:focus,
+.form-textarea:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+
+/* =========================================================
+   CATEGORY
 ========================================================= */
 
 .category-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     padding: 5px 10px;
-
     border-radius: 6px;
-
     font-size: 12px;
     font-weight: 600;
-
     line-height: 1;
-
     white-space: nowrap;
 }
 
-
-/* Public category */
-
 .category-badge.public {
-    background-color: #eff6ff;
+    background: #eff6ff;
     color: #2563eb;
     border: 1px solid #dbeafe;
 }
 
-
-/* Personal category */
-
 .category-badge.personal {
-    background-color: #f5f3ff;
+    background: #f5f3ff;
     color: #7c3aed;
     border: 1px solid #ede9fe;
 }
-/* =========================================================
-   TASK CATEGORY SELECT
-========================================================= */
 
 .task-category-input {
     width: 100px;
-
-    border: 1px solid #e5e7eb;
-
-    background: white;
-
-    color: #1f2937;
-
-    border-radius: 9px;
-
-    padding: 11px 14px;
-
-    font-family: inherit;
-
-    font-size: 13px;
-
-    outline: none;
-
+    padding: 11px 14px 11px 32px;
     cursor: pointer;
-
-    direction: rtl;
-
-    text-align: right;
-
-    transition: all 0.2s ease;
-
+    font-size: 13px;
     appearance: none;
-
-    /* فلش سفارشی */
     background-image:
         linear-gradient(45deg, transparent 50%, #9ca3af 50%),
         linear-gradient(135deg, #9ca3af 50%, transparent 50%);
-
     background-position:
         calc(100% - 18px) 50%,
         calc(100% - 13px) 50%;
-
-    background-size:
-        5px 5px,
-        5px 5px;
-
+    background-size: 5px 5px;
     background-repeat: no-repeat;
-
-    padding-left: 32px;
 }
-
-
-/* -------------------------
-   Hover
-------------------------- */
 
 .task-category-input:hover {
     border-color: #c7d2fe;
-
     background-color: #fafaff;
 }
 
-
-/* -------------------------
-   Focus
-------------------------- */
-
-.task-category-input:focus {
-    border-color: #6366f1;
-
-    box-shadow:
-        0 0 0 3px
-        rgba(99, 102, 241, 0.1);
-
-    background-color: white;
-}
-
-
-/* -------------------------
-   Options
-------------------------- */
-
 .task-category-input option {
     font-family: inherit;
-
     font-size: 13px;
-
     color: #1f2937;
-
     background: white;
 }
 
@@ -169,424 +114,187 @@ body {
 ========================================================= */
 
 .sidebar {
-    width: 250px;
-
-    min-height: 100vh;
-
-    flex-shrink: 0;
-
-    direction: rtl;
-
-    background: #111827;
-
-    color: white;
-
-    padding: 24px 16px;
-
     display: flex;
-
     flex-direction: column;
+    width: 250px;
+    min-height: 100vh;
+    flex-shrink: 0;
+    padding: 24px 16px;
+    background: #111827;
+    color: white;
+    direction: rtl;
 }
-
-
-/* -------------------------
-   Logo
-------------------------- */
 
 .logo {
     display: flex;
-
     align-items: center;
-
     gap: 10px;
-
     padding: 0 12px;
-
     margin-bottom: 45px;
+}
+
+.logo-icon,
+.avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 .logo-icon {
     width: 38px;
     height: 38px;
-
     border-radius: 10px;
-
     background: #6366f1;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
     font-size: 20px;
-
     font-weight: 700;
-
-    flex-shrink: 0;
 }
 
 .logo span {
+    color: white;
     font-size: 20px;
-
     font-weight: 700;
-
     letter-spacing: -0.5px;
-
-    color: white;
 }
-
-
-/* -------------------------
-   Navigation
-------------------------- */
 
 .sidebar .nav-item {
     direction: rtl;
-
     text-align: right;
 }
 
 .sidebar .nav-item span {
     margin-left: 10px;
-
-    margin-right: 0;
-}
-
-.nav-title {
-    color: #6b7280;
-
-    font-size: 11px;
-
-    text-transform: uppercase;
-
-    letter-spacing: 1px;
-
-    padding: 0 12px;
-
-    margin-bottom: 10px;
 }
 
 .nav {
     display: flex;
-
     flex-direction: column;
-
     gap: 5px;
+}
+
+.nav-title {
+    padding: 0 12px;
+    margin-bottom: 10px;
+    color: #6b7280;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .nav-item {
     display: flex;
-
     align-items: center;
-
     gap: 12px;
-
     padding: 12px;
-
     border-radius: 9px;
-
     color: #9ca3af;
-
     text-decoration: none;
-
     font-size: 14px;
-
     transition: 0.2s;
 }
 
 .nav-item:hover {
     background: #1f2937;
-
     color: white;
 }
 
 .nav-item.active {
     background: #6366f1;
-
     color: white;
 }
 
-
-/* -------------------------
-   Sidebar Bottom
-------------------------- */
-
 .sidebar-bottom {
-    margin-top: auto;
-
     width: 100%;
-}
-
-
-/* -------------------------
-   Profile
-------------------------- */
-
-.profile {
-    direction: rtl;
-
-    text-align: right;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    padding: 12px;
-}
-
-.avatar {
-    width: 36px;
-    height: 36px;
-
-    border-radius: 50%;
-
-    background: #374151;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    font-size: 14px;
-
-    font-weight: 600;
-
-    flex-shrink: 0;
-}
-
-.profile-info {
-    display: flex;
-
-    flex-direction: column;
-
-    min-width: 0;
-}
-
-.profile-name {
-    font-size: 13px;
-
-    font-weight: 600;
-
-    color: white;
-}
-
-.profile-email {
-    font-size: 11px;
-
-    color: #6b7280;
-}
-/* -------------------------
-   Navigation
-------------------------- */
-
-.sidebar .nav-item {
-    direction: rtl;
-    text-align: right;
-}
-
-.sidebar .nav-item span {
-    margin-left: 10px;
-    margin-right: 0;
-}
-
-.nav-title {
-    color: #6b7280;
-
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-
-    padding: 0 12px;
-    margin-bottom: 10px;
-}
-
-.nav {
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 5px;
-}
-
-.nav-item {
-    display: flex;
-
-    align-items: center;
-
-    gap: 12px;
-
-    padding: 12px;
-
-    border-radius: 9px;
-
-    color: #9ca3af;
-
-    text-decoration: none;
-
-    font-size: 14px;
-
-    transition: 0.2s;
-}
-
-.nav-item:hover {
-    background: #1f2937;
-    color: white;
-}
-
-.nav-item.active {
-    background: #6366f1;
-    color: white;
-}
-
-
-/* -------------------------
-   Sidebar Bottom
-------------------------- */
-
-.sidebar-bottom {
     margin-top: auto;
 }
 
-
-/* -------------------------
-   Profile
-------------------------- */
-
 .profile {
-    direction: rtl;
-
-    text-align: right;
-
     display: flex;
-
     align-items: center;
-
     gap: 10px;
+    padding: 12px;
+    direction: rtl;
+    text-align: right;
 }
 
 .avatar {
     width: 36px;
     height: 36px;
-
     border-radius: 50%;
-
     background: #374151;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
     font-size: 14px;
     font-weight: 600;
-
-    flex-shrink: 0;
 }
 
 .profile-info {
     display: flex;
-
     flex-direction: column;
-
     min-width: 0;
 }
 
 .profile-name {
+    color: white;
     font-size: 13px;
     font-weight: 600;
 }
 
 .profile-email {
-    font-size: 11px;
     color: #6b7280;
+    font-size: 11px;
 }
 
 
 /* =========================================================
-   MAIN CONTENT
+   MAIN / HEADER
 ========================================================= */
 
 .main {
     flex: 1;
-
     min-width: 0;
-
     direction: rtl;
 }
-
-
-/* =========================================================
-   HOME — HEADER
-========================================================= */
 
 .topbar {
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     margin-bottom: 35px;
-
     direction: rtl;
 }
 
-.welcome {
+.welcome,
+.page-header {
     text-align: right;
 }
 
-.welcome h1 {
-    font-size: 30px;
-
-    letter-spacing: -1px;
-
+.welcome h1,
+.page-header h1 {
     margin-bottom: 6px;
+    font-size: 30px;
+    letter-spacing: -1px;
 }
 
-.welcome p {
+.welcome p,
+.page-header p {
     color: #6b7280;
-
     font-size: 14px;
 }
 
 
 /* =========================================================
-   ADD TASK FORM
+   ADD TASK
 ========================================================= */
 
 .add-task-form {
     display: flex;
-
     align-items: center;
-
     gap: 10px;
-
     direction: rtl;
 }
 
 .add-task-form input {
-    border: 1px solid #e5e7eb;
-
-    background: white;
-
-    border-radius: 9px;
-
     padding: 11px 14px;
-
-    font-family: inherit;
-
     font-size: 13px;
-
-    outline: none;
-
-    transition: 0.2s;
-
-    direction: rtl;
-
-    text-align: right;
 }
 
 .add-task-form input:first-child {
@@ -597,26 +305,8 @@ body {
     width: 240px;
 }
 
-.add-task-form input:focus {
-    border-color: #6366f1;
-
-    box-shadow:
-        0 0 0 3px
-        rgba(99, 102, 241, 0.1);
-}
-
-
-/* -------------------------
-   Date Inputs
-------------------------- */
-
 .jalali-date-input {
     cursor: pointer;
-
-    direction: rtl;
-
-    text-align: right;
-
     font-family: inherit;
 }
 
@@ -624,40 +314,33 @@ body {
     color: #9ca3af;
 }
 
-
-/* -------------------------
-   Add Button
-------------------------- */
-
-.add-button {
+.add-button,
+.save-button {
     border: none;
-
     background: #6366f1;
-
     color: white;
-
-    padding: 12px 18px;
-
-    border-radius: 9px;
-
     font-family: inherit;
-
-    font-size: 14px;
-
     font-weight: 600;
-
     cursor: pointer;
-
-    box-shadow:
-        0 4px 12px
-        rgba(99, 102, 241, 0.2);
-
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
     transition: 0.2s;
 }
 
-.add-button:hover {
-    background: #4f46e5;
+.add-button {
+    padding: 12px 18px;
+    border-radius: 9px;
+    font-size: 14px;
+}
 
+.save-button {
+    padding: 12px 20px;
+    border-radius: 9px;
+    font-size: 13px;
+}
+
+.add-button:hover,
+.save-button:hover {
+    background: #4f46e5;
     transform: translateY(-1px);
 }
 
@@ -668,238 +351,127 @@ body {
 
 .stats {
     display: grid;
-
-    grid-template-columns:
-        repeat(3, 1fr);
-
+    grid-template-columns: repeat(3, 1fr);
     gap: 18px;
-
     margin-bottom: 35px;
 }
 
 .stat-card {
-    background: white;
-
-    border: 1px solid #e5e7eb;
-
-    border-radius: 14px;
-
     padding: 22px;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    background: white;
 }
 
 .stat-header {
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     margin-bottom: 15px;
 }
 
 .stat-title {
     color: #6b7280;
-
     font-size: 13px;
 }
 
 .stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 34px;
     height: 34px;
-
     border-radius: 8px;
-
     background: #eef2ff;
-
     color: #6366f1;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
     font-weight: 700;
 }
 
 .stat-number {
     font-size: 27px;
-
     font-weight: 700;
 }
 
 
 /* =========================================================
-   TASK FILTERS
+   FILTERS
 ========================================================= */
 
 .task-filters {
     display: flex;
-
     gap: 8px;
-
     margin-bottom: 18px;
-
     direction: rtl;
 }
 
 .filter-button {
     padding: 8px 14px;
-
     border-radius: 8px;
-
     color: #6b7280;
-
     text-decoration: none;
-
     font-size: 13px;
-
     font-weight: 600;
-
-    transition: all 0.2s ease;
+    transition: 0.2s;
 }
 
 .filter-button:hover {
     background: #eef2ff;
-
     color: #6366f1;
 }
 
 .filter-button.active {
     background: #6366f1;
-
     color: white;
 }
 
 
 /* =========================================================
-   TODO LIST
+   TODO LIST / CARD
 ========================================================= */
 
 .todo-list {
     display: flex;
-
     flex-direction: column;
-
     gap: 10px;
 }
 
-
-/* =========================================================
-   TODO CARD
-========================================================= */
-
 .todo-card {
-    background: white;
-
-    border: 1px solid #e5e7eb;
-
-    border-radius: 12px;
-
-    padding: 18px 20px;
-
     display: flex;
-
     align-items: center;
-
     gap: 15px;
-
+    padding: 18px 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: white;
     direction: rtl;
-
     transition: 0.2s;
 }
 
 .todo-card:hover {
     border-color: #c7d2fe;
-
-    box-shadow:
-        0 4px 15px
-        rgba(0, 0, 0, 0.04);
-
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
     transform: translateY(-1px);
 }
 
-
-/* -------------------------
-   Todo Content
-------------------------- */
-
 .todo-content {
     flex: 1;
-
     min-width: 0;
-
     text-align: right;
 }
 
 .todo-title {
-    font-size: 14px;
-
-    font-weight: 600;
-
     margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: 600;
 }
 
 .todo-description {
-    font-size: 12px;
-
     color: #9ca3af;
+    font-size: 12px;
 }
 
-
-/* =========================================================
-   COMPLETE BUTTON
-========================================================= */
-
-.complete-form {
-    flex-shrink: 0;
-}
-
-.complete-button {
-    width: 22px;
-    height: 22px;
-
-    border: 2px solid #d1d5db;
-
-    border-radius: 6px;
-
-    background: white;
-
-    color: white;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    cursor: pointer;
-
-    font-size: 13px;
-
-    font-weight: 700;
-
-    padding: 0;
-
-    transition: all 0.2s ease;
-}
-
-.complete-button:hover {
-    border-color: #6366f1;
-
-    background: #f5f3ff;
-}
-
-.complete-button.completed {
-    background: #6366f1;
-
-    border-color: #6366f1;
-}
-
-.complete-button.completed:hover {
-    background: #4f46e5;
-
-    border-color: #4f46e5;
+.todo-category {
+    margin-top: 8px;
 }
 
 
@@ -909,189 +481,163 @@ body {
 
 .todo-actions {
     display: flex;
-
     align-items: center;
-
     gap: 8px;
-
-    direction: rtl;
-
     flex-wrap: wrap;
+    direction: rtl;
 }
 
-.todo-actions form {
+.todo-actions form,
+.complete-form {
     margin: 0;
+}
+
+.complete-form {
+    flex-shrink: 0;
+}
+
+.complete-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: 2px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.complete-button:hover {
+    border-color: #6366f1;
+    background: #f5f3ff;
+}
+
+.complete-button.completed {
+    border-color: #6366f1;
+    background: #6366f1;
+}
+
+.complete-button.completed:hover {
+    border-color: #4f46e5;
+    background: #4f46e5;
 }
 
 
 /* =========================================================
-   STATUS BADGE
+   STATUS
 ========================================================= */
 
 .status {
-    font-size: 11px;
-
     padding: 5px 9px;
-
     border-radius: 20px;
-
     background: #fef3c7;
-
     color: #92400e;
+    font-size: 11px;
 }
 
 .status.completed {
     background: #dcfce7;
-
     color: #166534;
 }
 
 
 /* =========================================================
-   IMPORTANT BUTTON
+   IMPORTANT
 ========================================================= */
 
 .important-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 32px;
     height: 32px;
-
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
     border: 1px solid #e5e7eb;
-
     border-radius: 8px;
-
     background: white;
-
     color: #d1d5db;
-
     font-size: 16px;
-
     cursor: pointer;
-
-    transition: all 0.2s ease;
+    transition: 0.2s;
 }
 
-.important-button:hover {
-    background: #fffbeb;
-
-    border-color: #fcd34d;
-
-    color: #f59e0b;
-}
-
+.important-button:hover,
 .important-button.important {
-    background: #fffbeb;
-
     border-color: #fbbf24;
-
+    background: #fffbeb;
     color: #f59e0b;
 }
 
 
 /* =========================================================
-   EDIT BUTTON
+   EDIT / DELETE
 ========================================================= */
 
-.edit-button {
+.edit-button,
+.delete-button,
+.cancel-button {
     display: inline-flex;
-
     align-items: center;
-
+    justify-content: center;
     gap: 5px;
-
     padding: 7px 10px;
-
     border: 1px solid #e5e7eb;
-
     border-radius: 8px;
-
     background: white;
-
     color: #6b7280;
-
     text-decoration: none;
-
+    font-family: inherit;
     font-size: 12px;
-
     font-weight: 600;
+    transition: 0.2s;
+}
 
-    transition: all 0.2s ease;
+.delete-button {
+    cursor: pointer;
 }
 
 .edit-button:hover {
-    background: #eef2ff;
-
     border-color: #c7d2fe;
-
+    background: #eef2ff;
     color: #6366f1;
 }
 
-
-/* =========================================================
-   DELETE BUTTON
-========================================================= */
-
-.delete-button {
-    display: inline-flex;
-
-    align-items: center;
-
-    gap: 5px;
-
-    padding: 7px 10px;
-
-    border: 1px solid #e5e7eb;
-
-    border-radius: 8px;
-
-    background: white;
-
-    color: #6b7280;
-
-    font-family: inherit;
-
-    font-size: 12px;
-
-    font-weight: 600;
-
-    cursor: pointer;
-
-    transition: all 0.2s ease;
-}
-
 .delete-button:hover {
-    background: #fef2f2;
-
     border-color: #fecaca;
-
+    background: #fef2f2;
     color: #dc2626;
 }
 
+.cancel-button {
+    padding: 11px 18px;
+    font-size: 13px;
+}
+
+.cancel-button:hover {
+    background: #f9fafb;
+    color: #374151;
+}
+
 
 /* =========================================================
-   TODO DATE
+   TODO DATES
 ========================================================= */
 
 .todo-dates {
     display: flex;
-
     flex-direction: column;
-
     gap: 3px;
-
     text-align: right;
 }
 
 .todo-date {
-    font-size: 11px;
-
     color: #9ca3af;
-
+    font-size: 11px;
     white-space: nowrap;
 }
 
@@ -1101,47 +647,33 @@ body {
 ========================================================= */
 
 .empty-state {
-    background: white;
-
-    border: 1px dashed #d1d5db;
-
-    border-radius: 14px;
-
     padding: 60px 20px;
-
+    border: 1px dashed #d1d5db;
+    border-radius: 14px;
+    background: white;
     text-align: center;
 }
 
 .empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 55px;
     height: 55px;
-
     margin: 0 auto 15px;
-
     border-radius: 50%;
-
     background: #eef2ff;
-
     color: #6366f1;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
     font-size: 22px;
 }
 
 .empty-state h3 {
-    font-size: 16px;
-
     margin-bottom: 7px;
+    font-size: 16px;
 }
 
 .empty-state p {
     color: #9ca3af;
-
     font-size: 13px;
 }
 
@@ -1152,25 +684,16 @@ body {
 
 .page-header {
     margin-bottom: 30px;
-
-    text-align: right;
 }
 
 .back-link {
     display: inline-flex;
-
     align-items: center;
-
     gap: 6px;
-
-    color: #6b7280;
-
-    text-decoration: none;
-
-    font-size: 13px;
-
     margin-bottom: 18px;
-
+    color: #6b7280;
+    text-decoration: none;
+    font-size: 13px;
     transition: 0.2s;
 }
 
@@ -1178,45 +701,14 @@ body {
     color: #6366f1;
 }
 
-.page-header h1 {
-    font-size: 30px;
-
-    letter-spacing: -1px;
-
-    margin-bottom: 6px;
-}
-
-.page-header p {
-    color: #6b7280;
-
-    font-size: 14px;
-}
-
-
-/* =========================================================
-   EDIT CARD
-========================================================= */
-
 .edit-card {
     max-width: 760px;
-
-    background: white;
-
-    border: 1px solid #e5e7eb;
-
-    border-radius: 16px;
-
     padding: 30px;
-
-    box-shadow:
-        0 4px 20px
-        rgba(0, 0, 0, 0.03);
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
 }
-
-
-/* -------------------------
-   Form
-------------------------- */
 
 .form-group {
     margin-bottom: 22px;
@@ -1224,169 +716,53 @@ body {
 
 .form-label {
     display: block;
-
-    font-size: 13px;
-
-    font-weight: 600;
-
-    color: #374151;
-
     margin-bottom: 8px;
-
+    color: #374151;
+    font-size: 13px;
+    font-weight: 600;
     text-align: right;
 }
 
 .form-input,
 .form-textarea {
     width: 100%;
-
-    border: 1px solid #e5e7eb;
-
-    background: #f9fafb;
-
-    border-radius: 10px;
-
     padding: 12px 14px;
-
-    font-family: inherit;
-
+    border-radius: 10px;
+    background: #f9fafb;
     font-size: 14px;
-
-    color: #1f2937;
-
-    outline: none;
-
-    transition: 0.2s;
-
-    direction: rtl;
-
-    text-align: right;
 }
 
 .form-input:focus,
 .form-textarea:focus {
     background: white;
-
-    border-color: #6366f1;
-
-    box-shadow:
-        0 0 0 3px
-        rgba(99, 102, 241, 0.1);
 }
 
 .form-textarea {
     min-height: 130px;
-
     resize: vertical;
-
     line-height: 1.6;
 }
 
-
-/* -------------------------
-   Form Actions
-------------------------- */
-
 .form-actions {
     display: flex;
-
     align-items: center;
-
     justify-content: flex-end;
-
     gap: 10px;
-
     padding-top: 10px;
-
-    border-top:
-        1px solid #f0f1f3;
+    border-top: 1px solid #f0f1f3;
 }
-
-.cancel-button {
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    padding: 11px 18px;
-
-    border: 1px solid #e5e7eb;
-
-    background: white;
-
-    color: #6b7280;
-
-    border-radius: 9px;
-
-    text-decoration: none;
-
-    font-size: 13px;
-
-    font-weight: 600;
-
-    transition: 0.2s;
-}
-
-.cancel-button:hover {
-    background: #f9fafb;
-
-    color: #374151;
-}
-
-.save-button {
-    border: none;
-
-    background: #6366f1;
-
-    color: white;
-
-    padding: 12px 20px;
-
-    border-radius: 9px;
-
-    font-family: inherit;
-
-    font-size: 13px;
-
-    font-weight: 600;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 4px 12px
-        rgba(99, 102, 241, 0.2);
-
-    transition: 0.2s;
-}
-
-.save-button:hover {
-    background: #4f46e5;
-
-    transform: translateY(-1px);
-}
-
-
-/* =========================================================
-   EDIT PAGE — TASK INFO
-========================================================= */
 
 .task-info {
     display: flex;
-
     align-items: center;
-
     gap: 8px;
-
     margin-bottom: 25px;
-
     direction: rtl;
 }
 
 .task-id {
-    font-size: 11px;
-
     color: #9ca3af;
+    font-size: 11px;
 }
 
 
@@ -1402,7 +778,6 @@ body {
 
     .main {
         width: calc(100% - 210px);
-
         padding: 25px;
     }
 
@@ -1433,16 +808,13 @@ body {
 
     .main {
         width: 100%;
-
         padding: 20px;
     }
 
     .topbar {
-        align-items: flex-start;
-
-        gap: 15px;
-
         flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
     }
 
     .welcome h1,
@@ -1452,25 +824,19 @@ body {
 
     .add-task-form {
         width: 100%;
-
         flex-direction: column;
-
         align-items: stretch;
     }
 
+    .add-task-form input,
     .add-task-form input:first-child,
     .add-task-form input:nth-child(2),
-    .add-task-form input {
-        width: 100%;
-    }
-
     .add-button {
         width: 100%;
     }
 
     .todo-card {
         align-items: flex-start;
-
         flex-wrap: wrap;
     }
 
@@ -1480,7 +846,6 @@ body {
 
     .todo-actions {
         width: 100%;
-
         justify-content: flex-start;
     }
 
@@ -1499,7 +864,6 @@ body {
     .cancel-button,
     .save-button {
         width: 100%;
-
         text-align: center;
     }
 }
