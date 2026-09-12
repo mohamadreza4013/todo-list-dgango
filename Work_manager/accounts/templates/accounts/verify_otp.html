@@ -1,0 +1,351 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>تأیید شماره - تسک‌فلو</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'accounts/signup.css' %}"
+    >
+
+</head>
+
+
+<body>
+
+<div class="signup-page">
+
+    <div class="signup-wrapper">
+
+
+        <!-- =========================
+             Logo
+             ========================= -->
+
+        <div class="signup-logo">
+
+            <div class="signup-logo-icon">
+                ✓
+            </div>
+
+            <span>
+                تسک‌فلو
+            </span>
+
+        </div>
+
+
+        <!-- =========================
+             OTP Card
+             ========================= -->
+
+        <div class="signup-card">
+
+
+            <div class="signup-header">
+
+                <h1>
+                    تأیید شماره موبایل
+                </h1>
+
+                <p>
+                    کد تأیید برای شماره
+                    <strong>
+                        {{ phone_number }}
+                    </strong>
+                    در ترمینال نمایش داده شده است.
+                </p>
+
+            </div>
+
+
+            <!-- =========================
+                 OTP Form
+                 ========================= -->
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+
+                {% if error %}
+
+                    <div class="signup-error">
+
+                        {{ error }}
+
+                    </div>
+
+                {% endif %}
+
+
+                <div class="signup-form-group">
+
+                    <label
+                        for="otp"
+                        class="signup-label"
+                    >
+                        کد تأیید
+                    </label>
+
+
+                    <input
+                        id="otp"
+                        type="text"
+                        name="otp"
+                        maxlength="6"
+                        minlength="6"
+                        inputmode="numeric"
+                        autocomplete="one-time-code"
+                        placeholder="کد ۶ رقمی را وارد کنید"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="signup-button"
+                >
+                    تأیید شماره
+                </button>
+
+            </form>
+
+
+
+            <!-- =========================
+                 OTP TIMER
+                 ========================= -->
+
+            <div class="otp-timer-container">
+
+                <span>
+                    زمان باقی‌مانده:
+                </span>
+
+                <strong id="otp-timer">
+                    --:--
+                </strong>
+
+            </div>
+
+
+            <!-- =========================
+                 RESEND OTP
+                 ========================= -->
+
+            <div class="otp-resend-container">
+
+                <form
+                    method="POST"
+                    action="{% url 'resend_signup_otp' %}"
+                    id="resend-otp-form"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        id="resend-otp-button"
+                        class="otp-resend-button"
+                        disabled
+                    >
+
+                        <span class="resend-icon">
+                            ↻
+                        </span>
+
+                        <span class="resend-text">
+                            ارسال مجدد کد
+                        </span>
+
+                        <span
+                            id="resend-countdown"
+                            class="resend-countdown"
+                        ></span>
+
+                    </button>
+
+                </form>
+
+            </div>
+
+
+
+
+            <!-- =========================
+                 Back to Signup
+                 ========================= -->
+
+            <div class="signup-login-link">
+
+                <a href="{% url 'signup' %}">
+                    بازگشت به ثبت‌نام
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- Footer -->
+
+        <div class="signup-footer">
+            مدیریت ساده و منظم وظایف با تسک‌فلو
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     OTP TIMER SCRIPT
+     ========================= -->
+
+<script>
+
+    // Remaining OTP lifetime received from Django.
+    let remainingSeconds = Number(
+        "{{ remaining_seconds }}"
+    );
+
+
+    const timerElement = document.getElementById(
+        "otp-timer"
+    );
+
+    const resendButton = document.getElementById(
+        "resend-otp-button"
+    );
+
+    const resendCountdown = document.getElementById(
+        "resend-countdown"
+    );
+
+
+    // Convert English digits to Persian digits.
+    function toPersianDigits(value) {
+
+        return String(value).replace(
+            /\d/g,
+            function (digit) {
+
+                return "۰۱۲۳۴۵۶۷۸۹"[digit];
+
+            }
+        );
+
+    }
+
+
+    // Format seconds as MM:SS.
+    function formatTime(seconds) {
+
+        const minutes = Math.floor(
+            seconds / 60
+        );
+
+        const remaining = seconds % 60;
+
+        return (
+            String(minutes).padStart(2, "0")
+            + ":"
+            + String(remaining).padStart(2, "0")
+        );
+
+    }
+
+
+    // Update the timer and resend button.
+    function updateTimer() {
+
+        // OTP has expired.
+        if (remainingSeconds <= 0) {
+
+            timerElement.textContent = "۰۰:۰۰";
+
+            resendButton.disabled = false;
+
+            resendCountdown.textContent = "";
+
+            resendButton.classList.add(
+                "resend-active"
+            );
+
+            return;
+
+        }
+
+
+        // Show current remaining time.
+        const formattedTime = formatTime(
+            remainingSeconds
+        );
+
+        timerElement.textContent =
+            toPersianDigits(
+                formattedTime
+            );
+
+
+        // Keep resend button disabled.
+        resendButton.disabled = true;
+
+        resendButton.classList.remove(
+            "resend-active"
+        );
+
+
+        // Show countdown inside the button.
+        resendCountdown.textContent =
+            "("
+            + toPersianDigits(
+                formattedTime
+            )
+            + ")";
+
+    }
+
+
+    // Initial state.
+    updateTimer();
+
+
+    // Run every second.
+    const timer = setInterval(
+        function () {
+
+            remainingSeconds--;
+
+            updateTimer();
+
+
+            // Stop timer after expiration.
+            if (remainingSeconds <= 0) {
+
+                clearInterval(timer);
+
+            }
+
+        },
+        1000
+    );
+
+</script>
+</body>
+
+</html>

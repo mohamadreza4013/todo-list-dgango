@@ -304,3 +304,157 @@ body {
     }
 
 }
+/* =========================
+   OTP TIMER
+   ========================= */
+
+.otp-timer-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    margin-top: 22px;
+
+    color: #6b7280;
+
+    font-size: 13px;
+}
+
+.otp-timer-container strong {
+    min-width: 48px;
+
+    color: #6366f1;
+
+    font-size: 17px;
+    font-weight: 800;
+
+    direction: ltr;
+
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* =========================
+   RESEND OTP
+   ========================= */
+
+.otp-resend-container {
+    margin-top: 16px;
+}
+
+.otp-resend-button {
+    width: 100%;
+    min-height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    border: 1px solid #e0e7ff;
+    border-radius: 12px;
+
+    background: #f8f9ff;
+    color: #6366f1;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease;
+}
+
+
+/* =========================
+   ENABLED
+   ========================= */
+
+.otp-resend-button:hover:not(:disabled) {
+    background: #eef0ff;
+    border-color: #c7cbff;
+
+    box-shadow:
+        0 6px 18px rgba(
+            99,
+            102,
+            241,
+            0.10
+        );
+
+    transform: translateY(-1px);
+}
+
+.otp-resend-button:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+
+/* =========================
+   DISABLED
+   ========================= */
+
+.otp-resend-button:disabled {
+    background: #f1f5ff;
+    border-color: #dbe4ff;
+
+    color: #8b95b8;
+
+    cursor: not-allowed;
+
+    opacity: 1;
+
+    box-shadow:
+        inset 0 0 0 1px rgba(
+            99,
+            102,
+            241,
+            0.02
+        );
+}
+
+
+/* =========================
+   RESEND ICON
+   ========================= */
+
+.resend-icon {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 22px;
+    height: 22px;
+
+    font-size: 18px;
+    font-weight: 700;
+}
+
+
+/* =========================
+   COUNTDOWN
+   ========================= */
+
+.resend-countdown {
+    min-width: 42px;
+
+    color: #8b95b8;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    direction: ltr;
+
+    font-variant-numeric: tabular-nums;
+}

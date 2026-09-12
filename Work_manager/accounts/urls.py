@@ -18,7 +18,17 @@ urlpatterns = [
         "signup/",
         views.signup,
         name="signup" ),
+    path(
+        "signup/verify/",
+        views.verify_signup_otp,
+        name="verify_signup_otp"
+    ),
     path("logout-confirm/",
          views.logout_confirm,
          name="logout_confirm"),
+    path(
+        "signup/verify/resend/",
+        views.resend_signup_otp,
+        name="resend_signup_otp"
+    ),
 ]

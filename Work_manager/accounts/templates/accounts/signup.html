@@ -221,7 +221,30 @@
                     {% endif %}
 
                 </div>
+                    <!-- =========================
+                     Phone Number
+                     ========================= -->
 
+                <div class="signup-form-group">
+
+                    <label
+                        for="{{ form.phone_number.id_for_label }}"
+                        class="signup-label"
+                    >
+                        شماره موبایل
+                    </label>
+
+                    {{ form.phone_number }}
+
+                    {% if form.phone_number.errors %}
+
+                        <div class="field-error">
+                            {{ form.phone_number.errors }}
+                        </div>
+
+                    {% endif %}
+
+                </div>
 
                 <!-- =========================
                      Password

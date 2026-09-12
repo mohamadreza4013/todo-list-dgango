@@ -7,6 +7,8 @@ from django.contrib.auth.forms import UserCreationForm
 # Import Django's default User model
 from django.contrib.auth.models import User
 
+import re
+
 
 # ==================================================
 # USER SIGNUP FORM
@@ -34,6 +36,21 @@ class SignUpForm(UserCreationForm):
         label="ایمیل"
     )
 
+    # User's mobile phone number
+    phone_number = forms.CharField(
+        max_length=11,
+        min_length=11,
+        required=True,
+        label="شماره موبایل",
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "مثال: 09123456789",
+                "inputmode": "numeric",
+                "autocomplete": "tel",
+            }
+        )
+    )
+
 
 # ==================================================
 # FORM META CONFIGURATION
@@ -50,9 +67,51 @@ class SignUpForm(UserCreationForm):
             "first_name",
             "last_name",
             "email",
+            "phone_number",
             "password1",
             "password2",
         )
+
+
+# ==================================================
+# PHONE NUMBER VALIDATION
+# ==================================================
+
+    def clean_phone_number(self):
+
+        # Get the submitted phone number
+        phone_number = self.cleaned_data["phone_number"]
+
+        # Remove spaces and common separators
+        phone_number = phone_number.strip()
+        phone_number = phone_number.replace(
+            " ",
+            ""
+        )
+        phone_number = phone_number.replace(
+            "-",
+            ""
+        )
+
+        # Convert Persian digits to English digits
+        phone_number = phone_number.translate(
+            str.maketrans(
+                "۰۱۲۳۴۵۶۷۸۹",
+                "0123456789"
+            )
+        )
+
+        # Check Iranian mobile number format
+        if not re.fullmatch(
+            r"09\d{9}",
+            phone_number
+        ):
+
+            raise forms.ValidationError(
+                "شماره موبایل باید به صورت 09123456789 باشد."
+            )
+
+        return phone_number
 
 
 # ==================================================
