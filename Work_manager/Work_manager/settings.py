@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
+from dotenv import load_dotenv
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -134,3 +137,20 @@ MAILERS = {
         "BACKEND": "django.core.mail.backends.console.EmailBackend",
     },
 }
+
+GOOGLE_CLIENT_SECRET_FILE = os.getenv(
+    "GOOGLE_CLIENT_SECRET_FILE"
+)
+
+GOOGLE_REDIRECT_URI = os.getenv(
+    "GOOGLE_REDIRECT_URI"
+)
+
+GOOGLE_CALENDAR_SCOPES = [
+    "https://www.googleapis.com/auth/calendar.events"
+]
+
+os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = os.getenv(
+    "OAUTHLIB_INSECURE_TRANSPORT",
+    "0"
+)

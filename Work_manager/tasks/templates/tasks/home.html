@@ -16,12 +16,14 @@
     <title>TaskFlow | مدیریت وظایف</title>
 
     <!-- TaskFlow CSS -->
+
     <link
         rel="stylesheet"
         href="{% static 'tasks/style.css' %}"
     >
 
     <!-- Calendar CSS -->
+
     <link
         rel="stylesheet"
         href="{% static 'calendar/calendar.css' %}"
@@ -42,7 +44,9 @@
     <aside class="sidebar">
 
 
-        <!-- Logo -->
+        <!-- ==================================================
+             LOGO
+        ================================================== -->
 
         <div class="logo">
 
@@ -57,97 +61,140 @@
         </div>
 
 
-        <!-- Workspace navigation title -->
+        <!-- ==================================================
+             WORKSPACE NAVIGATION TITLE
+        ================================================== -->
 
         <div class="nav-title">
             فضای کاری
         </div>
 
 
-        <!-- Main navigation -->
+        <!-- ==================================================
+             MAIN NAVIGATION
+        ================================================== -->
 
-<!-- Main navigation -->
-        
         <nav class="nav">
-        
-        
+
+
             <!-- Dashboard -->
-        
+
             <a
                 href="{% url 'home' %}"
                 class="nav-item {% if not my_tasks %}active{% endif %}"
             >
-        
+
                 <span>
                     ▦
                 </span>
-        
+
                 داشبورد
-        
+
             </a>
-        
-        
+
+
             <!-- My Tasks -->
-        
+
             <a
                 href="{% url 'home' %}?scope=my"
                 class="nav-item {% if my_tasks %}active{% endif %}"
             >
-        
+
                 <span>
                     ✓
                 </span>
-        
+
                 وظایف من
-        
+
             </a>
-        
-        
+
+
             <!-- Important Tasks -->
-        
+
             <a
                 href="{% url 'important_tasks' %}"
                 class="nav-item"
             >
-        
+
                 <span>
                     ★
                 </span>
-        
+
                 مهم
-        
+
             </a>
-        
-        
+
+
             <!-- Logout -->
-        
+
             <a
                 href="{% url 'logout_confirm' %}"
                 class="nav-item"
             >
-        
+
                 <span>
                     ↪
                 </span>
-        
+
                 خروج
-        
+
             </a>
-        
+
         </nav>
 
 
         <!-- ==================================================
              SIDEBAR BOTTOM
-    ================================================== -->
+        ================================================== -->
 
         <div class="sidebar-bottom">
 
 
+            <!-- ==================================================
+                 GOOGLE CALENDAR
+            ================================================== -->
+
             <div class="nav">
 
+                {% if google_connected %}
 
-                <!-- Settings -->
+                    <div
+                        class="nav-item google-connected"
+                    >
+
+                        <span>
+                            ✓
+                        </span>
+
+                        Google Calendar متصل است
+
+                    </div>
+
+                {% else %}
+
+                    <a
+                        href="{% url 'google_connect' %}"
+                        class="nav-item"
+                    >
+
+                        <span>
+                            📅
+                        </span>
+
+                        اتصال به Google Calendar
+
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- ==================================================
+                 SETTINGS
+            ================================================== -->
+
+            <div class="nav">
 
                 <a
                     href="#"
@@ -165,25 +212,40 @@
             </div>
 
 
-            <!-- User profile -->
+            <!-- ==================================================
+                 USER PROFILE
+            ================================================== -->
 
             <div class="profile">
 
 
+                <!-- User avatar -->
+
                 <div class="avatar">
 
                     {% if user.first_name and user.last_name %}
+
                         {{ user.first_name|first }}{{ user.last_name|first }}
+
                     {% elif user.first_name %}
+
                         {{ user.first_name|first }}
+
                     {% else %}
+
                         {{ user.username|first }}
+
                     {% endif %}
 
                 </div>
 
 
+                <!-- User information -->
+
                 <div class="profile-info">
+
+
+                    <!-- User name -->
 
                     <span class="profile-name">
 
@@ -192,7 +254,9 @@
                             {{ user.first_name }}
 
                             {% if user.last_name %}
+
                                 {{ user.last_name }}
+
                             {% endif %}
 
                         {% else %}
@@ -204,12 +268,18 @@
                     </span>
 
 
+                    <!-- User email -->
+
                     <span class="profile-email">
 
                         {% if user.email %}
+
                             {{ user.email }}
+
                         {% else %}
+
                             حساب کاربری
+
                         {% endif %}
 
                     </span>
@@ -303,9 +373,6 @@
                     >
 
 
-                    <!-- Task end date -->
-
-
                     <!-- Task deadline -->
 
                     <input
@@ -361,13 +428,11 @@
 
                 </div>
 
-
                 <div class="stat-number">
                     {{ total_tasks }}
                 </div>
 
             </div>
-
 
 
             <!-- Completed tasks -->
@@ -386,13 +451,11 @@
 
                 </div>
 
-
                 <div class="stat-number">
                     {{ completed_tasks }}
                 </div>
 
             </div>
-
 
 
             <!-- Remaining tasks -->
@@ -411,7 +474,6 @@
 
                 </div>
 
-
                 <div class="stat-number">
                     {{ remaining_tasks }}
                 </div>
@@ -427,38 +489,46 @@
         ================================================== -->
 
         <div class="task-filters">
-        
-        
+
+
             <!-- Show all tasks -->
-        
+
             <a
                 href="{% url 'home' %}{% if my_tasks %}?scope=my{% endif %}"
                 class="filter-button {% if not filter_type %}active{% endif %}"
             >
+
                 همه
+
             </a>
-        
-        
+
+
             <!-- Show active tasks -->
-        
+
             <a
                 href="{% url 'home' %}?{% if my_tasks %}scope=my&{% endif %}filter=active"
                 class="filter-button {% if filter_type == 'active' %}active{% endif %}"
             >
+
                 در حال انجام
+
             </a>
-        
-        
+
+
             <!-- Show completed tasks -->
-        
+
             <a
                 href="{% url 'home' %}?{% if my_tasks %}scope=my&{% endif %}filter=completed"
                 class="filter-button {% if filter_type == 'completed' %}active{% endif %}"
             >
+
                 انجام‌شده
+
             </a>
-        
+
         </div>
+
+
 
         <!-- ==================================================
              TODO LIST
@@ -476,7 +546,9 @@
                 >
 
 
-                    <!-- Complete / incomplete toggle -->
+                    <!-- ==================================================
+                         COMPLETE / INCOMPLETE TOGGLE
+                    ================================================== -->
 
                     <form
                         method="POST"
@@ -493,7 +565,9 @@
                         >
 
                             {% if todo.completed %}
+
                                 ✓
+
                             {% endif %}
 
                         </button>
@@ -502,7 +576,9 @@
 
 
 
-                    <!-- Task content -->
+                    <!-- ==================================================
+                         TASK CONTENT
+                    ================================================== -->
 
                     <div class="todo-content">
 
@@ -529,6 +605,7 @@
 
                         <div class="todo-category">
 
+
                             {% if todo.category == "public" %}
 
                                 <span class="category-badge public">
@@ -549,7 +626,9 @@
 
 
 
-                    <!-- Task actions -->
+                    <!-- ==================================================
+                         TASK ACTIONS
+                    ================================================== -->
 
                     <div class="todo-actions">
 
@@ -561,13 +640,16 @@
                         >
 
                             {% if todo.completed %}
+
                                 انجام‌شده
+
                             {% else %}
+
                                 در انتظار
+
                             {% endif %}
 
                         </span>
-
 
 
                         <!-- Toggle important status -->
@@ -593,7 +675,6 @@
                         </form>
 
 
-
                         <!-- Edit task -->
 
                         <a
@@ -604,7 +685,6 @@
                             ✎ ویرایش
 
                         </a>
-
 
 
                         <!-- Delete task -->
@@ -629,8 +709,9 @@
                         </form>
 
 
-
-                        <!-- Task dates -->
+                        <!-- ==================================================
+                             TASK DATES
+                        ================================================== -->
 
                         <div class="todo-dates">
 
@@ -638,8 +719,10 @@
                             <!-- Creation date -->
 
                             <span class="todo-date">
+
                                 ایجاد:
                                 {{ todo.created_at_jalali_str }}
+
                             </span>
 
 
@@ -648,14 +731,13 @@
                             {% if todo.start_date_jalali_str %}
 
                                 <span class="todo-date">
+
                                     شروع:
                                     {{ todo.start_date_jalali_str }}
+
                                 </span>
 
                             {% endif %}
-
-
-
 
 
                             <!-- Deadline -->
@@ -663,18 +745,24 @@
                             {% if todo.deadline_jalali_str %}
 
                                 <span class="todo-date">
+
                                     مهلت:
                                     {{ todo.deadline_jalali_str }}
+
                                 </span>
 
                             {% endif %}
+
+
                             <!-- Completion date -->
 
                             {% if todo.end_date_jalali_str %}
 
                                 <span class="todo-date end-date">
+
                                     اتمام:
                                     {{ todo.end_date_jalali_str }}
+
                                 </span>
 
                             {% endif %}
@@ -689,7 +777,9 @@
             {% empty %}
 
 
-                <!-- Empty task list state -->
+                <!-- ==================================================
+                     EMPTY TASK LIST
+                ================================================== -->
 
                 <div class="empty-state">
 
@@ -706,7 +796,6 @@
                     </p>
 
                 </div>
-
 
             {% endfor %}
 
@@ -742,7 +831,9 @@
             class="calendar-picker-close"
             aria-label="بستن تقویم"
         >
+
             ×
+
         </button>
 
 
@@ -775,7 +866,9 @@
                     class="month-button"
                     aria-label="ماه قبل"
                 >
+
                     ‹
+
                 </button>
 
 
@@ -795,7 +888,9 @@
                     class="month-button"
                     aria-label="ماه بعد"
                 >
+
                     ›
+
                 </button>
 
             </div>

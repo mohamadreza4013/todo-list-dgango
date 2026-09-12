@@ -1,21 +1,14 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+
 import jdatetime
 
-from ..models import Todo
-
-
+from ..models import Todo, GoogleAccount
+from ..services.google_calendar import create_google_event
 # ==================================================
 # DASHBOARD / HOME
 # ==================================================
-
-def to_persian_digits(value):
-    return str(value).translate(
-        str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹")
-    )
-
-
 @login_required
 def home(request):
     """
@@ -36,8 +29,13 @@ def home(request):
             "personal"
         )
 
-        start_date_str = request.POST.get("start_date")
-        deadline_str = request.POST.get("deadline")
+        start_date_str = request.POST.get(
+            "start_date"
+        )
+
+        deadline_str = request.POST.get(
+            "deadline"
+        )
 
 
         # ==================================================
@@ -58,7 +56,10 @@ def home(request):
 
             try:
 
-                iso_start = start_date_str.replace("/", "-")
+                iso_start = start_date_str.replace(
+                    "/",
+                    "-"
+                )
 
                 start_date = jdatetime.date.fromisoformat(
                     iso_start
@@ -79,7 +80,10 @@ def home(request):
 
             try:
 
-                iso_deadline = deadline_str.replace("/", "-")
+                iso_deadline = deadline_str.replace(
+                    "/",
+                    "-"
+                )
 
                 deadline = jdatetime.date.fromisoformat(
                     iso_deadline
@@ -111,12 +115,62 @@ def home(request):
 
 
         # ==================================================
+        # GOOGLE CALENDAR SYNC
+        # ==================================================
+
+        google_calendar_synced = False
+
+        google_event_link = None
+
+
+        # Only sync when:
+        # 1. The task has a deadline.
+        # 2. The current user connected Google Calendar.
+        # 3. The task does not already have a Google event.
+
+        if (
+            deadline
+            and GoogleAccount.objects.filter(
+                user=request.user
+            ).exists()
+            and not todo.google_event_id
+        ):
+
+            try:
+
+                google_event = create_google_event(
+                    todo
+                )
+
+                if google_event:
+
+                    google_calendar_synced = True
+
+                    google_event_link = (
+                        google_event.get(
+                            "htmlLink"
+                        )
+                    )
+
+            except Exception as error:
+
+                # Do not prevent TaskFlow
+                # from creating the Todo.
+                print(
+                    "Google Calendar sync error:",
+                    error
+                )
+
+
+        # ==================================================
         # CONVERT DATES TO JALALI STRINGS
         # ==================================================
 
         start_date_jalali = (
 
-            todo.start_date.strftime("%Y/%m/%d")
+            todo.start_date.strftime(
+                "%Y/%m/%d"
+            )
 
             if todo.start_date
 
@@ -127,7 +181,9 @@ def home(request):
 
         deadline_jalali = (
 
-            todo.deadline.strftime("%Y/%m/%d")
+            todo.deadline.strftime(
+                "%Y/%m/%d"
+            )
 
             if todo.deadline
 
@@ -140,7 +196,9 @@ def home(request):
 
             jdatetime.datetime.fromgregorian(
                 datetime=todo.created_at
-            ).strftime("%Y/%m/%d")
+            ).strftime(
+                "%Y/%m/%d"
+            )
 
         )
 
@@ -166,6 +224,14 @@ def home(request):
             "deadline": deadline_jalali,
 
             "created_at": created_at_jalali,
+
+            "google_calendar_synced": (
+                google_calendar_synced
+            ),
+
+            "google_event_link": (
+                google_event_link
+            ),
         })
 
 
@@ -173,12 +239,13 @@ def home(request):
     # GET FILTER PARAMETERS
     # ==================================================
 
-    # "my" means that only tasks belonging to
-    # the current user should be displayed.
-    scope = request.GET.get("scope")
+    scope = request.GET.get(
+        "scope"
+    )
 
-    # "active" and "completed" are status filters.
-    filter_type = request.GET.get("filter")
+    filter_type = request.GET.get(
+        "filter"
+    )
 
 
     # ==================================================
@@ -187,19 +254,14 @@ def home(request):
 
     if scope == "my":
 
-        # Show only tasks created by the current user.
         todos = Todo.objects.filter(
             user=request.user
         )
 
-        # Used by the template to highlight
-        # the "My Tasks" navigation item.
         my_tasks = True
 
     else:
 
-        # Show all public tasks and
-        # personal tasks belonging to the current user.
         todos = Todo.objects.filter(
 
             category="public"
@@ -211,18 +273,12 @@ def home(request):
 
         )
 
-        # Used by the template to highlight
-        # the dashboard navigation item.
         my_tasks = False
 
 
     # ==================================================
     # TASK STATUS FILTER
     # ==================================================
-
-    # Apply the status filter after the task scope.
-    # Therefore, when "My Tasks" is active,
-    # these filters only affect the user's own tasks.
 
     if filter_type == "active":
 
@@ -241,7 +297,6 @@ def home(request):
     # ORDER TASKS
     # ==================================================
 
-    # Keep newest tasks first.
     todos = todos.order_by(
         "-created_at"
     )
@@ -250,9 +305,6 @@ def home(request):
     # ==================================================
     # STATISTICS
     # ==================================================
-
-    # Calculate statistics after applying
-    # both the scope and status filter.
 
     total_tasks = todos.count()
 
@@ -271,28 +323,27 @@ def home(request):
 
     for todo in todos:
 
-
-        # --------------------------------------------------
         # Creation date
-        # --------------------------------------------------
 
         todo.created_at_jalali_str = (
 
             jdatetime.datetime.fromgregorian(
                 datetime=todo.created_at
-            ).strftime("%Y/%m/%d")
+            ).strftime(
+                "%Y/%m/%d"
+            )
 
         )
 
 
-        # --------------------------------------------------
         # Start date
-        # --------------------------------------------------
 
         if todo.start_date:
 
             todo.start_date_jalali_str = (
-                todo.start_date.strftime("%Y/%m/%d")
+                todo.start_date.strftime(
+                    "%Y/%m/%d"
+                )
             )
 
         else:
@@ -300,14 +351,14 @@ def home(request):
             todo.start_date_jalali_str = None
 
 
-        # --------------------------------------------------
         # Completion date
-        # --------------------------------------------------
 
         if todo.end_date:
 
             todo.end_date_jalali_str = (
-                todo.end_date.strftime("%Y/%m/%d")
+                todo.end_date.strftime(
+                    "%Y/%m/%d"
+                )
             )
 
         else:
@@ -315,19 +366,30 @@ def home(request):
             todo.end_date_jalali_str = None
 
 
-        # --------------------------------------------------
         # Deadline
-        # --------------------------------------------------
 
         if todo.deadline:
 
             todo.deadline_jalali_str = (
-                todo.deadline.strftime("%Y/%m/%d")
+                todo.deadline.strftime(
+                    "%Y/%m/%d"
+                )
             )
 
         else:
 
             todo.deadline_jalali_str = None
+
+
+    # ==================================================
+    # GOOGLE CALENDAR CONNECTION STATUS
+    # ==================================================
+
+    google_connected = (
+        GoogleAccount.objects.filter(
+            user=request.user
+        ).exists()
+    )
 
 
     # ==================================================
@@ -348,6 +410,7 @@ def home(request):
 
         "remaining_tasks": remaining_tasks,
 
+        "google_connected": google_connected,
     }
 
 

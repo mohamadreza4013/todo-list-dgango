@@ -24,7 +24,10 @@ from .todo import (
 
 # Import the important tasks view
 from .important import important_tasks
-
+from .google import (
+    google_connect,
+    google_callback,
+)
 #from .user import (
 #register_view,
 #login_view,

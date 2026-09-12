@@ -1,11 +1,20 @@
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import (
+    get_object_or_404,
+    redirect,
+    render,
+)
 
 import jdatetime
 
-from ..models import Todo
+from ..models import Todo, GoogleAccount
 
+from ..services.google_calendar import (
+    create_google_event,
+    update_google_event,
+    delete_google_event,
+)
 
 # ==================================================
 # DIGIT CONVERSION
@@ -141,6 +150,11 @@ def toggle_todo(request, todo_id):
 # ==================================================
 
 @login_required
+# ==================================================
+# EDIT TODO
+# ==================================================
+
+@login_required
 def edit_todo(request, todo_id):
 
     todo = get_object_or_404(
@@ -161,19 +175,33 @@ def edit_todo(request, todo_id):
 
     if request.method == "POST":
 
-        # Title
+        # Save the old deadline before changing the Todo.
+        old_deadline = todo.deadline
+
+        # --------------------------------------------------
+        # TITLE
+        # --------------------------------------------------
+
         todo.title = request.POST.get(
             "title",
             ""
         ).strip()
 
-        # Description
+
+        # --------------------------------------------------
+        # DESCRIPTION
+        # --------------------------------------------------
+
         todo.description = request.POST.get(
             "description",
             ""
         )
 
-        # Category
+
+        # --------------------------------------------------
+        # CATEGORY
+        # --------------------------------------------------
+
         category = request.POST.get(
             "category",
             "personal"
@@ -187,42 +215,132 @@ def edit_todo(request, todo_id):
 
         todo.category = category
 
-        # Start date
+
+        # --------------------------------------------------
+        # START DATE
+        # --------------------------------------------------
+
         start_date_str = request.POST.get(
             "start_date",
             ""
         ).strip()
 
         if start_date_str:
+
             start_date = parse_jalali_date(
                 start_date_str
             )
 
             if start_date is not None:
+
                 todo.start_date = start_date
+
         else:
+
             todo.start_date = None
 
-        # Deadline
+
+        # --------------------------------------------------
+        # DEADLINE
+        # --------------------------------------------------
+
         deadline_str = request.POST.get(
             "deadline",
             ""
         ).strip()
 
         if deadline_str:
+
             deadline = parse_jalali_date(
                 deadline_str
             )
 
             if deadline is not None:
+
                 todo.deadline = deadline
+
         else:
+
             todo.deadline = None
 
-        # Save changes
+
+        # --------------------------------------------------
+        # SAVE TODO
+        # --------------------------------------------------
+
         todo.save()
 
+
+        # ==================================================
+        # GOOGLE CALENDAR SYNC
+        # ==================================================
+
+        google_connected = GoogleAccount.objects.filter(
+            user=request.user
+        ).exists()
+
+
+        if google_connected:
+
+            try:
+
+                # --------------------------------------------------
+                # CASE 1:
+                # Existing deadline was removed
+                # --------------------------------------------------
+
+                if (
+                    old_deadline
+                    and not todo.deadline
+                    and todo.google_event_id
+                ):
+
+                    delete_google_event(
+                        todo
+                    )
+
+
+                # --------------------------------------------------
+                # CASE 2:
+                # Existing Google event should be updated
+                # --------------------------------------------------
+
+                elif (
+                    todo.deadline
+                    and todo.google_event_id
+                ):
+
+                    update_google_event(
+                        todo
+                    )
+
+
+                # --------------------------------------------------
+                # CASE 3:
+                # Todo gets a deadline for the first time
+                # --------------------------------------------------
+
+                elif (
+                    todo.deadline
+                    and not todo.google_event_id
+                ):
+
+                    create_google_event(
+                        todo
+                    )
+
+            except Exception as error:
+
+                # Keep TaskFlow working even if
+                # Google Calendar has an error.
+                print(
+                    "Google Calendar sync error:",
+                    error
+                )
+
+
         return redirect("home")
+
 
     # --------------------------------------------------
     # GET
@@ -248,7 +366,11 @@ def edit_todo(request, todo_id):
         context
     )
 
+# ==================================================
+# DELETE TODO
+# ==================================================
 
+@login_required
 # ==================================================
 # DELETE TODO
 # ==================================================
@@ -257,6 +379,7 @@ def edit_todo(request, todo_id):
 def delete_todo(request, todo_id):
 
     if request.method != "POST":
+
         return JsonResponse(
             {
                 "success": False,
@@ -265,16 +388,27 @@ def delete_todo(request, todo_id):
             status=400
         )
 
+
+    # --------------------------------------------------
+    # GET TODO
+    # --------------------------------------------------
+
     todo = get_object_or_404(
         Todo,
         id=todo_id
     )
+
+
+    # --------------------------------------------------
+    # PERMISSION CHECK
+    # --------------------------------------------------
 
     # Personal tasks can only be deleted by their owner.
     if (
         todo.category == "personal"
         and todo.user != request.user
     ):
+
         return JsonResponse(
             {
                 "success": False,
@@ -283,7 +417,48 @@ def delete_todo(request, todo_id):
             status=403
         )
 
+
+    # ==================================================
+    # GOOGLE CALENDAR SYNC
+    # ==================================================
+
+    google_connected = GoogleAccount.objects.filter(
+        user=request.user
+    ).exists()
+
+
+    if (
+        google_connected
+        and todo.google_event_id
+    ):
+
+        try:
+
+            # Delete the related Google Calendar event
+            delete_google_event(
+                todo
+            )
+
+        except Exception as error:
+
+            # Keep TaskFlow working even if
+            # Google Calendar deletion fails.
+            print(
+                "Google Calendar delete error:",
+                error
+            )
+
+
+    # ==================================================
+    # DELETE TODO
+    # ==================================================
+
     todo.delete()
+
+
+    # ==================================================
+    # RETURN RESPONSE
+    # ==================================================
 
     return JsonResponse(
         {
@@ -291,7 +466,6 @@ def delete_todo(request, todo_id):
             "todo_id": todo_id
         }
     )
-
 
 # ==================================================
 # TOGGLE IMPORTANT STATUS

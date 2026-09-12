@@ -10,3 +10,4 @@
 
 # Import the Todo model
 from .todo import Todo
+from .todo import GoogleAccount

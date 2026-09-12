@@ -3,7 +3,7 @@ URL configuration for Work_manager project.
 """
 from django.contrib import admin
 from django.urls import path, include
-
+from tasks.views.google import google_connect, google_callback
 from tasks.views import (
     home,
     toggle_todo,
@@ -82,4 +82,15 @@ urlpatterns = [
          include('accounts.urls'),
          name="accountsurls"
          ),
+    path(
+        "google/connect/",
+        google_connect,
+        name="google_connect"
+    ),
+
+    path(
+        "google/callback/",
+        google_callback,
+        name="google_callback"
+    ),
 ]

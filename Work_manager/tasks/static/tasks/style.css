@@ -23,7 +23,48 @@ body {
     direction: rtl;
 }
 
+/* ==================================================
+   GOOGLE CALENDAR CONNECTION
+================================================== */
 
+.google-calendar-connection {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 16px;
+}
+
+.google-calendar-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 10px 16px;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+    color: #333333;
+
+    border: 1px solid #dddddd;
+
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    transition: 0.2s ease;
+}
+
+.google-calendar-button:hover {
+    background: #f7f7f7;
+    border-color: #cfcfcf;
+}
+
+.google-calendar-icon {
+    font-size: 17px;
+}
 /* =========================================================
    SHARED INPUTS
 ========================================================= */
