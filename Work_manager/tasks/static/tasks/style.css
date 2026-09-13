@@ -1079,3 +1079,872 @@ body {
         text-align: center;
     }
 }
+/* ==================================================
+   TOPIC BUTTONS
+================================================== */
+
+/* Create new topic button */
+
+.create-topic-button {
+    min-height: 44px;
+    padding: 0 14px;
+
+    border: 1px solid #e0e7ff;
+    border-radius: 10px;
+
+    background: #f8f9ff;
+    color: #6366f1;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.create-topic-button:hover:not(:disabled) {
+    background: #eef0ff;
+    border-color: #c7cbff;
+
+    color: #4f46e5;
+
+    box-shadow:
+        0 6px 18px rgba(99, 102, 241, 0.10);
+
+    transform: translateY(-1px);
+}
+
+.create-topic-button:disabled {
+    background: #f3f4f6;
+    border-color: #e5e7eb;
+    color: #9ca3af;
+
+    cursor: not-allowed;
+
+    opacity: 1;
+}
+
+
+/* ==================================================
+   CREATE TOPIC MODAL
+================================================== */
+
+.create-topic-modal[hidden] {
+    display: none;
+}
+
+.create-topic-modal {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 10000;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.create-topic-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    background: rgba(15, 23, 42, 0.45);
+}
+
+.create-topic-container {
+    position: relative;
+
+    z-index: 1;
+
+    width: min(420px, calc(100% - 32px));
+
+    padding: 24px;
+
+    border-radius: 16px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 20px 50px rgba(15, 23, 42, 0.18);
+}
+
+.create-topic-container h2 {
+    margin: 0 0 18px;
+
+    font-size: 20px;
+    font-weight: 800;
+
+    color: #1f2937;
+}
+
+
+/* Close button */
+
+.create-topic-close {
+    position: absolute;
+
+    top: 12px;
+    left: 12px;
+
+    width: 36px;
+    height: 36px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #f8fafc;
+
+    color: #64748b;
+
+    font-size: 22px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.create-topic-close:hover {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+
+/* Topic input */
+
+.new-topic-input {
+    width: 100%;
+
+    min-height: 48px;
+
+    padding: 0 14px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: #1f2937;
+
+    font-size: 14px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.new-topic-input:focus {
+    border-color: #818cf8;
+
+    box-shadow:
+        0 0 0 4px rgba(99, 102, 241, 0.10);
+}
+
+
+/* Modal action buttons */
+
+.create-topic-actions {
+    display: flex;
+
+    justify-content: flex-start;
+
+    gap: 10px;
+
+    margin-top: 18px;
+}
+
+.cancel-topic-button,
+.save-topic-button {
+    min-height: 44px;
+
+    padding: 0 18px;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+/* Cancel */
+
+.cancel-topic-button {
+    border: 1px solid #e5e7eb;
+
+    background: #ffffff;
+
+    color: #64748b;
+}
+
+.cancel-topic-button:hover {
+    background: #f8fafc;
+
+    border-color: #d1d5db;
+
+    color: #475569;
+}
+
+
+/* Save */
+
+.save-topic-button {
+    border: 1px solid #6366f1;
+
+    background: #6366f1;
+
+    color: #ffffff;
+}
+
+.save-topic-button:hover:not(:disabled) {
+    background: #4f46e5;
+
+    border-color: #4f46e5;
+
+    box-shadow:
+        0 6px 18px rgba(99, 102, 241, 0.18);
+
+    transform: translateY(-1px);
+}
+
+.save-topic-button:disabled {
+    background: #a5b4fc;
+
+    border-color: #a5b4fc;
+
+    cursor: not-allowed;
+}
+
+
+/* Error message */
+
+.create-topic-error {
+    margin-top: 10px;
+
+    padding: 10px 12px;
+
+    border-radius: 10px;
+
+    background: #fef2f2;
+
+    color: #dc2626;
+
+    font-size: 13px;
+}
+
+.create-topic-error[hidden] {
+    display: none;
+}
+/* ==================================================
+   CREATE TASK BUTTON
+================================================== */
+
+.create-task-button {
+    min-height: 46px;
+
+    padding: 0 18px;
+
+    border: 1px solid #6366f1;
+    border-radius: 11px;
+
+    background: #6366f1;
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.create-task-button:hover {
+    background: #4f46e5;
+    border-color: #4f46e5;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 6px 18px rgba(99, 102, 241, 0.18);
+}
+
+
+
+/* ==================================================
+   TOPIC ROW
+================================================== */
+
+.topic-input-row {
+    display: grid;
+
+    grid-template-columns: 1fr auto;
+
+    gap: 10px;
+
+    align-items: center;
+}
+/* ==================================================
+   CREATE TOPIC MODAL - ABOVE CREATE TASK MODAL
+================================================== */
+
+.create-topic-modal {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 11000;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.create-topic-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 11001;
+
+    background: rgba(15, 23, 42, 0.45);
+}
+
+.create-topic-container {
+    position: relative;
+
+    z-index: 11002;
+
+    width: min(420px, calc(100% - 32px));
+
+    padding: 24px;
+
+    border-radius: 16px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 20px 50px rgba(15, 23, 42, 0.18);
+}
+
+/* ==================================================
+   CREATE TOPIC BUTTON
+================================================== */
+
+.create-task-field .create-topic-button {
+    min-height: 46px;
+
+    padding: 0 13px;
+
+    border: 1px solid #e0e7ff;
+    border-radius: 10px;
+    z-index: 11000;
+    background: #f8f9ff;
+    color: #6366f1;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.create-task-field .create-topic-button:hover:not(:disabled) {
+    background: #eef0ff;
+
+    border-color: #c7cbff;
+
+    color: #4f46e5;
+}
+
+.create-task-field .create-topic-button:disabled {
+    background: #f3f4f6;
+
+    border-color: #e5e7eb;
+
+    color: #9ca3af;
+
+    cursor: not-allowed;
+}
+
+
+/* ==================================================
+   ERROR
+================================================== */
+
+.create-task-error {
+    padding: 10px 12px;
+
+    border-radius: 10px;
+
+    background: #fef2f2;
+
+    color: #dc2626;
+
+    font-size: 13px;
+}
+
+.create-task-error[hidden] {
+    display: none;
+}
+
+
+/* ==================================================
+   ACTION BUTTONS
+================================================== */
+
+.create-task-actions {
+    display: flex;
+
+    justify-content: flex-start;
+
+    gap: 10px;
+
+    padding-top: 4px;
+}
+
+.cancel-task-button,
+.save-task-button {
+    min-height: 44px;
+
+    padding: 0 18px;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+/* Cancel */
+
+.cancel-task-button {
+    border: 1px solid #e5e7eb;
+
+    background: #ffffff;
+
+    color: #64748b;
+}
+
+.cancel-task-button:hover {
+    background: #f8fafc;
+
+    border-color: #d1d5db;
+
+    color: #475569;
+}
+
+
+/* Save */
+
+.save-task-button {
+    border: 1px solid #6366f1;
+
+    background: #6366f1;
+
+    color: #ffffff;
+}
+
+.save-task-button:hover:not(:disabled) {
+    background: #4f46e5;
+
+    border-color: #4f46e5;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 6px 18px rgba(99, 102, 241, 0.18);
+}
+
+.save-task-button:disabled {
+    background: #a5b4fc;
+
+    border-color: #a5b4fc;
+
+    cursor: not-allowed;
+}
+
+
+/* ==================================================
+   CREATE TASK MODAL
+================================================== */
+
+.create-task-modal[hidden] {
+    display: none;
+}
+
+.create-task-modal {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 10000;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.create-task-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    background: rgba(15, 23, 42, 0.45);
+}
+
+.create-task-container {
+    position: relative;
+
+    z-index: 1;
+
+    width: min(520px, calc(100% - 32px));
+
+    max-height: calc(100vh - 40px);
+
+    overflow-y: auto;
+
+    padding: 24px;
+
+    border-radius: 16px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 20px 50px rgba(15, 23, 42, 0.18);
+}
+
+
+/* ==================================================
+   TITLE
+================================================== */
+
+.create-task-container h2 {
+    margin: 0 0 22px;
+
+    padding-left: 35px;
+
+    font-size: 20px;
+    font-weight: 800;
+
+    color: #1f2937;
+}
+
+
+/* ==================================================
+   CLOSE BUTTON
+================================================== */
+
+.create-task-close {
+    position: absolute;
+
+    top: 12px;
+    left: 12px;
+
+    width: 36px;
+    height: 36px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #f8fafc;
+
+    color: #64748b;
+
+    font-size: 22px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.create-task-close:hover {
+    background: #f1f5f9;
+    color: #334155;
+}
+
+
+/* ==================================================
+   FORM
+================================================== */
+
+.create-task-form {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 16px;
+}
+
+
+/* ==================================================
+   FIELD
+================================================== */
+
+.create-task-field {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+.create-task-field label {
+    font-size: 13px;
+
+    font-weight: 700;
+
+    color: #475569;
+}
+
+
+/* ==================================================
+   INPUTS
+================================================== */
+
+.create-task-field input,
+.create-task-field textarea,
+.create-task-field select {
+    width: 100%;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 11px;
+
+    background: #ffffff;
+
+    color: #1f2937;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.create-task-field input,
+.create-task-field select {
+    min-height: 46px;
+
+    padding: 0 13px;
+}
+
+.create-task-field textarea {
+    min-height: 90px;
+
+    padding: 12px 13px;
+
+    resize: vertical;
+
+    font-family: inherit;
+}
+
+.create-task-field input:focus,
+.create-task-field textarea:focus,
+.create-task-field select:focus {
+    border-color: #818cf8;
+
+    box-shadow:
+        0 0 0 4px rgba(99, 102, 241, 0.10);
+}
+
+/* ==================================================
+   MOBILE
+================================================== */
+
+@media (max-width: 600px) {
+
+    .create-task-container {
+        width: calc(100% - 20px);
+
+        padding: 20px;
+    }
+
+
+    .topic-input-row {
+        grid-template-columns: 1fr;
+    }
+
+
+    .create-task-field .create-topic-button {
+        width: 100%;
+    }
+
+
+    .create-task-actions {
+        flex-direction: column;
+    }
+
+
+    .cancel-task-button,
+    .save-task-button {
+        width: 100%;
+    }
+
+}
+/* ==================================================
+   TODO META
+================================================== */
+
+.todo-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+
+/* ==================================================
+   CATEGORY BADGE
+================================================== */
+
+.category-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 5px 10px;
+
+    border-radius: 8px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    line-height: 1;
+
+    white-space: nowrap;
+}
+
+
+/* Public */
+
+.category-badge.public {
+    background: #eef2ff;
+    color: #4f46e5;
+}
+
+
+/* Personal */
+
+.category-badge.personal {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+
+/* ==================================================
+   TOPIC BADGE
+================================================== */
+
+.topic-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    padding: 5px 10px;
+
+    border-radius: 8px;
+
+    background: #f0fdf4;
+
+    color: #15803d;
+
+    border: 1px solid #dcfce7;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    line-height: 1;
+
+    white-space: nowrap;
+
+    max-width: 220px;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+/* Topic icon */
+
+.topic-icon {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    opacity: 0.8;
+}
+
+
+/* Topic name */
+
+.topic-name {
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+/* Hover */
+
+.topic-badge:hover {
+    background: #dcfce7;
+
+    border-color: #bbf7d0;
+
+    transform: translateY(-1px);
+}

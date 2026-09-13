@@ -1,88 +1,799 @@
 // ==================================================
-// ADD TASK
+// CREATE TASK MODAL
 // ==================================================
 
-const addTaskForm = document.querySelector(
-    ".add-task-form-container"
-);
+const createTaskButton =
+    document.querySelector("#create-task-button");
 
 
-if (addTaskForm) {
+const createTaskModal =
+    document.querySelector("#create-task-modal");
 
-    addTaskForm.addEventListener(
+
+const createTaskClose =
+    document.querySelector("#create-task-close");
+
+
+const cancelTaskButton =
+    document.querySelector("#cancel-task-button");
+
+
+const createTaskForm =
+    document.querySelector("#create-task-form");
+
+
+const saveTaskButton =
+    document.querySelector("#save-task-button");
+
+
+const createTaskError =
+    document.querySelector("#create-task-error");
+
+
+const taskTitleInput =
+    document.querySelector("#task-title");
+
+
+// ==================================================
+// OPEN CREATE TASK MODAL
+// ==================================================
+
+if (createTaskButton) {
+
+    createTaskButton.addEventListener(
+        "click",
+        function () {
+
+            if (!createTaskModal) {
+                return;
+            }
+
+            createTaskModal.hidden = false;
+
+            if (createTaskError) {
+
+                createTaskError.hidden = true;
+
+                createTaskError.textContent = "";
+
+            }
+
+            if (taskTitleInput) {
+
+                taskTitleInput.focus();
+
+            }
+
+        }
+    );
+
+}
+
+
+// ==================================================
+// CLOSE CREATE TASK MODAL
+// ==================================================
+
+function closeCreateTaskModal() {
+
+    if (!createTaskModal) {
+        return;
+    }
+
+    createTaskModal.hidden = true;
+
+    if (createTaskError) {
+
+        createTaskError.hidden = true;
+
+        createTaskError.textContent = "";
+
+    }
+
+}
+
+
+if (createTaskClose) {
+
+    createTaskClose.addEventListener(
+        "click",
+        closeCreateTaskModal
+    );
+
+}
+
+
+if (cancelTaskButton) {
+
+    cancelTaskButton.addEventListener(
+        "click",
+        closeCreateTaskModal
+    );
+
+}
+
+
+// ==================================================
+// CLOSE CREATE TASK MODAL BY OVERLAY
+// ==================================================
+
+const createTaskOverlay =
+    createTaskModal
+        ? createTaskModal.querySelector(
+            ".create-task-overlay"
+        )
+        : null;
+
+
+if (createTaskOverlay) {
+
+    createTaskOverlay.addEventListener(
+        "click",
+        closeCreateTaskModal
+    );
+
+}
+
+
+// ==================================================
+// CREATE TASK
+// ==================================================
+
+if (createTaskForm) {
+
+    createTaskForm.addEventListener(
         "submit",
         async function (event) {
 
             event.preventDefault();
 
+            if (createTaskError) {
+
+                createTaskError.hidden = true;
+
+                createTaskError.textContent = "";
+
+            }
+
+            if (saveTaskButton) {
+
+                saveTaskButton.disabled = true;
+
+                saveTaskButton.textContent =
+                    "در حال ایجاد...";
+
+            }
+
             try {
 
-                const response = await fetch(
-                    window.location.href,
-                    {
-                        method: "POST",
+                const response =
+                    await fetch(
+                        window.location.href,
+                        {
+                            method: "POST",
 
-                        body: new FormData(
-                            addTaskForm
-                        ),
+                            body:
+                                new FormData(
+                                    createTaskForm
+                                ),
 
-                        headers: {
-                            "X-Requested-With":
-                                "XMLHttpRequest",
-                        },
-                    }
-                );
+                            headers: {
+                                "X-Requested-With":
+                                    "XMLHttpRequest",
+                            },
+                        }
+                    );
 
 
                 const data =
                     await response.json();
 
 
-                if (data.success) {
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
 
-                    /*
-                     * Pagination is handled by Django.
-                     *
-                     * After creating a new Todo, the newest
-                     * task belongs to the first page.
-                     *
-                     * Therefore, reload the first page instead
-                     * of manually inserting a new card into the DOM.
-                     */
-
-
-                    const currentUrl =
-                        new URL(
-                            window.location.href
-                        );
-
-
-                    // Remove the current page number.
-                    currentUrl.searchParams.delete(
-                        "page"
+                    throw new Error(
+                        data.error ||
+                        "خطا در ایجاد وظیفه."
                     );
-
-
-                    /*
-                     * Reload the page from the server.
-                     *
-                     * Django will recalculate:
-                     * - Todo list
-                     * - Pagination
-                     * - Statistics
-                     */
-
-                    window.location.href =
-                        currentUrl.toString();
 
                 }
 
-            } catch (error) {
+
+                /*
+                 * New tasks are the newest tasks,
+                 * therefore they belong to page 1.
+                 */
+
+                const currentUrl =
+                    new URL(
+                        window.location.href
+                    );
+
+
+                currentUrl.searchParams.delete(
+                    "page"
+                );
+
+
+                /*
+                 * Reload the first page so Django
+                 * recalculates:
+                 *
+                 * - task list
+                 * - statistics
+                 * - pagination
+                 */
+
+                window.location.href =
+                    currentUrl.toString();
+
+            }
+
+            catch (error) {
 
                 console.error(
-                    "Error adding task:",
+                    "Error creating task:",
                     error
                 );
+
+
+                if (createTaskError) {
+
+                    createTaskError.textContent =
+                        error.message;
+
+                    createTaskError.hidden = false;
+
+                }
+
+
+                if (saveTaskButton) {
+
+                    saveTaskButton.disabled =
+                        false;
+
+                    saveTaskButton.textContent =
+                        "ایجاد وظیفه";
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+
+// ==================================================
+// CREATE PERSONAL TOPIC
+// ==================================================
+
+const categorySelect =
+    document.querySelector("#task-category");
+
+
+const topicSelect =
+    document.querySelector("#task-topic");
+
+
+const createTopicButton =
+    document.querySelector("#create-topic-button");
+
+
+const createTopicModal =
+    document.querySelector("#create-topic-modal");
+
+
+const createTopicClose =
+    document.querySelector("#create-topic-close");
+
+
+const cancelTopicButton =
+    document.querySelector("#cancel-topic-button");
+
+
+const saveTopicButton =
+    document.querySelector("#save-topic-button");
+
+
+const newTopicInput =
+    document.querySelector("#new-topic-name");
+
+
+const createTopicError =
+    document.querySelector("#create-topic-error");
+
+
+// ==================================================
+// STORE INITIAL TOPICS
+// ==================================================
+
+const topicOptions = topicSelect
+    ? Array.from(
+        topicSelect.options
+    ).map(
+        function (option) {
+
+            return {
+                value: option.value,
+                text: option.textContent.trim(),
+                category:
+                    option.dataset.category || "",
+            };
+
+        }
+    )
+    : [];
+
+
+// ==================================================
+// UPDATE TOPIC OPTIONS
+// ==================================================
+
+function updateTopicOptions(
+    selectedTopicId = null
+) {
+
+    if (
+        !categorySelect ||
+        !topicSelect
+    ) {
+
+        return;
+
+    }
+
+
+    const selectedCategory =
+        categorySelect.value;
+
+
+    /*
+     * Remove all current options.
+     */
+
+    topicSelect.innerHTML = "";
+
+
+    /*
+     * Get topics that belong to
+     * the selected category.
+     */
+
+    const matchingTopics =
+        topicOptions.filter(
+            function (topic) {
+
+                return (
+                    topic.category ===
+                    selectedCategory
+                );
+
+            }
+        );
+
+
+    /*
+     * Add matching topics.
+     */
+
+    matchingTopics.forEach(
+        function (topic) {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                topic.value;
+
+
+            option.textContent =
+                topic.text;
+
+
+            option.dataset.category =
+                topic.category;
+
+
+            topicSelect.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    /*
+     * Select the requested topic
+     * when it exists in the current category.
+     */
+
+    if (selectedTopicId !== null) {
+
+        const selectedOption =
+            Array.from(
+                topicSelect.options
+            ).find(
+                function (option) {
+
+                    return (
+                        option.value ===
+                        String(selectedTopicId)
+                    );
+
+                }
+            );
+
+
+        if (selectedOption) {
+
+            selectedOption.selected =
+                true;
+
+        }
+
+    }
+
+
+    /*
+     * If no topic is selected,
+     * automatically select the first one.
+     */
+
+    if (
+        topicSelect.options.length > 0 &&
+        topicSelect.value === ""
+    ) {
+
+        topicSelect.selectedIndex = 0;
+
+    }
+
+
+    /*
+     * Disable the select when
+     * no topics are available.
+     */
+
+    topicSelect.disabled =
+        matchingTopics.length === 0;
+
+
+    /*
+     * New personal topics can only
+     * be created for personal tasks.
+     */
+
+    if (createTopicButton) {
+
+        createTopicButton.disabled =
+            selectedCategory !== "personal";
+
+    }
+
+}
+
+
+// ==================================================
+// CATEGORY CHANGE
+// ==================================================
+
+if (categorySelect) {
+
+    categorySelect.addEventListener(
+        "change",
+        function () {
+
+            updateTopicOptions();
+
+        }
+    );
+
+}
+
+
+// ==================================================
+// OPEN CREATE TOPIC MODAL
+// ==================================================
+
+if (createTopicButton) {
+
+    createTopicButton.addEventListener(
+        "click",
+        function () {
+
+            /*
+             * Only personal topics can be
+             * created by the current user.
+             */
+
+            if (
+                categorySelect &&
+                categorySelect.value !== "personal"
+            ) {
+
+                return;
+
+            }
+
+
+            if (!createTopicModal) {
+                return;
+            }
+
+
+            createTopicModal.hidden = false;
+
+
+            if (createTopicError) {
+
+                createTopicError.hidden = true;
+
+                createTopicError.textContent = "";
+
+            }
+
+
+            if (newTopicInput) {
+
+                newTopicInput.value = "";
+
+                newTopicInput.focus();
+
+            }
+
+        }
+    );
+
+}
+
+
+// ==================================================
+// CLOSE CREATE TOPIC MODAL
+// ==================================================
+
+function closeCreateTopicModal() {
+
+    if (!createTopicModal) {
+        return;
+    }
+
+    createTopicModal.hidden = true;
+
+    if (createTopicError) {
+
+        createTopicError.hidden = true;
+
+        createTopicError.textContent = "";
+
+    }
+
+}
+
+
+if (createTopicClose) {
+
+    createTopicClose.addEventListener(
+        "click",
+        closeCreateTopicModal
+    );
+
+}
+
+
+if (cancelTopicButton) {
+
+    cancelTopicButton.addEventListener(
+        "click",
+        closeCreateTopicModal
+    );
+
+}
+
+
+// ==================================================
+// CLOSE TOPIC MODAL BY OVERLAY
+// ==================================================
+
+const createTopicOverlay =
+    createTopicModal
+        ? createTopicModal.querySelector(
+            ".create-topic-overlay"
+        )
+        : null;
+
+
+if (createTopicOverlay) {
+
+    createTopicOverlay.addEventListener(
+        "click",
+        closeCreateTopicModal
+    );
+
+}
+
+
+// ==================================================
+// CREATE TOPIC
+// ==================================================
+
+if (saveTopicButton) {
+
+    saveTopicButton.addEventListener(
+        "click",
+        async function () {
+
+            const name =
+                newTopicInput
+                    ? newTopicInput.value.trim()
+                    : "";
+
+
+            // --------------------------------------------------
+            // VALIDATE NAME
+            // --------------------------------------------------
+
+            if (!name) {
+
+                if (createTopicError) {
+
+                    createTopicError.textContent =
+                        "نام موضوع را وارد کنید.";
+
+                    createTopicError.hidden = false;
+
+                }
+
+                return;
+
+            }
+
+
+            // --------------------------------------------------
+            // DISABLE SAVE BUTTON
+            // --------------------------------------------------
+
+            saveTopicButton.disabled = true;
+
+            saveTopicButton.textContent =
+                "در حال ایجاد...";
+
+
+            try {
+
+                const formData =
+                    new FormData();
+
+
+                formData.append(
+                    "name",
+                    name
+                );
+
+
+                // --------------------------------------------------
+                // SEND REQUEST
+                // --------------------------------------------------
+
+                const response =
+                    await fetch(
+                        "/topic/create/",
+                        {
+                            method: "POST",
+
+                            body: formData,
+
+                            headers: {
+                                "X-CSRFToken":
+                                    getCSRFToken(),
+
+                                "X-Requested-With":
+                                    "XMLHttpRequest",
+                            },
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+
+                    throw new Error(
+                        data.error ||
+                        "خطا در ایجاد موضوع."
+                    );
+
+                }
+
+
+                // --------------------------------------------------
+                // CREATE NEW TOPIC
+                // --------------------------------------------------
+
+                const newTopic =
+                    data.topic;
+
+
+                const newTopicValue =
+                    String(
+                        newTopic.id
+                    );
+
+
+                // --------------------------------------------------
+                // UPDATE INTERNAL TOPIC LIST
+                // --------------------------------------------------
+
+                topicOptions.push({
+
+                    value:
+                        newTopicValue,
+
+                    text:
+                        newTopic.name,
+
+                    category:
+                        "personal",
+
+                });
+
+
+                // --------------------------------------------------
+                // UPDATE SELECT
+                // --------------------------------------------------
+
+                updateTopicOptions(
+                    newTopicValue
+                );
+
+
+                // --------------------------------------------------
+                // CLOSE MODAL
+                // --------------------------------------------------
+
+                closeCreateTopicModal();
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Error creating topic:",
+                    error
+                );
+
+
+                if (createTopicError) {
+
+                    createTopicError.textContent =
+                        error.message;
+
+                    createTopicError.hidden =
+                        false;
+
+                }
+
+            }
+
+            finally {
+
+                saveTopicButton.disabled =
+                    false;
+
+                saveTopicButton.textContent =
+                    "ایجاد موضوع";
 
             }
 
@@ -100,15 +811,16 @@ async function loadPage(url) {
 
     try {
 
-        const response = await fetch(
-            url,
-            {
-                headers: {
-                    "X-Requested-With":
-                        "XMLHttpRequest",
-                },
-            }
-        );
+        const response =
+            await fetch(
+                url,
+                {
+                    headers: {
+                        "X-Requested-With":
+                            "XMLHttpRequest",
+                    },
+                }
+            );
 
 
         if (!response.ok) {
@@ -135,9 +847,9 @@ async function loadPage(url) {
             );
 
 
-        // --------------------------------------------------
+        // ==================================================
         // TODO LIST
-        // --------------------------------------------------
+        // ==================================================
 
         const currentTodoList =
             document.querySelector(
@@ -162,9 +874,9 @@ async function loadPage(url) {
         }
 
 
-        // --------------------------------------------------
+        // ==================================================
         // PAGINATION
-        // --------------------------------------------------
+        // ==================================================
 
         const currentPagination =
             document.querySelector(
@@ -179,8 +891,7 @@ async function loadPage(url) {
 
 
         /*
-         * A page may have no pagination
-         * when there is only one page.
+         * Replace existing pagination.
          */
 
         if (
@@ -194,15 +905,16 @@ async function loadPage(url) {
 
         }
 
+        /*
+         * Add pagination when the
+         * current page previously had none.
+         */
+
         else if (
             !currentPagination &&
-            newPagination
+            newPagination &&
+            currentTodoList
         ) {
-
-            /*
-             * Insert pagination after
-             * the todo list.
-             */
 
             currentTodoList.insertAdjacentElement(
                 "afterend",
@@ -210,6 +922,11 @@ async function loadPage(url) {
             );
 
         }
+
+        /*
+         * Remove pagination when
+         * only one page remains.
+         */
 
         else if (
             currentPagination &&
@@ -221,9 +938,9 @@ async function loadPage(url) {
         }
 
 
-        // --------------------------------------------------
+        // ==================================================
         // STATISTICS
-        // --------------------------------------------------
+        // ==================================================
 
         const currentStats =
             document.querySelector(
@@ -248,9 +965,9 @@ async function loadPage(url) {
         }
 
 
-        // --------------------------------------------------
+        // ==================================================
         // FILTER BUTTONS
-        // --------------------------------------------------
+        // ==================================================
 
         const currentFilters =
             document.querySelector(
@@ -275,9 +992,9 @@ async function loadPage(url) {
         }
 
 
-        // --------------------------------------------------
+        // ==================================================
         // UPDATE URL
-        // --------------------------------------------------
+        // ==================================================
 
         window.history.pushState(
             {},
@@ -286,21 +1003,31 @@ async function loadPage(url) {
         );
 
 
-        // Re-bind events to the newly loaded buttons.
+        // ==================================================
+        // REBIND PAGINATION
+        // ==================================================
+
         bindPaginationEvents();
+
+
+        // ==================================================
+        // REBIND FILTERS
+        // ==================================================
 
         bindFilterEvents();
 
-        bindTodoEvents();
 
+        // ==================================================
+        // PERSIAN DIGITS
+        // ==================================================
 
-        // Convert dynamic numbers.
         convertTextNodesToPersianDigits(
             document.body
         );
 
+    }
 
-    } catch (error) {
+    catch (error) {
 
         console.error(
             "Error loading page:",
@@ -326,12 +1053,12 @@ function bindFilterEvents() {
             function (button) {
 
                 /*
-                 * Prevent binding the same event
-                 * multiple times.
+                 * Prevent multiple event bindings.
                  */
 
                 if (
-                    button.dataset.bound === "true"
+                    button.dataset.bound ===
+                    "true"
                 ) {
 
                     return;
@@ -339,7 +1066,8 @@ function bindFilterEvents() {
                 }
 
 
-                button.dataset.bound = "true";
+                button.dataset.bound =
+                    "true";
 
 
                 button.addEventListener(
@@ -374,8 +1102,13 @@ function bindPaginationEvents() {
         .forEach(
             function (button) {
 
+                /*
+                 * Prevent multiple event bindings.
+                 */
+
                 if (
-                    button.dataset.bound === "true"
+                    button.dataset.bound ===
+                    "true"
                 ) {
 
                     return;
@@ -383,7 +1116,8 @@ function bindPaginationEvents() {
                 }
 
 
-                button.dataset.bound = "true";
+                button.dataset.bound =
+                    "true";
 
 
                 button.addEventListener(
@@ -406,28 +1140,7 @@ function bindPaginationEvents() {
 
 
 // ==================================================
-// TODO EVENTS
-// ==================================================
-
-function bindTodoEvents() {
-
-    /*
-     * todo.js is responsible for:
-     * - complete
-     * - important
-     * - delete
-     *
-     * Therefore this function is intentionally empty.
-     *
-     * It exists so the page-loading logic remains
-     * organized and can be extended later.
-     */
-
-}
-
-
-// ==================================================
-// CONVERT ENGLISH DIGITS TO PERSIAN DIGITS
+// PERSIAN DIGITS
 // ==================================================
 
 function toPersianDigits(value) {
@@ -545,6 +1258,22 @@ const observer =
 
 
 // ==================================================
+// BROWSER BACK / FORWARD
+// ==================================================
+
+window.addEventListener(
+    "popstate",
+    function () {
+
+        loadPage(
+            window.location.href
+        );
+
+    }
+);
+
+
+// ==================================================
 // INITIALIZATION
 // ==================================================
 
@@ -552,26 +1281,30 @@ document.addEventListener(
     "DOMContentLoaded",
     function () {
 
-        // Convert numbers already present on page.
+        // Convert existing numbers.
         convertTextNodesToPersianDigits(
             document.body
         );
 
 
-        // Bind filters.
+        // Initialize filters.
         bindFilterEvents();
 
 
-        // Bind pagination.
+        // Initialize pagination.
         bindPaginationEvents();
 
 
-        // Bind Todo events.
-        bindTodoEvents();
+        // Initialize topic options.
+        updateTopicOptions();
 
     }
 );
 
+
+// ==================================================
+// START OBSERVER
+// ==================================================
 
 observer.observe(
     document.body,

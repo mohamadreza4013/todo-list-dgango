@@ -1,7 +1,6 @@
 {% load static %}
 
 <!DOCTYPE html>
-
 <html lang="fa" dir="rtl">
 
 <head>
@@ -10,18 +9,13 @@
          DOCUMENT SETTINGS
     ================================================== -->
 
-    <!-- Page character encoding -->
     <meta charset="UTF-8">
 
-
-    <!-- Make the page responsive -->
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
 
-
-    <!-- Page title -->
     <title>
         ویرایش وظیفه - تسک‌فلو
     </title>
@@ -31,14 +25,11 @@
          CSS
     ================================================== -->
 
-    <!-- Main project CSS -->
     <link
         rel="stylesheet"
         href="{% static 'tasks/style.css' %}"
     >
 
-
-    <!-- Calendar CSS -->
     <link
         rel="stylesheet"
         href="{% static 'calendar/calendar.css' %}"
@@ -85,6 +76,7 @@
     </div>
 
 
+
     <!-- ==================================================
          EDIT TASK CARD
     ================================================== -->
@@ -129,15 +121,18 @@
         </div>
 
 
+
         <!-- ==================================================
              EDIT FORM
         ================================================== -->
 
         <form
             method="POST"
+            id="edit-task-form"
         >
 
             {% csrf_token %}
+
 
 
             <!-- ==================================================
@@ -167,6 +162,7 @@
             </div>
 
 
+
             <!-- ==================================================
                  DESCRIPTION
             ================================================== -->
@@ -191,6 +187,7 @@
             </div>
 
 
+
             <!-- ==================================================
                  CATEGORY
             ================================================== -->
@@ -211,21 +208,21 @@
                     name="category"
                 >
 
-                    <!-- Personal -->
-
                     <option
                         value="personal"
-                        {% if todo.category == "personal" %}selected{% endif %}
+                        {% if todo.category == "personal" %}
+                            selected
+                        {% endif %}
                     >
                         شخصی
                     </option>
 
 
-                    <!-- Public -->
-
                     <option
                         value="public"
-                        {% if todo.category == "public" %}selected{% endif %}
+                        {% if todo.category == "public" %}
+                            selected
+                        {% endif %}
                     >
                         عمومی
                     </option>
@@ -233,6 +230,93 @@
                 </select>
 
             </div>
+
+
+
+            <!-- ==================================================
+                 TOPIC
+            ================================================== -->
+
+            <div class="form-group">
+
+                <label
+                    class="form-label"
+                    for="topic"
+                >
+                    موضوع
+                </label>
+
+
+                <div class="topic-input-row">
+
+                    <select
+                        id="topic"
+                        class="form-input task-topic-input"
+                        name="topic"
+                    >
+
+
+                        <!-- ==================================================
+                             PERSONAL TOPICS
+                        ================================================== -->
+
+                        {% for topic in personal_topics %}
+
+                            <option
+                                value="{{ topic.id }}"
+                                data-category="personal"
+                                {% if todo.topic_id == topic.id %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                {{ topic.name }}
+
+                            </option>
+
+                        {% endfor %}
+
+
+
+                        <!-- ==================================================
+                             PUBLIC TOPICS
+                        ================================================== -->
+
+                        {% for topic in public_topics %}
+
+                            <option
+                                value="{{ topic.id }}"
+                                data-category="public"
+                                {% if todo.topic_id == topic.id %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                {{ topic.name }}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+
+                    <!-- Create new topic -->
+
+                    <button
+                        type="button"
+                        id="create-topic-button"
+                        class="create-topic-button"
+                    >
+
+                        + موضوع جدید
+
+                    </button>
+
+                </div>
+
+            </div>
+
 
 
             <!-- ==================================================
@@ -263,6 +347,7 @@
             </div>
 
 
+
             <!-- ==================================================
                  DEADLINE
             ================================================== -->
@@ -291,6 +376,7 @@
             </div>
 
 
+
             <!-- ==================================================
                  FORM ACTIONS
             ================================================== -->
@@ -304,7 +390,9 @@
                     href="{% url 'home' %}"
                     class="cancel-button"
                 >
+
                     لغو
+
                 </a>
 
 
@@ -314,7 +402,9 @@
                     type="submit"
                     class="save-button"
                 >
+
                     ذخیره تغییرات
+
                 </button>
 
             </div>
@@ -324,6 +414,99 @@
     </div>
 
 </div>
+
+
+
+<!-- ==================================================
+     CREATE TOPIC MODAL
+================================================== -->
+
+<div
+    id="create-topic-modal"
+    class="create-topic-modal"
+    hidden
+>
+
+    <div class="create-topic-overlay"></div>
+
+
+    <div class="create-topic-container">
+
+
+        <!-- Close button -->
+
+        <button
+            type="button"
+            id="create-topic-close"
+            class="create-topic-close"
+            aria-label="بستن"
+        >
+
+            ×
+
+        </button>
+
+
+        <!-- Modal title -->
+
+        <h2>
+            ایجاد موضوع جدید
+        </h2>
+
+
+        <!-- Topic name -->
+
+        <input
+            type="text"
+            id="new-topic-name"
+            class="new-topic-input"
+            placeholder="مثلاً ورزش"
+            maxlength="50"
+            autocomplete="off"
+        >
+
+
+        <!-- Topic actions -->
+
+        <div class="create-topic-actions">
+
+
+            <button
+                type="button"
+                id="cancel-topic-button"
+                class="cancel-topic-button"
+            >
+
+                انصراف
+
+            </button>
+
+
+            <button
+                type="button"
+                id="save-topic-button"
+                class="save-topic-button"
+            >
+
+                ایجاد موضوع
+
+            </button>
+
+        </div>
+
+
+        <!-- Topic error -->
+
+        <div
+            id="create-topic-error"
+            class="create-topic-error"
+            hidden
+        ></div>
+
+    </div>
+
+</div>
+
 
 
 <!-- ==================================================
@@ -336,19 +519,14 @@
     hidden
 >
 
-
-    <!-- ==================================================
-         CALENDAR OVERLAY
-    ================================================== -->
+    <!-- Calendar overlay -->
 
     <div
         class="calendar-picker-overlay"
     ></div>
 
 
-    <!-- ==================================================
-         CALENDAR CONTAINER
-    ================================================== -->
+    <!-- Calendar container -->
 
     <div
         class="calendar-picker-container"
@@ -363,13 +541,13 @@
             class="calendar-picker-close"
             aria-label="بستن تقویم"
         >
+
             ×
+
         </button>
 
 
-        <!-- ==================================================
-             CALENDAR HEADER
-        ================================================== -->
+        <!-- Calendar header -->
 
         <div
             class="calendar-picker-header"
@@ -382,16 +560,12 @@
         </div>
 
 
-        <!-- ==================================================
-             CALENDAR
-        ================================================== -->
+        <!-- Calendar -->
 
         <div class="calendar">
 
 
-            <!-- ==================================================
-                 CALENDAR NAVIGATION
-            ================================================== -->
+            <!-- Calendar navigation -->
 
             <div
                 class="calendar-topbar"
@@ -406,7 +580,9 @@
                     class="month-button"
                     aria-label="ماه قبل"
                 >
+
                     ‹
+
                 </button>
 
 
@@ -426,15 +602,15 @@
                     class="month-button"
                     aria-label="ماه بعد"
                 >
+
                     ›
+
                 </button>
 
             </div>
 
 
-            <!-- ==================================================
-                 WEEKDAYS
-            ================================================== -->
+            <!-- Weekdays -->
 
             <div
                 id="weekdays"
@@ -442,9 +618,7 @@
             ></div>
 
 
-            <!-- ==================================================
-                 CALENDAR DAYS
-            ================================================== -->
+            <!-- Calendar days -->
 
             <div
                 id="calendar-grid"
@@ -458,15 +632,23 @@
 </div>
 
 
+
 <!-- ==================================================
      JAVASCRIPT
 ================================================== -->
 
-<!-- Jalali calendar -->
 <script
     src="{% static 'calendar/calendar.js' %}"
 ></script>
 
+
+<script
+    src="{% static 'tasks/todo.js' %}"
+></script>
+
+<script
+    src="{% static 'tasks/edit_todo.js' %}"
+></script>
 
 </body>
 

@@ -15,7 +15,7 @@ function formatDate(dateString) {
 
     const date = new Date(dateString);
 
-    // Return the original string if the date is invalid
+    // Return the original string if the date is invalid.
     if (isNaN(date.getTime())) {
         return dateString;
     }
@@ -26,7 +26,10 @@ function formatDate(dateString) {
         year: 'numeric'
     };
 
-    return date.toLocaleDateString('fa-IR', options);
+    return date.toLocaleDateString(
+        'fa-IR',
+        options
+    );
 }
 
 
@@ -42,7 +45,9 @@ function createTodoCard(todo) {
             data-todo-id="${todo.todo_id}"
         >
 
-            <!-- Complete -->
+            <!-- ==================================================
+                 COMPLETE
+            ================================================== -->
 
             <form
                 method="POST"
@@ -59,7 +64,9 @@ function createTodoCard(todo) {
                 <button
                     type="submit"
                     class="complete-button ${
-                        todo.completed ? 'completed' : ''
+                        todo.completed
+                            ? 'completed'
+                            : ''
                     }"
                     title="${
                         todo.completed
@@ -67,69 +74,135 @@ function createTodoCard(todo) {
                             : 'علامت‌گذاری به‌عنوان انجام‌شده'
                     }"
                 >
+
                     ${
                         todo.completed
                             ? '✓'
                             : ''
                     }
+
                 </button>
 
             </form>
 
 
-            <!-- Todo Content -->
+
+            <!-- ==================================================
+                 TODO CONTENT
+            ================================================== -->
 
             <div class="todo-content">
 
+
+                <!-- ==================================================
+                     TASK TITLE
+                ================================================== -->
+
                 <div class="todo-title">
-                    ${escapeHTML(todo.title)}
+
+                    ${escapeHTML(
+                        todo.title
+                    )}
+
                 </div>
+
+
+                <!-- ==================================================
+                     TASK DESCRIPTION
+                ================================================== -->
 
                 ${
                     todo.description
                         ? `
                             <div class="todo-description">
-                                ${escapeHTML(todo.description)}
-                            </div>
-                        `
-                        : ""
-                }
 
-
-                <!-- Category -->
-
-                ${
-                    todo.category
-                        ? `
-                            <div class="todo-category">
-
-                                ${
-                                    todo.category === "public"
-                                        ? `
-                                            <span class="category-badge public">
-                                                عمومی
-                                            </span>
-                                        `
-                                        : `
-                                            <span class="category-badge personal">
-                                                شخصی
-                                            </span>
-                                        `
-                                }
+                                ${escapeHTML(
+                                    todo.description
+                                )}
 
                             </div>
                         `
                         : ""
                 }
+
+
+
+                <!-- ==================================================
+                     TASK META
+                ================================================== -->
+
+                <div class="todo-meta">
+
+
+                    <!-- ==================================================
+                         TASK CATEGORY
+                    ================================================== -->
+
+                    ${
+                        todo.category
+                            ? `
+                                <span
+                                    class="category-badge ${
+                                        todo.category === "public"
+                                            ? "public"
+                                            : "personal"
+                                    }"
+                                >
+
+                                    ${
+                                        todo.category === "public"
+                                            ? "عمومی"
+                                            : "شخصی"
+                                    }
+
+                                </span>
+                            `
+                            : ""
+                    }
+
+
+                    <!-- ==================================================
+                         TASK TOPIC
+                    ================================================== -->
+
+                    ${
+                        todo.topic
+                            ? `
+                                <span class="topic-badge">
+
+                                    <span class="topic-icon">
+                                        #
+                                    </span>
+
+                                    <span class="topic-name">
+
+                                        ${escapeHTML(
+                                            todo.topic.name
+                                        )}
+
+                                    </span>
+
+                                </span>
+                            `
+                            : ""
+                    }
+
+                </div>
 
             </div>
 
 
-            <!-- Todo Actions -->
+
+            <!-- ==================================================
+                 TODO ACTIONS
+            ================================================== -->
 
             <div class="todo-actions">
 
-                <!-- Status -->
+
+                <!-- ==================================================
+                     STATUS
+                ================================================== -->
 
                 <span
                     class="status ${
@@ -138,15 +211,20 @@ function createTodoCard(todo) {
                             : ''
                     }"
                 >
+
                     ${
                         todo.completed
                             ? 'انجام‌شده'
                             : 'در انتظار'
                     }
+
                 </span>
 
 
-                <!-- Important -->
+
+                <!-- ==================================================
+                     IMPORTANT
+                ================================================== -->
 
                 <form
                     method="POST"
@@ -173,23 +251,33 @@ function createTodoCard(todo) {
                                 : 'افزودن به وظایف مهم'
                         }"
                     >
+
                         ★
+
                     </button>
 
                 </form>
 
 
-                <!-- Edit -->
+
+                <!-- ==================================================
+                     EDIT
+                ================================================== -->
 
                 <a
                     href="/todo/${todo.todo_id}/edit/"
                     class="edit-button"
                 >
+
                     ✎ ویرایش
+
                 </a>
 
 
-                <!-- Delete -->
+
+                <!-- ==================================================
+                     DELETE
+                ================================================== -->
 
                 <form
                     method="POST"
@@ -207,60 +295,84 @@ function createTodoCard(todo) {
                         type="submit"
                         class="delete-button"
                     >
+
                         🗑 حذف
+
                     </button>
 
                 </form>
 
 
-                <!-- Task Dates -->
+
+                <!-- ==================================================
+                     TASK DATES
+                ================================================== -->
 
                 <div class="todo-dates">
 
-                    <!-- Task creation date -->
+
+                    <!-- ==================================================
+                         CREATION DATE
+                    ================================================== -->
 
                     <span class="todo-date">
+
                         ایجاد:
-                        ${toPersianDigits(todo.created_at)}
+                        ${toPersianDigits(
+                            todo.created_at
+                        )}
+
                     </span>
 
 
-                    <!-- Task start date -->
+                    <!-- ==================================================
+                         START DATE
+                    ================================================== -->
 
                     ${
                         todo.start_date
                             ? `
                                 <span class="todo-date">
+
                                     شروع:
                                     ${todo.start_date}
+
                                 </span>
                             `
                             : ""
                     }
 
 
-                    <!-- Task end date -->
+                    <!-- ==================================================
+                         COMPLETION DATE
+                    ================================================== -->
 
                     ${
                         todo.end_date
                             ? `
                                 <span class="todo-date end-date">
+
                                     اتمام:
                                     ${todo.end_date}
+
                                 </span>
                             `
                             : ""
                     }
 
 
-                    <!-- Task deadline -->
+                    <!-- ==================================================
+                         DEADLINE
+                    ================================================== -->
 
                     ${
                         todo.deadline
                             ? `
                                 <span class="todo-date">
+
                                     مهلت:
                                     ${todo.deadline}
+
                                 </span>
                             `
                             : ""
@@ -282,22 +394,32 @@ function createTodoCard(todo) {
 async function refreshCurrentPage() {
 
     /*
-     * home.js provides loadPage() for AJAX pagination.
-     * Use it when available.
+     * Use the AJAX page loader when it exists.
      *
-     * On pages where loadPage() is not available,
-     * reload the current page normally.
+     * This keeps pagination, statistics and the
+     * current URL synchronized with Django.
      */
 
-    if (typeof loadPage === "function") {
+    if (
+        typeof loadPage === "function"
+    ) {
 
-        await loadPage(window.location.href);
+        await loadPage(
+            window.location.href
+        );
 
-    } else {
-
-        window.location.reload();
+        return;
 
     }
+
+
+    /*
+     * Fallback for pages that do not use
+     * the AJAX page loader.
+     */
+
+    window.location.reload();
+
 }
 
 
@@ -307,7 +429,7 @@ async function refreshCurrentPage() {
 
 document.addEventListener(
     "submit",
-    async function(event) {
+    async function (event) {
 
 
         // ==================================================
@@ -357,22 +479,23 @@ document.addEventListener(
                     await response.json();
 
 
-                if (data.success) {
+                if (!data.success) {
 
-                    /*
-                     * Reload the current server-side page.
-                     *
-                     * This keeps:
-                     * - task list
-                     * - statistics
-                     * - pagination
-                     *
-                     * synchronized with Django.
-                     */
-
-                    await refreshCurrentPage();
+                    throw new Error(
+                        data.error ||
+                        "خطا در تغییر وضعیت وظیفه."
+                    );
 
                 }
+
+
+                /*
+                 * Refresh the current page so Django
+                 * recalculates the task list,
+                 * statistics and pagination.
+                 */
+
+                await refreshCurrentPage();
 
             }
 
@@ -387,6 +510,7 @@ document.addEventListener(
 
 
             return;
+
         }
 
 
@@ -438,22 +562,23 @@ document.addEventListener(
                     await response.json();
 
 
-                if (data.success) {
+                if (!data.success) {
 
-                    /*
-                     * Refresh the page so that:
-                     *
-                     * - Important page membership
-                     * - Dashboard task list
-                     * - Statistics
-                     * - Pagination
-                     *
-                     * are all updated from the database.
-                     */
-
-                    await refreshCurrentPage();
+                    throw new Error(
+                        data.error ||
+                        "خطا در تغییر وضعیت مهم."
+                    );
 
                 }
+
+
+                /*
+                 * Refresh the current page so that
+                 * Important membership and pagination
+                 * stay synchronized with Django.
+                 */
+
+                await refreshCurrentPage();
 
             }
 
@@ -468,6 +593,7 @@ document.addEventListener(
 
 
             return;
+
         }
 
 
@@ -532,23 +658,27 @@ document.addEventListener(
                     await response.json();
 
 
-                if (data.success) {
+                if (!data.success) {
 
-                    /*
-                     * Refresh the current page instead of
-                     * manually removing the card.
-                     *
-                     * This allows Django to recalculate:
-                     *
-                     * - total tasks
-                     * - completed tasks
-                     * - remaining tasks
-                     * - pagination
-                     */
-
-                    await refreshCurrentPage();
+                    throw new Error(
+                        data.error ||
+                        "خطا در حذف وظیفه."
+                    );
 
                 }
+
+
+                /*
+                 * Refresh instead of manually removing
+                 * the card.
+                 *
+                 * Django will recalculate:
+                 * - task list
+                 * - statistics
+                 * - pagination
+                 */
+
+                await refreshCurrentPage();
 
             }
 
@@ -563,6 +693,7 @@ document.addEventListener(
 
 
             return;
+
         }
 
     }
@@ -594,6 +725,16 @@ function getCSRFToken() {
 
 function escapeHTML(text) {
 
+    if (
+        text === null ||
+        text === undefined
+    ) {
+
+        return "";
+
+    }
+
+
     const div =
         document.createElement(
             "div"
@@ -601,9 +742,37 @@ function escapeHTML(text) {
 
 
     div.textContent =
-        text;
+        String(text);
 
 
     return div.innerHTML;
+
+}
+
+
+// ==================================================
+// PERSIAN DIGITS
+// ==================================================
+
+function toPersianDigits(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return value;
+
+    }
+
+
+    return String(value).replace(
+        /\d/g,
+        function (digit) {
+
+            return "۰۱۲۳۴۵۶۷۸۹"[digit];
+
+        }
+    );
 
 }

@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 
 import jdatetime
 
-from ..models import Todo, GoogleAccount
+from ..models import Todo, GoogleAccount, Topic
 from ..services.google_calendar import create_google_event
 
 
@@ -120,6 +120,10 @@ def home(request):
             "personal"
         )
 
+        topic_id = request.POST.get(
+            "topic"
+        )
+
         start_date_str = request.POST.get(
             "start_date",
             ""
@@ -140,6 +144,55 @@ def home(request):
         ]:
 
             category = "personal"
+
+        # ==================================================
+        # VALIDATE TOPIC
+        # ==================================================
+
+        topic = None
+
+        if topic_id:
+
+            try:
+
+                topic = Topic.objects.get(
+                    id=topic_id,
+                    is_active=True
+                )
+
+                # --------------------------------------------------
+                # PUBLIC TASK
+                # --------------------------------------------------
+
+                if category == "public":
+
+                    # Public tasks can only use public topics.
+                    if not topic.is_public:
+
+                        topic = None
+
+                # --------------------------------------------------
+                # PERSONAL TASK
+                # --------------------------------------------------
+
+                else:
+
+                    # Personal tasks can only use topics
+                    # created by the current user.
+                    if (
+                        topic.is_public
+                        or topic.user != request.user
+                    ):
+
+                        topic = None
+
+            except (
+                Topic.DoesNotExist,
+                ValueError,
+                TypeError,
+            ):
+
+                topic = None
 
         # ==================================================
         # CONVERT JALALI START DATE
@@ -170,6 +223,8 @@ def home(request):
             description=description,
 
             category=category,
+
+            topic=topic,
 
             start_date=start_date,
 
@@ -268,6 +323,15 @@ def home(request):
 
             "category": todo.category,
 
+            "topic": (
+                {
+                    "id": todo.topic.id,
+                    "name": todo.topic.name,
+                }
+                if todo.topic
+                else None
+            ),
+
             "start_date": start_date_jalali,
 
             "deadline": deadline_jalali,
@@ -357,6 +421,7 @@ def home(request):
 
     # Calculate statistics BEFORE pagination.
     # This ensures the numbers represent all matching tasks.
+
     total_tasks = todos.count()
 
     completed_tasks = todos.filter(
@@ -425,8 +490,9 @@ def home(request):
     # PREPARE DATES FOR CURRENT PAGE
     # ==================================================
 
-    # Only prepare dates for tasks
-    # shown on the current page.
+    # Only prepare dates for tasks shown
+    # on the current page.
+
     for todo in page_obj:
 
         # --------------------------------------------------
@@ -498,6 +564,27 @@ def home(request):
             todo.deadline_jalali_str = None
 
     # ==================================================
+    # TOPIC LISTS
+    # ==================================================
+
+    # Public topics are created and managed by the admin.
+    public_topics = Topic.objects.filter(
+        is_public=True,
+        is_active=True
+    ).order_by(
+        "name"
+    )
+
+    # Personal topics belong only to the current user.
+    personal_topics = Topic.objects.filter(
+        user=request.user,
+        is_public=False,
+        is_active=True
+    ).order_by(
+        "name"
+    )
+
+    # ==================================================
     # GOOGLE CALENDAR CONNECTION STATUS
     # ==================================================
 
@@ -533,6 +620,11 @@ def home(request):
         "completed_tasks": completed_tasks,
 
         "remaining_tasks": remaining_tasks,
+
+        # Topic lists.
+        "public_topics": public_topics,
+
+        "personal_topics": personal_topics,
 
         # Google Calendar status.
         "google_connected": google_connected,

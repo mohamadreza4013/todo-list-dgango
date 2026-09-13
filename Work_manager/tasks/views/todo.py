@@ -8,7 +8,11 @@ from django.shortcuts import (
 
 import jdatetime
 
-from ..models import Todo, GoogleAccount
+from ..models import (
+    Todo,
+    GoogleAccount,
+    Topic,
+)
 
 from ..services.google_calendar import (
     create_google_event,
@@ -238,6 +242,64 @@ def edit_todo(request, todo_id):
         todo.category = category
 
         # --------------------------------------------------
+        # TOPIC
+        # --------------------------------------------------
+
+        topic_id = request.POST.get(
+            "topic",
+            ""
+        ).strip()
+
+        topic = None
+
+        if topic_id:
+
+            try:
+
+                # Get only an active topic.
+                selected_topic = Topic.objects.get(
+                    id=topic_id,
+                    is_active=True
+                )
+
+                # --------------------------------------------------
+                # PUBLIC TASK
+                # --------------------------------------------------
+
+                if category == "public":
+
+                    # Public tasks can only use public topics.
+                    if selected_topic.is_public:
+
+                        topic = selected_topic
+
+                # --------------------------------------------------
+                # PERSONAL TASK
+                # --------------------------------------------------
+
+                else:
+
+                    # Personal tasks can only use
+                    # the current user's personal topics.
+                    if (
+                        not selected_topic.is_public
+                        and selected_topic.user == request.user
+                    ):
+
+                        topic = selected_topic
+
+            except (
+                Topic.DoesNotExist,
+                ValueError,
+                TypeError,
+            ):
+
+                topic = None
+
+        # Save the validated topic.
+        todo.topic = topic
+
+        # --------------------------------------------------
         # START DATE
         # --------------------------------------------------
 
@@ -255,6 +317,10 @@ def edit_todo(request, todo_id):
             if start_date is not None:
 
                 todo.start_date = start_date
+
+            else:
+
+                todo.start_date = None
 
         else:
 
@@ -278,6 +344,10 @@ def edit_todo(request, todo_id):
             if deadline is not None:
 
                 todo.deadline = deadline
+
+            else:
+
+                todo.deadline = None
 
         else:
 
@@ -366,10 +436,41 @@ def edit_todo(request, todo_id):
         todo.deadline
     )
 
+    # --------------------------------------------------
+    # PUBLIC TOPICS
+    # --------------------------------------------------
+
+    public_topics = Topic.objects.filter(
+        is_public=True,
+        is_active=True
+    ).order_by(
+        "name"
+    )
+
+    # --------------------------------------------------
+    # PERSONAL TOPICS
+    # --------------------------------------------------
+
+    personal_topics = Topic.objects.filter(
+        user=request.user,
+        is_public=False,
+        is_active=True
+    ).order_by(
+        "name"
+    )
+
+    # ==================================================
+    # CONTEXT
+    # ==================================================
+
     context = {
         "todo": todo,
+
         "start_date_jalali": start_date_jalali,
         "deadline_jalali": deadline_jalali,
+
+        "public_topics": public_topics,
+        "personal_topics": personal_topics,
     }
 
     return render(

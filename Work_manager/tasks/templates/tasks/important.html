@@ -135,44 +135,46 @@
 
         <div class="sidebar-bottom">
 
-            <div class="nav">
 
             <!-- Google Calendar -->
-        
-            {% if google_connected %}
-        
-                <div class="nav-item google-connected">
-        
-                    <span>
-                        ✓
-                    </span>
-        
-                    Google Calendar متصل است
-        
-                </div>
-        
-            {% else %}
-        
-                <a
-                    href="{% url 'google_connect' %}"
-                    class="nav-item"
-                >
-        
-                    <span>
-                        📅
-                    </span>
-        
-                    اتصال به Google Calendar
-        
-                </a>
-        
-            {% endif %}
-        
-        </div>
+
             <div class="nav">
 
+                {% if google_connected %}
 
-                <!-- Settings -->
+                    <div class="nav-item google-connected">
+
+                        <span>
+                            ✓
+                        </span>
+
+                        Google Calendar متصل است
+
+                    </div>
+
+                {% else %}
+
+                    <a
+                        href="{% url 'google_connect' %}"
+                        class="nav-item"
+                    >
+
+                        <span>
+                            📅
+                        </span>
+
+                        اتصال به Google Calendar
+
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- Settings -->
+
+            <div class="nav">
 
                 <a
                     href="#"
@@ -446,14 +448,14 @@
                     <div class="todo-content">
 
 
-                        <!-- Title -->
+                        <!-- Task title -->
 
                         <div class="todo-title">
                             {{ todo.title }}
                         </div>
 
 
-                        <!-- Description -->
+                        <!-- Task description -->
 
                         {% if todo.description %}
 
@@ -464,9 +466,16 @@
                         {% endif %}
 
 
-                        <!-- Category -->
+                        <!-- ==================================================
+                             TASK META
+                        ================================================== -->
 
-                        <div class="todo-category">
+                        <div class="todo-meta">
+
+
+                            <!-- ==================================================
+                                 TASK CATEGORY
+                            ================================================== -->
 
                             {% if todo.category == "public" %}
 
@@ -482,6 +491,28 @@
 
                             {% endif %}
 
+
+                            <!-- ==================================================
+                                 TASK TOPIC
+                            ================================================== -->
+
+                            {% if todo.topic %}
+
+                                <span class="topic-badge">
+
+                                    <span class="topic-icon">
+                                        #
+                                    </span>
+
+                                    <span class="topic-name">
+                                        {{ todo.topic.name }}
+                                    </span>
+
+                                </span>
+
+                            {% endif %}
+
+
                         </div>
 
                     </div>
@@ -495,7 +526,9 @@
                     <div class="todo-actions">
 
 
-                        <!-- Status -->
+                        <!-- ==================================================
+                             STATUS
+                        ================================================== -->
 
                         <span
                             class="status {% if todo.completed %}completed{% endif %}"
@@ -515,7 +548,9 @@
 
 
 
-                        <!-- Important -->
+                        <!-- ==================================================
+                             IMPORTANT
+                        ================================================== -->
 
                         <form
                             method="POST"
@@ -539,7 +574,9 @@
 
 
 
-                        <!-- Edit -->
+                        <!-- ==================================================
+                             EDIT
+                        ================================================== -->
 
                         <a
                             href="{% url 'edit_todo' todo.id %}"
@@ -552,7 +589,9 @@
 
 
 
-                        <!-- Delete -->
+                        <!-- ==================================================
+                             DELETE
+                        ================================================== -->
 
                         <form
                             method="POST"

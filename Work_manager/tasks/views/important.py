@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.shortcuts import render
 
 import jdatetime
@@ -32,19 +33,30 @@ def to_persian_digits(value):
 @login_required
 def important_tasks(request):
 
-    # Get important public tasks and personal tasks
-    # that belong to the current user.
-    todos = Todo.objects.filter(
-        category="public",
-        important=True
-    ) | Todo.objects.filter(
-        category="personal",
-        user=request.user,
-        important=True
-    )
+    # ==================================================
+    # GET IMPORTANT TASKS
+    # ==================================================
 
-    # Show the newest tasks first.
-    todos = todos.order_by(
+    # Get:
+    # - all important public tasks
+    # - important personal tasks belonging to the current user
+    #
+    # select_related("topic") loads the related Topic
+    # together with each Todo object.
+    todos = Todo.objects.select_related(
+        "topic"
+    ).filter(
+        Q(
+            category="public",
+            important=True
+        )
+        |
+        Q(
+            category="personal",
+            user=request.user,
+            important=True
+        )
+    ).order_by(
         "-created_at"
     )
 
@@ -81,7 +93,7 @@ def important_tasks(request):
         "page"
     )
 
-    # get_page() also handles invalid page numbers safely.
+    # get_page() handles invalid and missing page numbers safely.
     page_obj = paginator.get_page(
         page_number
     )
@@ -91,9 +103,8 @@ def important_tasks(request):
     # FORMAT JALALI DATES
     # ==================================================
 
-    # Only format the tasks on the current page.
+    # Only format dates for tasks on the current page.
     for todo in page_obj:
-
 
         # --------------------------------------------------
         # CREATION DATE
@@ -102,7 +113,9 @@ def important_tasks(request):
         created_at_jalali = (
             jdatetime.datetime.fromgregorian(
                 datetime=todo.created_at
-            ).strftime("%Y/%m/%d")
+            ).strftime(
+                "%Y/%m/%d"
+            )
         )
 
         todo.created_at_jalali_str = (
@@ -228,6 +241,7 @@ def important_tasks(request):
     # ==================================================
 
     context = {
+
         # Current page of Todo objects.
         "todos": page_obj,
 

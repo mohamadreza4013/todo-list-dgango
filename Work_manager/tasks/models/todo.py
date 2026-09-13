@@ -45,7 +45,13 @@ class Todo(models.Model):
         ("public", "عمومی"),
     ]
 
-
+    topic = models.ForeignKey(
+        "Topic",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="todos"
+    )
     # =====================================================
     # USER / OWNER
     # =====================================================
@@ -277,13 +283,9 @@ class Todo(models.Model):
     def __str__(self):
         return self.title
 
-from django.db import models
-
-from django.conf import settings
 
 # Jalali date fields provided by django-jalali
 # We use jmodels to store and work with Persian/Jalali dates.
-from django_jalali.db import models as jmodels
 
 
 

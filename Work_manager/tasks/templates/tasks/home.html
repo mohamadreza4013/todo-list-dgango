@@ -158,9 +158,7 @@
 
                 {% if google_connected %}
 
-                    <div
-                        class="nav-item google-connected"
-                    >
+                    <div class="nav-item google-connected">
 
                         <span>
                             ✓
@@ -307,99 +305,32 @@
 
         <div class="topbar">
 
+            <div class="welcome">
+
+                <h1>
+                    مدیریت وظایف
+                </h1>
+
+                <p>
+                    وظایف خود را مدیریت کنید.
+                </p>
+
+            </div>
+
 
             <!-- ==================================================
-                 ADD TASK FORM
+                 CREATE TASK BUTTON
             ================================================== -->
 
-            <form
-                method="POST"
-                class="add-task-form-container"
+            <button
+                type="button"
+                id="create-task-button"
+                class="create-task-button"
             >
 
-                {% csrf_token %}
+                + ایجاد وظیفه
 
-
-                <div class="add-task-form">
-
-
-                    <!-- Task title -->
-
-                    <input
-                        type="text"
-                        name="title"
-                        placeholder="چه کاری باید انجام دهید؟"
-                        required
-                    >
-
-
-                    <!-- Task description -->
-
-                    <input
-                        type="text"
-                        name="description"
-                        placeholder="توضیحات را اضافه کنید..."
-                    >
-
-
-                    <!-- Task category -->
-
-                    <select
-                        name="category"
-                        class="task-category-input"
-                    >
-
-                        <option value="personal">
-                            شخصی
-                        </option>
-
-                        <option value="public">
-                            عمومی
-                        </option>
-
-                    </select>
-
-
-                    <!-- Task start date -->
-
-                    <input
-                        type="text"
-                        name="start_date"
-                        id="start-date"
-                        class="jalali-date-input"
-                        placeholder="انتخاب تاریخ شروع"
-                        autocomplete="off"
-                        readonly
-                    >
-
-
-                    <!-- Task deadline -->
-
-                    <input
-                        type="text"
-                        name="deadline"
-                        id="deadline"
-                        class="jalali-date-input"
-                        placeholder="انتخاب مهلت"
-                        autocomplete="off"
-                        readonly
-                    >
-
-
-                    <!-- Submit task -->
-
-                    <button
-                        type="submit"
-                        class="add-button"
-                    >
-
-                        + افزودن وظیفه
-
-                    </button>
-
-                </div>
-
-            </form>
+            </button>
 
         </div>
 
@@ -497,9 +428,7 @@
                 href="{% url 'home' %}{% if my_tasks %}?scope=my{% endif %}"
                 class="filter-button {% if not filter_type %}active{% endif %}"
             >
-
                 همه
-
             </a>
 
 
@@ -509,9 +438,7 @@
                 href="{% url 'home' %}?{% if my_tasks %}scope=my&{% endif %}filter=active"
                 class="filter-button {% if filter_type == 'active' %}active{% endif %}"
             >
-
                 در حال انجام
-
             </a>
 
 
@@ -521,9 +448,7 @@
                 href="{% url 'home' %}?{% if my_tasks %}scope=my&{% endif %}filter=completed"
                 class="filter-button {% if filter_type == 'completed' %}active{% endif %}"
             >
-
                 انجام‌شده
-
             </a>
 
         </div>
@@ -539,7 +464,6 @@
 
             {% for todo in todos %}
 
-
                 <div
                     class="todo-card"
                     data-todo-id="{{ todo.id }}"
@@ -547,7 +471,7 @@
 
 
                     <!-- ==================================================
-                         COMPLETE / INCOMPLETE TOGGLE
+                         COMPLETE / INCOMPLETE
                     ================================================== -->
 
                     <form
@@ -599,9 +523,16 @@
                         {% endif %}
 
 
-                        <!-- Task category -->
+                        <!-- ==================================================
+                             TASK META
+                        ================================================== -->
 
-                        <div class="todo-category">
+                        <div class="todo-meta">
+
+
+                            <!-- ==================================================
+                                 TASK CATEGORY
+                            ================================================== -->
 
                             {% if todo.category == "public" %}
 
@@ -617,6 +548,28 @@
 
                             {% endif %}
 
+
+                            <!-- ==================================================
+                                 TASK TOPIC
+                            ================================================== -->
+
+                            {% if todo.topic %}
+
+                                <span class="topic-badge">
+
+                                    <span class="topic-icon">
+                                        #
+                                    </span>
+
+                                    <span class="topic-name">
+                                        {{ todo.topic.name }}
+                                    </span>
+
+                                </span>
+
+                            {% endif %}
+
+
                         </div>
 
                     </div>
@@ -630,7 +583,9 @@
                     <div class="todo-actions">
 
 
-                        <!-- Task status -->
+                        <!-- ==================================================
+                             STATUS
+                        ================================================== -->
 
                         <span
                             class="status {% if todo.completed %}completed{% endif %}"
@@ -649,7 +604,9 @@
                         </span>
 
 
-                        <!-- Toggle important status -->
+                        <!-- ==================================================
+                             IMPORTANT
+                        ================================================== -->
 
                         <form
                             method="POST"
@@ -672,7 +629,9 @@
                         </form>
 
 
-                        <!-- Edit task -->
+                        <!-- ==================================================
+                             EDIT
+                        ================================================== -->
 
                         <a
                             href="{% url 'edit_todo' todo.id %}"
@@ -684,7 +643,9 @@
                         </a>
 
 
-                        <!-- Delete task -->
+                        <!-- ==================================================
+                             DELETE
+                        ================================================== -->
 
                         <form
                             method="POST"
@@ -764,6 +725,7 @@
 
                             {% endif %}
 
+
                         </div>
 
                     </div>
@@ -772,7 +734,6 @@
 
 
             {% empty %}
-
 
                 <!-- ==================================================
                      EMPTY TASK LIST
@@ -817,13 +778,10 @@
                         href="?{% if my_tasks %}scope=my&{% endif %}{% if filter_type %}filter={{ filter_type }}&{% endif %}page={{ page_obj.previous_page_number }}"
                         class="pagination-button"
                     >
-
                         قبلی
-
                     </a>
 
                 {% endif %}
-
 
 
                 <!-- Page numbers -->
@@ -832,10 +790,7 @@
 
                     {% for page in page_numbers %}
 
-
                         {% if page.number is None %}
-
-                            <!-- Ellipsis -->
 
                             <span
                                 class="pagination-page dots"
@@ -844,10 +799,7 @@
                                 …
                             </span>
 
-
                         {% elif page.number == page_obj.number %}
-
-                            <!-- Current page -->
 
                             <span
                                 class="pagination-page active"
@@ -856,10 +808,7 @@
                                 {{ page.display }}
                             </span>
 
-
                         {% else %}
-
-                            <!-- Other page -->
 
                             <a
                                 href="?{% if my_tasks %}scope=my&{% endif %}{% if filter_type %}filter={{ filter_type }}&{% endif %}page={{ page.number }}"
@@ -875,7 +824,6 @@
                 </div>
 
 
-
                 <!-- Next page -->
 
                 {% if page_obj.has_next %}
@@ -884,18 +832,366 @@
                         href="?{% if my_tasks %}scope=my&{% endif %}{% if filter_type %}filter={{ filter_type }}&{% endif %}page={{ page_obj.next_page_number }}"
                         class="pagination-button"
                     >
-
                         بعدی
-
                     </a>
 
                 {% endif %}
+
 
             </div>
 
         {% endif %}
 
     </main>
+
+</div>
+
+
+
+<!-- ==================================================
+     CREATE TASK MODAL
+================================================== -->
+
+<div
+    id="create-task-modal"
+    class="create-task-modal"
+    hidden
+>
+
+    <div class="create-task-overlay"></div>
+
+
+    <div class="create-task-container">
+
+
+        <!-- Close button -->
+
+        <button
+            type="button"
+            id="create-task-close"
+            class="create-task-close"
+            aria-label="بستن"
+        >
+            ×
+        </button>
+
+
+        <!-- Modal title -->
+
+        <h2>
+            ایجاد وظیفه جدید
+        </h2>
+
+
+        <!-- Create task form -->
+
+        <form
+            method="POST"
+            class="create-task-form"
+            id="create-task-form"
+        >
+
+            {% csrf_token %}
+
+
+            <!-- ==================================================
+                 TITLE
+            ================================================== -->
+
+            <div class="create-task-field">
+
+                <label for="task-title">
+                    عنوان وظیفه
+                </label>
+
+                <input
+                    type="text"
+                    name="title"
+                    id="task-title"
+                    placeholder="چه کاری باید انجام دهید؟"
+                    required
+                >
+
+            </div>
+
+
+            <!-- ==================================================
+                 DESCRIPTION
+            ================================================== -->
+
+            <div class="create-task-field">
+
+                <label for="task-description">
+                    توضیحات
+                </label>
+
+                <textarea
+                    name="description"
+                    id="task-description"
+                    placeholder="توضیحات را اضافه کنید..."
+                    rows="3"
+                ></textarea>
+
+            </div>
+
+
+            <!-- ==================================================
+                 CATEGORY
+            ================================================== -->
+
+            <div class="create-task-field">
+
+                <label for="task-category">
+                    نوع وظیفه
+                </label>
+
+                <select
+                    name="category"
+                    id="task-category"
+                    class="task-category-input"
+                >
+
+                    <option value="personal">
+                        شخصی
+                    </option>
+
+                    <option value="public">
+                        عمومی
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- ==================================================
+                 TOPIC
+            ================================================== -->
+
+            <div class="create-task-field">
+
+                <label for="task-topic">
+                    موضوع
+                </label>
+
+
+                <div class="topic-input-row">
+
+                    <select
+                        name="topic"
+                        id="task-topic"
+                        class="task-topic-input"
+                    >
+
+                        {% for topic in personal_topics %}
+
+                            <option
+                                value="{{ topic.id }}"
+                                data-category="personal"
+                            >
+                                {{ topic.name }}
+                            </option>
+
+                        {% endfor %}
+
+
+                        {% for topic in public_topics %}
+
+                            <option
+                                value="{{ topic.id }}"
+                                data-category="public"
+                            >
+                                {{ topic.name }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+
+                    <button
+                        type="button"
+                        id="create-topic-button"
+                        class="create-topic-button"
+                    >
+                        + موضوع جدید
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 START DATE
+            ================================================== -->
+
+            <div class="create-task-field">
+
+                <label for="start-date">
+                    تاریخ شروع
+                </label>
+
+                <input
+                    type="text"
+                    name="start_date"
+                    id="start-date"
+                    class="jalali-date-input"
+                    placeholder="انتخاب تاریخ شروع"
+                    autocomplete="off"
+                    readonly
+                >
+
+            </div>
+
+
+            <!-- ==================================================
+                 DEADLINE
+            ================================================== -->
+
+            <div class="create-task-field">
+
+                <label for="deadline">
+                    مهلت
+                </label>
+
+                <input
+                    type="text"
+                    name="deadline"
+                    id="deadline"
+                    class="jalali-date-input"
+                    placeholder="انتخاب مهلت"
+                    autocomplete="off"
+                    readonly
+                >
+
+            </div>
+
+
+            <!-- ==================================================
+                 ERROR
+            ================================================== -->
+
+            <div
+                id="create-task-error"
+                class="create-task-error"
+                hidden
+            ></div>
+
+
+            <!-- ==================================================
+                 ACTION BUTTONS
+            ================================================== -->
+
+            <div class="create-task-actions">
+
+                <button
+                    type="button"
+                    id="cancel-task-button"
+                    class="cancel-task-button"
+                >
+                    انصراف
+                </button>
+
+
+                <button
+                    type="submit"
+                    id="save-task-button"
+                    class="save-task-button"
+                >
+                    ایجاد وظیفه
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<!-- ==================================================
+     CREATE TOPIC MODAL
+================================================== -->
+
+<div
+    id="create-topic-modal"
+    class="create-topic-modal"
+    hidden
+>
+
+    <div class="create-topic-overlay"></div>
+
+
+    <div class="create-topic-container">
+
+
+        <!-- Close button -->
+
+        <button
+            type="button"
+            id="create-topic-close"
+            class="create-topic-close"
+            aria-label="بستن"
+        >
+            ×
+        </button>
+
+
+        <!-- Modal title -->
+
+        <h2>
+            ایجاد موضوع جدید
+        </h2>
+
+
+        <!-- Topic input -->
+
+        <input
+            type="text"
+            id="new-topic-name"
+            class="new-topic-input"
+            placeholder="مثلاً ورزش"
+            maxlength="50"
+            autocomplete="off"
+        >
+
+
+        <!-- Topic actions -->
+
+        <div class="create-topic-actions">
+
+            <button
+                type="button"
+                id="cancel-topic-button"
+                class="cancel-topic-button"
+            >
+                انصراف
+            </button>
+
+
+            <button
+                type="button"
+                id="save-topic-button"
+                class="save-topic-button"
+            >
+                ایجاد موضوع
+            </button>
+
+        </div>
+
+
+        <!-- Topic error -->
+
+        <div
+            id="create-topic-error"
+            class="create-topic-error"
+            hidden
+        ></div>
+
+    </div>
 
 </div>
 
@@ -925,9 +1221,7 @@
             class="calendar-picker-close"
             aria-label="بستن تقویم"
         >
-
             ×
-
         </button>
 
 
@@ -960,9 +1254,7 @@
                     class="month-button"
                     aria-label="ماه قبل"
                 >
-
                     ‹
-
                 </button>
 
 
@@ -982,9 +1274,7 @@
                     class="month-button"
                     aria-label="ماه بعد"
                 >
-
                     ›
-
                 </button>
 
             </div>

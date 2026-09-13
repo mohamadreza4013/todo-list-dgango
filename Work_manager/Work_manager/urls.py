@@ -11,6 +11,7 @@ from tasks.views import (
     delete_todo,
     toggle_important,
     important_tasks,
+    create_topic,
     #register_view,
     #login_view,
     #logout_view
@@ -92,5 +93,11 @@ urlpatterns = [
         "google/callback/",
         google_callback,
         name="google_callback"
+    ),
+
+    path(
+        "topic/create/",
+        create_topic,
+        name="create_topic"
     ),
 ]
