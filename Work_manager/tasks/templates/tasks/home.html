@@ -565,9 +565,7 @@
                         >
 
                             {% if todo.completed %}
-
                                 ✓
-
                             {% endif %}
 
                         </button>
@@ -604,7 +602,6 @@
                         <!-- Task category -->
 
                         <div class="todo-category">
-
 
                             {% if todo.category == "public" %}
 
@@ -800,6 +797,103 @@
             {% endfor %}
 
         </section>
+
+
+
+        <!-- ==================================================
+             PAGINATION
+        ================================================== -->
+
+        {% if page_obj.paginator.num_pages > 1 %}
+
+            <div class="pagination">
+
+
+                <!-- Previous page -->
+
+                {% if page_obj.has_previous %}
+
+                    <a
+                        href="?{% if my_tasks %}scope=my&{% endif %}{% if filter_type %}filter={{ filter_type }}&{% endif %}page={{ page_obj.previous_page_number }}"
+                        class="pagination-button"
+                    >
+
+                        قبلی
+
+                    </a>
+
+                {% endif %}
+
+
+
+                <!-- Page numbers -->
+
+                <div class="pagination-pages">
+
+                    {% for page in page_numbers %}
+
+
+                        {% if page.number is None %}
+
+                            <!-- Ellipsis -->
+
+                            <span
+                                class="pagination-page dots"
+                                aria-hidden="true"
+                            >
+                                …
+                            </span>
+
+
+                        {% elif page.number == page_obj.number %}
+
+                            <!-- Current page -->
+
+                            <span
+                                class="pagination-page active"
+                                aria-current="page"
+                            >
+                                {{ page.display }}
+                            </span>
+
+
+                        {% else %}
+
+                            <!-- Other page -->
+
+                            <a
+                                href="?{% if my_tasks %}scope=my&{% endif %}{% if filter_type %}filter={{ filter_type }}&{% endif %}page={{ page.number }}"
+                                class="pagination-page"
+                            >
+                                {{ page.display }}
+                            </a>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+                </div>
+
+
+
+                <!-- Next page -->
+
+                {% if page_obj.has_next %}
+
+                    <a
+                        href="?{% if my_tasks %}scope=my&{% endif %}{% if filter_type %}filter={{ filter_type }}&{% endif %}page={{ page_obj.next_page_number }}"
+                        class="pagination-button"
+                    >
+
+                        بعدی
+
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        {% endif %}
 
     </main>
 

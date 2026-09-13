@@ -65,6 +65,161 @@ body {
 .google-calendar-icon {
     font-size: 17px;
 }
+/* ==================================================
+   PAGINATION
+   ================================================== */
+
+/* Main pagination container */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    margin-top: 28px;
+    padding: 18px 0;
+    direction: rtl;
+    flex-wrap: wrap;
+}
+
+/* Page number container */
+.pagination-pages {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+/* Previous and next buttons */
+.pagination-button,
+.pagination-page {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 38px;
+    height: 38px;
+
+    padding: 0 13px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+
+    background-color: #ffffff;
+    color: #374151;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+/* Page number buttons need equal width */
+.pagination-page {
+    min-width: 38px;
+    padding: 0 8px;
+}
+
+/* Hover effect */
+.pagination-button:hover,
+.pagination-page:hover {
+    background-color: #f3f4f6;
+    border-color: #cbd5e1;
+    color: #111827;
+    transform: translateY(-1px);
+}
+
+/* Active page */
+.pagination-page.active {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+    color: #ffffff;
+    font-weight: 700;
+    cursor: default;
+}
+
+/* Prevent active page hover effect */
+.pagination-page.active:hover {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+    color: #ffffff;
+    transform: none;
+}
+
+/* Disabled previous/next buttons */
+.pagination-button.disabled {
+    background-color: #f9fafb;
+    border-color: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/* Focus accessibility */
+.pagination-button:focus-visible,
+.pagination-page:focus-visible {
+    outline: 3px solid rgba(79, 70, 229, 0.25);
+    outline-offset: 3px;
+}
+
+/* ==================================================
+   RESPONSIVE PAGINATION
+   ================================================== */
+
+@media (max-width: 768px) {
+    .pagination {
+        gap: 9px;
+        margin-top: 22px;
+        padding: 14px 0;
+    }
+
+    .pagination-pages {
+        gap: 5px;
+    }
+
+    .pagination-button,
+    .pagination-page {
+        min-width: 34px;
+        height: 34px;
+        padding: 0 10px;
+        border-radius: 8px;
+        font-size: 12px;
+    }
+
+    .pagination-page {
+        min-width: 34px;
+        padding: 0 7px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pagination {
+        gap: 7px;
+    }
+
+    .pagination-button,
+    .pagination-page {
+        min-width: 32px;
+        height: 32px;
+        padding: 0 8px;
+        font-size: 11px;
+    }
+
+    .pagination-page {
+        min-width: 32px;
+        padding: 0 6px;
+    }
+}
 /* =========================================================
    SHARED INPUTS
 ========================================================= */

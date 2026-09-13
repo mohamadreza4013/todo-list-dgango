@@ -1,4 +1,3 @@
-
 // ==================================================
 // TODO CARD
 // ==================================================
@@ -130,7 +129,6 @@ function createTodoCard(todo) {
 
             <div class="todo-actions">
 
-
                 <!-- Status -->
 
                 <span
@@ -219,12 +217,11 @@ function createTodoCard(todo) {
 
                 <div class="todo-dates">
 
-
                     <!-- Task creation date -->
 
                     <span class="todo-date">
                         ایجاد:
-                       ${toPersianDigits(todo.created_at)}
+                        ${toPersianDigits(todo.created_at)}
                     </span>
 
 
@@ -247,7 +244,7 @@ function createTodoCard(todo) {
                     ${
                         todo.end_date
                             ? `
-                                <span class="todo-date">
+                                <span class="todo-date end-date">
                                     اتمام:
                                     ${todo.end_date}
                                 </span>
@@ -279,6 +276,32 @@ function createTodoCard(todo) {
 
 
 // ==================================================
+// REFRESH CURRENT PAGE
+// ==================================================
+
+async function refreshCurrentPage() {
+
+    /*
+     * home.js provides loadPage() for AJAX pagination.
+     * Use it when available.
+     *
+     * On pages where loadPage() is not available,
+     * reload the current page normally.
+     */
+
+    if (typeof loadPage === "function") {
+
+        await loadPage(window.location.href);
+
+    } else {
+
+        window.location.reload();
+
+    }
+}
+
+
+// ==================================================
 // TODO EVENTS
 // ==================================================
 
@@ -300,24 +323,6 @@ document.addEventListener(
         if (completeForm) {
 
             event.preventDefault();
-
-
-            const card =
-                completeForm.closest(
-                    ".todo-card"
-                );
-
-
-            const button =
-                card.querySelector(
-                    ".complete-button"
-                );
-
-
-            const status =
-                card.querySelector(
-                    ".status"
-                );
 
 
             try {
@@ -354,124 +359,18 @@ document.addEventListener(
 
                 if (data.success) {
 
+                    /*
+                     * Reload the current server-side page.
+                     *
+                     * This keeps:
+                     * - task list
+                     * - statistics
+                     * - pagination
+                     *
+                     * synchronized with Django.
+                     */
 
-                    // ==================================================
-                    // UPDATE COMPLETE BUTTON
-                    // ==================================================
-
-                    button.classList.toggle(
-                        "completed",
-                        data.completed
-                    );
-
-
-                    if (data.completed) {
-
-                        button.textContent = "✓";
-
-                        button.title =
-                            "علامت‌گذاری به‌عنوان انجام‌نشده";
-
-                        status.textContent =
-                            "انجام‌شده";
-
-                        status.classList.add(
-                            "completed"
-                        );
-
-                    }
-
-                    else {
-
-                        button.textContent = "";
-
-                        button.title =
-                            "علامت‌گذاری به‌عنوان انجام‌شده";
-
-                        status.textContent =
-                            "در انتظار";
-
-                        status.classList.remove(
-                            "completed"
-                        );
-
-                    }
-
-
-                    // ==================================================
-                    // UPDATE END DATE
-                    // ==================================================
-
-                    const datesContainer =
-                        card.querySelector(
-                            ".todo-dates"
-                        );
-
-
-                    // Remove the previous completion date
-                    const oldEndDate =
-                        datesContainer.querySelector(
-                            ".end-date"
-                        );
-
-
-                    if (oldEndDate) {
-
-                        oldEndDate.remove();
-
-                    }
-
-
-                    // Add the completion date if the task is completed
-                    if (
-                        data.completed &&
-                        data.end_date
-                    ) {
-
-                        const endDateElement =
-                            document.createElement(
-                                "span"
-                            );
-
-                        endDateElement.className =
-                            "todo-date end-date";
-
-                        endDateElement.textContent =
-                            `اتمام: ${data.end_date}`;
-
-                        datesContainer.appendChild(
-                            endDateElement
-                        );
-
-                    }
-
-
-                    // ==================================================
-                    // UPDATE DASHBOARD STATISTICS
-                    // ==================================================
-
-                    if (
-                        typeof updateStats ===
-                        "function"
-                    ) {
-
-                        updateStats();
-
-                    }
-
-
-                    // ==================================================
-                    // UPDATE IMPORTANT PAGE STATISTICS
-                    // ==================================================
-
-                    if (
-                        window.location.pathname ===
-                        "/important/"
-                    ) {
-
-                        updateImportantStats();
-
-                    }
+                    await refreshCurrentPage();
 
                 }
 
@@ -505,18 +404,6 @@ document.addEventListener(
         if (importantForm) {
 
             event.preventDefault();
-
-
-            const card =
-                importantForm.closest(
-                    ".todo-card"
-                );
-
-
-            const button =
-                importantForm.querySelector(
-                    ".important-button"
-                );
 
 
             try {
@@ -553,37 +440,18 @@ document.addEventListener(
 
                 if (data.success) {
 
-                    button.classList.toggle(
-                        "important",
-                        data.important
-                    );
-
-
-                    button.title =
-                        data.important
-                            ? "حذف از وظایف مهم"
-                            : "افزودن به وظایف مهم";
-
-
                     /*
-                        If we are on the Important page
-                        and the Task is no longer important,
-                        remove the card.
-                    */
+                     * Refresh the page so that:
+                     *
+                     * - Important page membership
+                     * - Dashboard task list
+                     * - Statistics
+                     * - Pagination
+                     *
+                     * are all updated from the database.
+                     */
 
-                    if (
-                        !data.important &&
-                        window.location.pathname ===
-                            "/important/"
-                    ) {
-
-                        card.remove();
-
-                        updateImportantStats();
-
-                        showImportantEmptyState();
-
-                    }
+                    await refreshCurrentPage();
 
                 }
 
@@ -632,12 +500,6 @@ document.addEventListener(
             }
 
 
-            const card =
-                deleteForm.closest(
-                    ".todo-card"
-                );
-
-
             try {
 
                 const response =
@@ -672,33 +534,19 @@ document.addEventListener(
 
                 if (data.success) {
 
-                    card.remove();
+                    /*
+                     * Refresh the current page instead of
+                     * manually removing the card.
+                     *
+                     * This allows Django to recalculate:
+                     *
+                     * - total tasks
+                     * - completed tasks
+                     * - remaining tasks
+                     * - pagination
+                     */
 
-
-                    // Dashboard statistics
-
-                    if (
-                        typeof updateStats ===
-                        "function"
-                    ) {
-
-                        updateStats();
-
-                    }
-
-
-                    // Important page statistics
-
-                    if (
-                        window.location.pathname ===
-                        "/important/"
-                    ) {
-
-                        updateImportantStats();
-
-                        showImportantEmptyState();
-
-                    }
+                    await refreshCurrentPage();
 
                 }
 
@@ -719,131 +567,6 @@ document.addEventListener(
 
     }
 );
-
-
-// ==================================================
-// IMPORTANT PAGE STATISTICS
-// ==================================================
-
-function updateImportantStats() {
-
-    const cards =
-        document.querySelectorAll(
-            ".todo-card"
-        );
-
-
-    let completed = 0;
-
-
-    cards.forEach(card => {
-
-        const button =
-            card.querySelector(
-                ".complete-button"
-            );
-
-
-        if (
-            button &&
-            button.classList.contains(
-                "completed"
-            )
-        ) {
-
-            completed++;
-
-        }
-
-    });
-
-
-    const total =
-        cards.length;
-
-
-    const remaining =
-        total - completed;
-
-
-    const statNumbers =
-        document.querySelectorAll(
-            ".stat-number"
-        );
-
-
-    if (statNumbers.length >= 3) {
-
-        // Important Tasks
-
-        statNumbers[0].textContent =
-            total;
-
-
-        // Completed
-
-        statNumbers[1].textContent =
-            completed;
-
-
-        // Remaining
-
-        statNumbers[2].textContent =
-            remaining;
-
-    }
-
-}
-
-
-// ==================================================
-// IMPORTANT PAGE EMPTY STATE
-// ==================================================
-
-function showImportantEmptyState() {
-
-    const todoList =
-        document.querySelector(
-            ".todo-list"
-        );
-
-
-    if (!todoList) {
-
-        return;
-
-    }
-
-
-    const cards =
-        todoList.querySelectorAll(
-            ".todo-card"
-        );
-
-
-    if (cards.length === 0) {
-
-        todoList.innerHTML = `
-            <div class="empty-state">
-
-                <div class="empty-icon">
-                    ★
-                </div>
-
-                <h3>
-                    وظیفه مهمی وجود ندارد
-                </h3>
-
-                <p>
-                    یک وظیفه را مهم کنید تا اینجا نمایش داده شود.
-                </p>
-
-            </div>
-        `;
-
-    }
-
-}
 
 
 // ==================================================

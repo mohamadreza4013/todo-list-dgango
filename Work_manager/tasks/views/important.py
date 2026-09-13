@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.shortcuts import render
 
 import jdatetime
 
-from ..models import Todo
+from ..models import Todo, GoogleAccount
 
 
 # ==================================================
@@ -32,7 +33,7 @@ def to_persian_digits(value):
 def important_tasks(request):
 
     # Get important public tasks and personal tasks
-    # that belong to the current user
+    # that belong to the current user.
     todos = Todo.objects.filter(
         category="public",
         important=True
@@ -42,14 +43,18 @@ def important_tasks(request):
         important=True
     )
 
-    # Show the newest tasks first
-    todos = todos.order_by("-created_at")
+    # Show the newest tasks first.
+    todos = todos.order_by(
+        "-created_at"
+    )
 
 
     # ==================================================
     # CALCULATE TASK STATISTICS
     # ==================================================
 
+    # Statistics must be calculated BEFORE pagination
+    # so they represent all important tasks.
     total_tasks = todos.count()
 
     completed_tasks = todos.filter(
@@ -59,6 +64,146 @@ def important_tasks(request):
     remaining_tasks = todos.filter(
         completed=False
     ).count()
+
+
+    # ==================================================
+    # PAGINATION
+    # ==================================================
+
+    # Show 5 tasks on each page.
+    paginator = Paginator(
+        todos,
+        5
+    )
+
+    # Get the requested page number from the URL.
+    page_number = request.GET.get(
+        "page"
+    )
+
+    # get_page() also handles invalid page numbers safely.
+    page_obj = paginator.get_page(
+        page_number
+    )
+
+
+    # ==================================================
+    # FORMAT JALALI DATES
+    # ==================================================
+
+    # Only format the tasks on the current page.
+    for todo in page_obj:
+
+
+        # --------------------------------------------------
+        # CREATION DATE
+        # --------------------------------------------------
+
+        created_at_jalali = (
+            jdatetime.datetime.fromgregorian(
+                datetime=todo.created_at
+            ).strftime("%Y/%m/%d")
+        )
+
+        todo.created_at_jalali_str = (
+            to_persian_digits(
+                created_at_jalali
+            )
+        )
+
+
+        # --------------------------------------------------
+        # START DATE
+        # --------------------------------------------------
+
+        if todo.start_date:
+
+            start_date_jalali = (
+                todo.start_date.strftime(
+                    "%Y/%m/%d"
+                )
+            )
+
+            todo.start_date_jalali_str = (
+                to_persian_digits(
+                    start_date_jalali
+                )
+            )
+
+        else:
+
+            todo.start_date_jalali_str = None
+
+
+        # --------------------------------------------------
+        # END DATE
+        # --------------------------------------------------
+
+        if todo.end_date:
+
+            end_date_jalali = (
+                todo.end_date.strftime(
+                    "%Y/%m/%d"
+                )
+            )
+
+            todo.end_date_jalali_str = (
+                to_persian_digits(
+                    end_date_jalali
+                )
+            )
+
+        else:
+
+            todo.end_date_jalali_str = None
+
+
+        # --------------------------------------------------
+        # DEADLINE
+        # --------------------------------------------------
+
+        if todo.deadline:
+
+            deadline_jalali = (
+                todo.deadline.strftime(
+                    "%Y/%m/%d"
+                )
+            )
+
+            todo.deadline_jalali_str = (
+                to_persian_digits(
+                    deadline_jalali
+                )
+            )
+
+        else:
+
+            todo.deadline_jalali_str = None
+
+
+    # ==================================================
+    # PAGINATION PAGE NUMBERS
+    # ==================================================
+
+    # Prepare Persian page numbers for the template.
+    page_numbers = [
+        {
+            "number": page,
+            "display": to_persian_digits(page),
+        }
+        for page in page_obj.paginator.page_range
+    ]
+
+
+    # ==================================================
+    # GOOGLE CALENDAR CONNECTION
+    # ==================================================
+
+    # Check whether the current user has connected
+    # their Google Calendar account.
+    google_connected = GoogleAccount.objects.filter(
+        user=request.user
+    ).exists()
 
 
     # ==================================================
@@ -79,87 +224,26 @@ def important_tasks(request):
 
 
     # ==================================================
-    # FORMAT JALALI DATES
-    # ==================================================
-
-    for todo in todos:
-
-        # Creation date
-
-        created_at_jalali = (
-            jdatetime.datetime.fromgregorian(
-                datetime=todo.created_at
-            ).strftime("%Y/%m/%d")
-        )
-
-        todo.created_at_jalali_str = to_persian_digits(
-            created_at_jalali
-        )
-
-
-        # Start date
-
-        if todo.start_date:
-
-            start_date_jalali = (
-                todo.start_date.strftime("%Y/%m/%d")
-            )
-
-            todo.start_date_jalali_str = to_persian_digits(
-                start_date_jalali
-            )
-
-        else:
-
-            todo.start_date_jalali_str = None
-
-
-        # End date
-
-        if todo.end_date:
-
-            end_date_jalali = (
-                todo.end_date.strftime("%Y/%m/%d")
-            )
-
-            todo.end_date_jalali_str = to_persian_digits(
-                end_date_jalali
-            )
-
-        else:
-
-            todo.end_date_jalali_str = None
-
-
-        # Deadline
-
-        if todo.deadline:
-
-            deadline_jalali = (
-                todo.deadline.strftime("%Y/%m/%d")
-            )
-
-            todo.deadline_jalali_str = to_persian_digits(
-                deadline_jalali
-            )
-
-        else:
-
-            todo.deadline_jalali_str = None
-
-
-    # ==================================================
     # CONTEXT
     # ==================================================
 
     context = {
-        "todos": todos,
+        # Current page of Todo objects.
+        "todos": page_obj,
 
+        # Django pagination object.
+        "page_obj": page_obj,
+
+        # Persian statistics.
         "total_tasks": total_tasks_display,
-
         "completed_tasks": completed_tasks_display,
-
         "remaining_tasks": remaining_tasks_display,
+
+        # Persian page numbers.
+        "page_numbers": page_numbers,
+
+        # Google Calendar connection status.
+        "google_connected": google_connected,
     }
 
 

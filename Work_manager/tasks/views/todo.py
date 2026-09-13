@@ -16,12 +16,14 @@ from ..services.google_calendar import (
     delete_google_event,
 )
 
+
 # ==================================================
 # DIGIT CONVERSION
 # ==================================================
 
 def to_english_digits(value):
     """Convert Persian digits to English digits."""
+
     if value is None:
         return ""
 
@@ -35,6 +37,7 @@ def to_english_digits(value):
 
 def to_persian_digits(value):
     """Convert English digits to Persian digits."""
+
     if value is None:
         return ""
 
@@ -52,14 +55,21 @@ def to_persian_digits(value):
 
 def parse_jalali_date(value):
     """Convert a Jalali date string to jdatetime.date."""
+
     if not value:
         return None
 
-    value = to_english_digits(str(value).strip())
+    value = to_english_digits(
+        str(value).strip()
+    )
+
     value = value.replace("-", "/")
 
     try:
-        year, month, day = map(int, value.split("/"))
+        year, month, day = map(
+            int,
+            value.split("/")
+        )
 
         return jdatetime.date(
             year,
@@ -73,6 +83,7 @@ def parse_jalali_date(value):
 
 def format_jalali_date(value):
     """Format a Jalali date using Persian digits."""
+
     if not value:
         return ""
 
@@ -88,7 +99,9 @@ def format_jalali_date(value):
 @login_required
 def toggle_todo(request, todo_id):
 
+    # Only POST requests are allowed.
     if request.method != "POST":
+
         return JsonResponse(
             {
                 "success": False,
@@ -97,6 +110,7 @@ def toggle_todo(request, todo_id):
             status=400
         )
 
+    # Get the selected Todo.
     todo = get_object_or_404(
         Todo,
         id=todo_id
@@ -107,6 +121,7 @@ def toggle_todo(request, todo_id):
         todo.category == "personal"
         and todo.user != request.user
     ):
+
         return JsonResponse(
             {
                 "success": False,
@@ -115,20 +130,31 @@ def toggle_todo(request, todo_id):
             status=403
         )
 
-    # Complete the task.
+    # --------------------------------------------------
+    # TOGGLE COMPLETION
+    # --------------------------------------------------
+
     if not todo.completed:
+
+        # Mark the task as completed.
         todo.completed = True
+
+        # Store the completion date.
         todo.end_date = jdatetime.date.today()
 
-    # Mark the task as incomplete.
     else:
+
+        # Mark the task as incomplete.
         todo.completed = False
+
+        # Remove the completion date.
         todo.end_date = None
 
+    # Save only the changed fields.
     todo.save(
         update_fields=[
             "completed",
-            "end_date"
+            "end_date",
         ]
     )
 
@@ -140,7 +166,7 @@ def toggle_todo(request, todo_id):
                 format_jalali_date(todo.end_date)
                 if todo.end_date
                 else None
-            )
+            ),
         }
     )
 
@@ -150,13 +176,9 @@ def toggle_todo(request, todo_id):
 # ==================================================
 
 @login_required
-# ==================================================
-# EDIT TODO
-# ==================================================
-
-@login_required
 def edit_todo(request, todo_id):
 
+    # Get the selected Todo.
     todo = get_object_or_404(
         Todo,
         id=todo_id
@@ -167,11 +189,12 @@ def edit_todo(request, todo_id):
         todo.category == "personal"
         and todo.user != request.user
     ):
+
         return redirect("home")
 
-    # --------------------------------------------------
+    # ==================================================
     # POST
-    # --------------------------------------------------
+    # ==================================================
 
     if request.method == "POST":
 
@@ -187,7 +210,6 @@ def edit_todo(request, todo_id):
             ""
         ).strip()
 
-
         # --------------------------------------------------
         # DESCRIPTION
         # --------------------------------------------------
@@ -196,7 +218,6 @@ def edit_todo(request, todo_id):
             "description",
             ""
         )
-
 
         # --------------------------------------------------
         # CATEGORY
@@ -209,12 +230,12 @@ def edit_todo(request, todo_id):
 
         if category not in [
             "personal",
-            "public"
+            "public",
         ]:
+
             category = "personal"
 
         todo.category = category
-
 
         # --------------------------------------------------
         # START DATE
@@ -239,7 +260,6 @@ def edit_todo(request, todo_id):
 
             todo.start_date = None
 
-
         # --------------------------------------------------
         # DEADLINE
         # --------------------------------------------------
@@ -263,30 +283,28 @@ def edit_todo(request, todo_id):
 
             todo.deadline = None
 
-
         # --------------------------------------------------
         # SAVE TODO
         # --------------------------------------------------
 
         todo.save()
 
-
         # ==================================================
         # GOOGLE CALENDAR SYNC
         # ==================================================
 
-        google_connected = GoogleAccount.objects.filter(
-            user=request.user
-        ).exists()
-
+        google_connected = (
+            GoogleAccount.objects.filter(
+                user=request.user
+            ).exists()
+        )
 
         if google_connected:
 
             try:
 
                 # --------------------------------------------------
-                # CASE 1:
-                # Existing deadline was removed
+                # CASE 1: DEADLINE REMOVED
                 # --------------------------------------------------
 
                 if (
@@ -299,10 +317,8 @@ def edit_todo(request, todo_id):
                         todo
                     )
 
-
                 # --------------------------------------------------
-                # CASE 2:
-                # Existing Google event should be updated
+                # CASE 2: EXISTING EVENT SHOULD BE UPDATED
                 # --------------------------------------------------
 
                 elif (
@@ -314,10 +330,8 @@ def edit_todo(request, todo_id):
                         todo
                     )
 
-
                 # --------------------------------------------------
-                # CASE 3:
-                # Todo gets a deadline for the first time
+                # CASE 3: CREATE NEW EVENT
                 # --------------------------------------------------
 
                 elif (
@@ -331,20 +345,18 @@ def edit_todo(request, todo_id):
 
             except Exception as error:
 
-                # Keep TaskFlow working even if
-                # Google Calendar has an error.
+                # Google Calendar errors should not
+                # break TaskFlow.
                 print(
                     "Google Calendar sync error:",
                     error
                 )
 
-
         return redirect("home")
 
-
-    # --------------------------------------------------
+    # ==================================================
     # GET
-    # --------------------------------------------------
+    # ==================================================
 
     start_date_jalali = format_jalali_date(
         todo.start_date
@@ -366,11 +378,7 @@ def edit_todo(request, todo_id):
         context
     )
 
-# ==================================================
-# DELETE TODO
-# ==================================================
 
-@login_required
 # ==================================================
 # DELETE TODO
 # ==================================================
@@ -378,6 +386,7 @@ def edit_todo(request, todo_id):
 @login_required
 def delete_todo(request, todo_id):
 
+    # Only POST requests are allowed.
     if request.method != "POST":
 
         return JsonResponse(
@@ -388,7 +397,6 @@ def delete_todo(request, todo_id):
             status=400
         )
 
-
     # --------------------------------------------------
     # GET TODO
     # --------------------------------------------------
@@ -397,7 +405,6 @@ def delete_todo(request, todo_id):
         Todo,
         id=todo_id
     )
-
 
     # --------------------------------------------------
     # PERMISSION CHECK
@@ -417,15 +424,15 @@ def delete_todo(request, todo_id):
             status=403
         )
 
-
     # ==================================================
     # GOOGLE CALENDAR SYNC
     # ==================================================
 
-    google_connected = GoogleAccount.objects.filter(
-        user=request.user
-    ).exists()
-
+    google_connected = (
+        GoogleAccount.objects.filter(
+            user=request.user
+        ).exists()
+    )
 
     if (
         google_connected
@@ -434,7 +441,7 @@ def delete_todo(request, todo_id):
 
         try:
 
-            # Delete the related Google Calendar event
+            # Delete the related Google Calendar event.
             delete_google_event(
                 todo
             )
@@ -448,13 +455,11 @@ def delete_todo(request, todo_id):
                 error
             )
 
-
     # ==================================================
     # DELETE TODO
     # ==================================================
 
     todo.delete()
-
 
     # ==================================================
     # RETURN RESPONSE
@@ -463,9 +468,10 @@ def delete_todo(request, todo_id):
     return JsonResponse(
         {
             "success": True,
-            "todo_id": todo_id
+            "todo_id": todo_id,
         }
     )
+
 
 # ==================================================
 # TOGGLE IMPORTANT STATUS
@@ -474,7 +480,9 @@ def delete_todo(request, todo_id):
 @login_required
 def toggle_important(request, todo_id):
 
+    # Only POST requests are allowed.
     if request.method != "POST":
+
         return JsonResponse(
             {
                 "success": False,
@@ -483,6 +491,7 @@ def toggle_important(request, todo_id):
             status=400
         )
 
+    # Get the selected Todo.
     todo = get_object_or_404(
         Todo,
         id=todo_id
@@ -493,6 +502,7 @@ def toggle_important(request, todo_id):
         todo.category == "personal"
         and todo.user != request.user
     ):
+
         return JsonResponse(
             {
                 "success": False,
@@ -501,7 +511,9 @@ def toggle_important(request, todo_id):
             status=403
         )
 
+    # Toggle the important status.
     todo.important = not todo.important
+
     todo.save(
         update_fields=["important"]
     )

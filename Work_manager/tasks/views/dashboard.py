@@ -1,14 +1,98 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
 import jdatetime
 
 from ..models import Todo, GoogleAccount
 from ..services.google_calendar import create_google_event
+
+
+# ==================================================
+# DIGIT CONVERSION
+# ==================================================
+
+def to_english_digits(value):
+    """Convert Persian digits to English digits."""
+
+    if value is None:
+        return ""
+
+    return str(value).translate(
+        str.maketrans(
+            "۰۱۲۳۴۵۶۷۸۹",
+            "0123456789"
+        )
+    )
+
+
+def to_persian_digits(value):
+    """Convert English digits to Persian digits."""
+
+    if value is None:
+        return ""
+
+    return str(value).translate(
+        str.maketrans(
+            "0123456789",
+            "۰۱۲۳۴۵۶۷۸۹"
+        )
+    )
+
+
+# ==================================================
+# JALALI DATE HELPERS
+# ==================================================
+
+def parse_jalali_date(value):
+    """Convert a Jalali date string to jdatetime.date."""
+
+    if not value:
+        return None
+
+    value = to_english_digits(
+        str(value).strip()
+    )
+
+    value = value.replace(
+        "-",
+        "/"
+    )
+
+    try:
+
+        year, month, day = map(
+            int,
+            value.split("/")
+        )
+
+        return jdatetime.date(
+            year,
+            month,
+            day
+        )
+
+    except (ValueError, TypeError):
+
+        return None
+
+
+def format_jalali_date(value):
+    """Format a Jalali date using Persian digits."""
+
+    if not value:
+        return ""
+
+    return to_persian_digits(
+        value.strftime("%Y/%m/%d")
+    )
+
+
 # ==================================================
 # DASHBOARD / HOME
 # ==================================================
+
 @login_required
 def home(request):
     """
@@ -21,8 +105,15 @@ def home(request):
 
     if request.method == "POST":
 
-        title = request.POST.get("title")
-        description = request.POST.get("description")
+        title = request.POST.get(
+            "title",
+            ""
+        ).strip()
+
+        description = request.POST.get(
+            "description",
+            ""
+        )
 
         category = request.POST.get(
             "category",
@@ -30,69 +121,41 @@ def home(request):
         )
 
         start_date_str = request.POST.get(
-            "start_date"
+            "start_date",
+            ""
         )
 
         deadline_str = request.POST.get(
-            "deadline"
+            "deadline",
+            ""
         )
-
 
         # ==================================================
         # VALIDATE CATEGORY
         # ==================================================
 
-        if category not in ["personal", "public"]:
-            category = "personal"
+        if category not in [
+            "personal",
+            "public",
+        ]:
 
+            category = "personal"
 
         # ==================================================
         # CONVERT JALALI START DATE
         # ==================================================
 
-        start_date = None
-
-        if start_date_str:
-
-            try:
-
-                iso_start = start_date_str.replace(
-                    "/",
-                    "-"
-                )
-
-                start_date = jdatetime.date.fromisoformat(
-                    iso_start
-                )
-
-            except ValueError:
-
-                start_date = None
-
+        start_date = parse_jalali_date(
+            start_date_str
+        )
 
         # ==================================================
         # CONVERT JALALI DEADLINE
         # ==================================================
 
-        deadline = None
-
-        if deadline_str:
-
-            try:
-
-                iso_deadline = deadline_str.replace(
-                    "/",
-                    "-"
-                )
-
-                deadline = jdatetime.date.fromisoformat(
-                    iso_deadline
-                )
-
-            except ValueError:
-
-                deadline = None
-
+        deadline = parse_jalali_date(
+            deadline_str
+        )
 
         # ==================================================
         # CREATE TASK
@@ -111,17 +174,15 @@ def home(request):
             start_date=start_date,
 
             deadline=deadline,
-        )
 
+        )
 
         # ==================================================
         # GOOGLE CALENDAR SYNC
         # ==================================================
 
         google_calendar_synced = False
-
         google_event_link = None
-
 
         # Only sync when:
         # 1. The task has a deadline.
@@ -154,54 +215,42 @@ def home(request):
 
             except Exception as error:
 
-                # Do not prevent TaskFlow
-                # from creating the Todo.
+                # Keep TaskFlow working even if
+                # Google Calendar has an error.
                 print(
                     "Google Calendar sync error:",
                     error
                 )
-
 
         # ==================================================
         # CONVERT DATES TO JALALI STRINGS
         # ==================================================
 
         start_date_jalali = (
-
-            todo.start_date.strftime(
-                "%Y/%m/%d"
+            format_jalali_date(
+                todo.start_date
             )
-
             if todo.start_date
-
             else ""
-
         )
-
 
         deadline_jalali = (
-
-            todo.deadline.strftime(
-                "%Y/%m/%d"
+            format_jalali_date(
+                todo.deadline
             )
-
             if todo.deadline
-
             else ""
-
         )
-
 
         created_at_jalali = (
-
-            jdatetime.datetime.fromgregorian(
-                datetime=todo.created_at
-            ).strftime(
-                "%Y/%m/%d"
+            to_persian_digits(
+                jdatetime.datetime.fromgregorian(
+                    datetime=todo.created_at
+                ).strftime(
+                    "%Y/%m/%d"
+                )
             )
-
         )
-
 
         # ==================================================
         # RETURN JSON RESPONSE
@@ -232,8 +281,8 @@ def home(request):
             "google_event_link": (
                 google_event_link
             ),
-        })
 
+        })
 
     # ==================================================
     # GET FILTER PARAMETERS
@@ -247,13 +296,13 @@ def home(request):
         "filter"
     )
 
-
     # ==================================================
     # TASK SCOPE
     # ==================================================
 
     if scope == "my":
 
+        # Show only the current user's tasks.
         todos = Todo.objects.filter(
             user=request.user
         )
@@ -262,19 +311,21 @@ def home(request):
 
     else:
 
-        todos = Todo.objects.filter(
-
-            category="public"
-
-        ) | Todo.objects.filter(
-
-            category="personal",
-            user=request.user
-
+        # Show:
+        # - all public tasks
+        # - current user's personal tasks
+        todos = (
+            Todo.objects.filter(
+                category="public"
+            )
+            |
+            Todo.objects.filter(
+                category="personal",
+                user=request.user
+            )
         )
 
         my_tasks = False
-
 
     # ==================================================
     # TASK STATUS FILTER
@@ -292,7 +343,6 @@ def home(request):
             completed=True
         )
 
-
     # ==================================================
     # ORDER TASKS
     # ==================================================
@@ -301,11 +351,12 @@ def home(request):
         "-created_at"
     )
 
-
     # ==================================================
     # STATISTICS
     # ==================================================
 
+    # Calculate statistics BEFORE pagination.
+    # This ensures the numbers represent all matching tasks.
     total_tasks = todos.count()
 
     completed_tasks = todos.filter(
@@ -316,33 +367,93 @@ def home(request):
         completed=False
     ).count()
 
+    # ==================================================
+    # PAGINATION
+    # ==================================================
+
+    # Number of tasks displayed on each page.
+    paginator = Paginator(
+        todos,
+        5
+    )
+
+    # Get requested page number.
+    page_number = request.GET.get(
+        "page"
+    )
+
+    # Get current page.
+    page_obj = paginator.get_page(
+        page_number
+    )
 
     # ==================================================
-    # PREPARE JALALI DATES
+    # COMPACT PAGE NUMBERS
     # ==================================================
 
-    for todo in todos:
+    # Example:
+    # 1, 2, 3, ..., 9, 10
 
+    raw_page_numbers = paginator.get_elided_page_range(
+        number=page_obj.number,
+        on_each_side=1,
+        on_ends=1
+    )
+
+    page_numbers = []
+
+    for page in raw_page_numbers:
+
+        # Django uses this value for the ellipsis.
+        if page == paginator.ELLIPSIS:
+
+            page_numbers.append({
+                "number": None,
+                "display": "…",
+            })
+
+        else:
+
+            page_numbers.append({
+                "number": page,
+                "display": to_persian_digits(
+                    page
+                ),
+            })
+
+    # ==================================================
+    # PREPARE DATES FOR CURRENT PAGE
+    # ==================================================
+
+    # Only prepare dates for tasks
+    # shown on the current page.
+    for todo in page_obj:
+
+        # --------------------------------------------------
         # Creation date
+        # --------------------------------------------------
 
         todo.created_at_jalali_str = (
-
-            jdatetime.datetime.fromgregorian(
-                datetime=todo.created_at
-            ).strftime(
-                "%Y/%m/%d"
+            to_persian_digits(
+                jdatetime.datetime.fromgregorian(
+                    datetime=todo.created_at
+                ).strftime(
+                    "%Y/%m/%d"
+                )
             )
-
         )
 
-
+        # --------------------------------------------------
         # Start date
+        # --------------------------------------------------
 
         if todo.start_date:
 
             todo.start_date_jalali_str = (
-                todo.start_date.strftime(
-                    "%Y/%m/%d"
+                to_persian_digits(
+                    todo.start_date.strftime(
+                        "%Y/%m/%d"
+                    )
                 )
             )
 
@@ -350,14 +461,17 @@ def home(request):
 
             todo.start_date_jalali_str = None
 
-
+        # --------------------------------------------------
         # Completion date
+        # --------------------------------------------------
 
         if todo.end_date:
 
             todo.end_date_jalali_str = (
-                todo.end_date.strftime(
-                    "%Y/%m/%d"
+                to_persian_digits(
+                    todo.end_date.strftime(
+                        "%Y/%m/%d"
+                    )
                 )
             )
 
@@ -365,21 +479,23 @@ def home(request):
 
             todo.end_date_jalali_str = None
 
-
+        # --------------------------------------------------
         # Deadline
+        # --------------------------------------------------
 
         if todo.deadline:
 
             todo.deadline_jalali_str = (
-                todo.deadline.strftime(
-                    "%Y/%m/%d"
+                to_persian_digits(
+                    todo.deadline.strftime(
+                        "%Y/%m/%d"
+                    )
                 )
             )
 
         else:
 
             todo.deadline_jalali_str = None
-
 
     # ==================================================
     # GOOGLE CALENDAR CONNECTION STATUS
@@ -391,28 +507,37 @@ def home(request):
         ).exists()
     )
 
-
     # ==================================================
     # TEMPLATE CONTEXT
     # ==================================================
 
     context = {
 
-        "todos": todos,
+        # Current page of Todo objects.
+        "todos": page_obj,
 
+        # Django pagination object.
+        "page_obj": page_obj,
+
+        # Compact pagination numbers.
+        "page_numbers": page_numbers,
+
+        # Current filters.
         "filter_type": filter_type,
 
         "my_tasks": my_tasks,
 
+        # Statistics.
         "total_tasks": total_tasks,
 
         "completed_tasks": completed_tasks,
 
         "remaining_tasks": remaining_tasks,
 
+        # Google Calendar status.
         "google_connected": google_connected,
-    }
 
+    }
 
     # ==================================================
     # RENDER HOME PAGE

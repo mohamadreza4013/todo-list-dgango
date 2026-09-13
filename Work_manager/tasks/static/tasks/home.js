@@ -2,221 +2,581 @@
 // ADD TASK
 // ==================================================
 
-const addTaskForm = document.querySelector(".add-task-form-container");
+const addTaskForm = document.querySelector(
+    ".add-task-form-container"
+);
+
 
 if (addTaskForm) {
-    addTaskForm.addEventListener("submit", async function (event) {
-        event.preventDefault();
 
-        try {
-            const response = await fetch(window.location.href, {
-                method: "POST",
-                body: new FormData(addTaskForm),
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest",
-                },
-            });
+    addTaskForm.addEventListener(
+        "submit",
+        async function (event) {
 
-            const data = await response.json();
+            event.preventDefault();
 
-            if (data.success) {
-                const todoList = document.querySelector(".todo-list");
+            try {
 
-                // حذف حالت خالی
-                const emptyState = todoList.querySelector(".empty-state");
-                if (emptyState) {
-                    emptyState.remove();
+                const response = await fetch(
+                    window.location.href,
+                    {
+                        method: "POST",
+
+                        body: new FormData(
+                            addTaskForm
+                        ),
+
+                        headers: {
+                            "X-Requested-With":
+                                "XMLHttpRequest",
+                        },
+                    }
+                );
+
+
+                const data =
+                    await response.json();
+
+
+                if (data.success) {
+
+                    /*
+                     * Pagination is handled by Django.
+                     *
+                     * After creating a new Todo, the newest
+                     * task belongs to the first page.
+                     *
+                     * Therefore, reload the first page instead
+                     * of manually inserting a new card into the DOM.
+                     */
+
+
+                    const currentUrl =
+                        new URL(
+                            window.location.href
+                        );
+
+
+                    // Remove the current page number.
+                    currentUrl.searchParams.delete(
+                        "page"
+                    );
+
+
+                    /*
+                     * Reload the page from the server.
+                     *
+                     * Django will recalculate:
+                     * - Todo list
+                     * - Pagination
+                     * - Statistics
+                     */
+
+                    window.location.href =
+                        currentUrl.toString();
+
                 }
 
-                // ساخت کارت جدید
-                const card = createTodoCard(data);
+            } catch (error) {
 
-                // افزودن به ابتدای لیست
-                todoList.insertAdjacentHTML("afterbegin", card);
+                console.error(
+                    "Error adding task:",
+                    error
+                );
 
-                // پاک کردن فرم
-                addTaskForm.reset();
-
-                // به‌روزرسانی آمار
-                updateStats();
             }
-        } catch (error) {
-            console.error("Error adding task:", error);
+
         }
-    });
+    );
+
 }
+
+
+// ==================================================
+// LOAD PAGE CONTENT
+// ==================================================
+
+async function loadPage(url) {
+
+    try {
+
+        const response = await fetch(
+            url,
+            {
+                headers: {
+                    "X-Requested-With":
+                        "XMLHttpRequest",
+                },
+            }
+        );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Failed to load page."
+            );
+
+        }
+
+
+        const html =
+            await response.text();
+
+
+        const parser =
+            new DOMParser();
+
+
+        const doc =
+            parser.parseFromString(
+                html,
+                "text/html"
+            );
+
+
+        // --------------------------------------------------
+        // TODO LIST
+        // --------------------------------------------------
+
+        const currentTodoList =
+            document.querySelector(
+                ".todo-list"
+            );
+
+
+        const newTodoList =
+            doc.querySelector(
+                ".todo-list"
+            );
+
+
+        if (
+            currentTodoList &&
+            newTodoList
+        ) {
+
+            currentTodoList.innerHTML =
+                newTodoList.innerHTML;
+
+        }
+
+
+        // --------------------------------------------------
+        // PAGINATION
+        // --------------------------------------------------
+
+        const currentPagination =
+            document.querySelector(
+                ".pagination"
+            );
+
+
+        const newPagination =
+            doc.querySelector(
+                ".pagination"
+            );
+
+
+        /*
+         * A page may have no pagination
+         * when there is only one page.
+         */
+
+        if (
+            currentPagination &&
+            newPagination
+        ) {
+
+            currentPagination.replaceWith(
+                newPagination
+            );
+
+        }
+
+        else if (
+            !currentPagination &&
+            newPagination
+        ) {
+
+            /*
+             * Insert pagination after
+             * the todo list.
+             */
+
+            currentTodoList.insertAdjacentElement(
+                "afterend",
+                newPagination
+            );
+
+        }
+
+        else if (
+            currentPagination &&
+            !newPagination
+        ) {
+
+            currentPagination.remove();
+
+        }
+
+
+        // --------------------------------------------------
+        // STATISTICS
+        // --------------------------------------------------
+
+        const currentStats =
+            document.querySelector(
+                ".stats"
+            );
+
+
+        const newStats =
+            doc.querySelector(
+                ".stats"
+            );
+
+
+        if (
+            currentStats &&
+            newStats
+        ) {
+
+            currentStats.innerHTML =
+                newStats.innerHTML;
+
+        }
+
+
+        // --------------------------------------------------
+        // FILTER BUTTONS
+        // --------------------------------------------------
+
+        const currentFilters =
+            document.querySelector(
+                ".task-filters"
+            );
+
+
+        const newFilters =
+            doc.querySelector(
+                ".task-filters"
+            );
+
+
+        if (
+            currentFilters &&
+            newFilters
+        ) {
+
+            currentFilters.innerHTML =
+                newFilters.innerHTML;
+
+        }
+
+
+        // --------------------------------------------------
+        // UPDATE URL
+        // --------------------------------------------------
+
+        window.history.pushState(
+            {},
+            "",
+            url
+        );
+
+
+        // Re-bind events to the newly loaded buttons.
+        bindPaginationEvents();
+
+        bindFilterEvents();
+
+        bindTodoEvents();
+
+
+        // Convert dynamic numbers.
+        convertTextNodesToPersianDigits(
+            document.body
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Error loading page:",
+            error
+        );
+
+    }
+
+}
+
 
 // ==================================================
 // FILTERS
 // ==================================================
 
-document.querySelectorAll(".filter-button").forEach((button) => {
-    button.addEventListener("click", async function (event) {
-        event.preventDefault();
+function bindFilterEvents() {
 
-        const url = button.href;
+    document
+        .querySelectorAll(
+            ".filter-button"
+        )
+        .forEach(
+            function (button) {
 
-        try {
-            const response = await fetch(url, {
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest",
-                },
-            });
+                /*
+                 * Prevent binding the same event
+                 * multiple times.
+                 */
 
-            const html = await response.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, "text/html");
+                if (
+                    button.dataset.bound === "true"
+                ) {
 
-            const newTodoList = doc.querySelector(".todo-list");
-            const currentTodoList = document.querySelector(".todo-list");
+                    return;
 
-            currentTodoList.innerHTML = newTodoList.innerHTML;
+                }
 
-            // به‌روزرسانی دکمه فعال
-            document.querySelectorAll(".filter-button").forEach((btn) => {
-                btn.classList.remove("active");
-            });
-            button.classList.add("active");
 
-            // به‌روزرسانی URL
-            window.history.pushState({}, "", url);
-        } catch (error) {
-            console.error("Error filtering tasks:", error);
-        }
-    });
-});
+                button.dataset.bound = "true";
 
-// ==================================================
-// UPDATE STATISTICS
-// ==================================================
 
-function updateStats() {
-    const cards = document.querySelectorAll(".todo-card");
-    let completed = 0;
+                button.addEventListener(
+                    "click",
+                    function (event) {
 
-    cards.forEach((card) => {
-        const button = card.querySelector(".complete-button");
-        if (button && button.classList.contains("completed")) {
-            completed++;
-        }
-    });
+                        event.preventDefault();
 
-    const total = cards.length;
-    const remaining = total - completed;
+                        loadPage(
+                            button.href
+                        );
 
-    const statNumbers = document.querySelectorAll(".stat-number");
-    if (statNumbers.length >= 3) {
-        statNumbers[0].textContent = total;
-        statNumbers[1].textContent = completed;
-        statNumbers[2].textContent = remaining;
-    }
+                    }
+                );
+
+            }
+        );
+
 }
+
+
+// ==================================================
+// PAGINATION
+// ==================================================
+
+function bindPaginationEvents() {
+
+    document
+        .querySelectorAll(
+            ".pagination a"
+        )
+        .forEach(
+            function (button) {
+
+                if (
+                    button.dataset.bound === "true"
+                ) {
+
+                    return;
+
+                }
+
+
+                button.dataset.bound = "true";
+
+
+                button.addEventListener(
+                    "click",
+                    function (event) {
+
+                        event.preventDefault();
+
+                        loadPage(
+                            button.href
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+// ==================================================
+// TODO EVENTS
+// ==================================================
+
+function bindTodoEvents() {
+
+    /*
+     * todo.js is responsible for:
+     * - complete
+     * - important
+     * - delete
+     *
+     * Therefore this function is intentionally empty.
+     *
+     * It exists so the page-loading logic remains
+     * organized and can be extended later.
+     */
+
+}
+
+
 // ==================================================
 // CONVERT ENGLISH DIGITS TO PERSIAN DIGITS
 // ==================================================
 
 function toPersianDigits(value) {
 
-    if (value === null || value === undefined) {
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
         return value;
+
     }
 
-    return String(value).replace(/\d/g, function (digit) {
-        return "۰۱۲۳۴۵۶۷۸۹"[digit];
-    });
+
+    return String(value).replace(
+        /\d/g,
+        function (digit) {
+
+            return "۰۱۲۳۴۵۶۷۸۹"[digit];
+
+        }
+    );
+
 }
 
 
 // ==================================================
-// CONVERT NUMBERS IN THE PAGE
+// CONVERT TEXT NODES TO PERSIAN DIGITS
 // ==================================================
 
-document.addEventListener("DOMContentLoaded", function () {
+function convertTextNodesToPersianDigits(
+    element
+) {
 
-    const walker = document.createTreeWalker(
-        document.body,
-        NodeFilter.SHOW_TEXT
-    );
-
-    const textNodes = [];
-
-    while (walker.nextNode()) {
-        textNodes.push(walker.currentNode);
-    }
-
-    textNodes.forEach(function (node) {
-
-        node.nodeValue = toPersianDigits(
-            node.nodeValue
+    const walker =
+        document.createTreeWalker(
+            element,
+            NodeFilter.SHOW_TEXT
         );
 
-    });
-
-});
-// ==================================================
-// CONVERT DYNAMIC NUMBERS TO PERSIAN DIGITS
-// ==================================================
-
-function toPersianDigits(value) {
-
-    if (value === null || value === undefined) {
-        return value;
-    }
-
-    return String(value).replace(/\d/g, function (digit) {
-        return "۰۱۲۳۴۵۶۷۸۹"[digit];
-    });
-}
-
-
-function convertTextNodesToPersianDigits(element) {
-
-    const walker = document.createTreeWalker(
-        element,
-        NodeFilter.SHOW_TEXT
-    );
 
     const textNodes = [];
 
-    while (walker.nextNode()) {
-        textNodes.push(walker.currentNode);
+
+    while (
+        walker.nextNode()
+    ) {
+
+        textNodes.push(
+            walker.currentNode
+        );
+
     }
 
-    textNodes.forEach(function (node) {
-        node.nodeValue = toPersianDigits(node.nodeValue);
-    });
+
+    textNodes.forEach(
+        function (node) {
+
+            node.nodeValue =
+                toPersianDigits(
+                    node.nodeValue
+                );
+
+        }
+    );
+
 }
 
 
-// Convert existing numbers
-document.addEventListener("DOMContentLoaded", function () {
-    convertTextNodesToPersianDigits(document.body);
-});
+// ==================================================
+// OBSERVE DYNAMIC CONTENT
+// ==================================================
+
+const observer =
+    new MutationObserver(
+        function (mutations) {
+
+            mutations.forEach(
+                function (mutation) {
+
+                    mutation.addedNodes.forEach(
+                        function (node) {
+
+                            if (
+                                node.nodeType ===
+                                Node.TEXT_NODE
+                            ) {
+
+                                node.nodeValue =
+                                    toPersianDigits(
+                                        node.nodeValue
+                                    );
+
+                            }
+
+                            else if (
+                                node.nodeType ===
+                                Node.ELEMENT_NODE
+                            ) {
+
+                                convertTextNodesToPersianDigits(
+                                    node
+                                );
+
+                            }
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+    );
 
 
-// Convert numbers added dynamically
-const observer = new MutationObserver(function (mutations) {
+// ==================================================
+// INITIALIZATION
+// ==================================================
 
-    mutations.forEach(function (mutation) {
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
-        mutation.addedNodes.forEach(function (node) {
-
-            if (node.nodeType === Node.TEXT_NODE) {
-                node.nodeValue = toPersianDigits(node.nodeValue);
-            }
-
-            else if (node.nodeType === Node.ELEMENT_NODE) {
-                convertTextNodesToPersianDigits(node);
-            }
-
-        });
-
-    });
-
-});
+        // Convert numbers already present on page.
+        convertTextNodesToPersianDigits(
+            document.body
+        );
 
 
-observer.observe(document.body, {
-    childList: true,
-    subtree: true
-});
+        // Bind filters.
+        bindFilterEvents();
+
+
+        // Bind pagination.
+        bindPaginationEvents();
+
+
+        // Bind Todo events.
+        bindTodoEvents();
+
+    }
+);
+
+
+observer.observe(
+    document.body,
+    {
+        childList: true,
+        subtree: true,
+    }
+);

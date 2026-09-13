@@ -135,7 +135,40 @@
 
         <div class="sidebar-bottom">
 
+            <div class="nav">
 
+            <!-- Google Calendar -->
+        
+            {% if google_connected %}
+        
+                <div class="nav-item google-connected">
+        
+                    <span>
+                        ✓
+                    </span>
+        
+                    Google Calendar متصل است
+        
+                </div>
+        
+            {% else %}
+        
+                <a
+                    href="{% url 'google_connect' %}"
+                    class="nav-item"
+                >
+        
+                    <span>
+                        📅
+                    </span>
+        
+                    اتصال به Google Calendar
+        
+                </a>
+        
+            {% endif %}
+        
+        </div>
             <div class="nav">
 
 
@@ -276,7 +309,6 @@
 
             <div class="stat-card">
 
-
                 <div class="stat-header">
 
                     <span class="stat-title">
@@ -294,7 +326,6 @@
                     {{ total_tasks }}
                 </div>
 
-
             </div>
 
 
@@ -302,7 +333,6 @@
             <!-- Completed important tasks -->
 
             <div class="stat-card">
-
 
                 <div class="stat-header">
 
@@ -321,7 +351,6 @@
                     {{ completed_tasks }}
                 </div>
 
-
             </div>
 
 
@@ -329,7 +358,6 @@
             <!-- Remaining important tasks -->
 
             <div class="stat-card">
-
 
                 <div class="stat-header">
 
@@ -348,9 +376,7 @@
                     {{ remaining_tasks }}
                 </div>
 
-
             </div>
-
 
         </section>
 
@@ -362,11 +388,9 @@
 
         <div class="tasks-header">
 
-
             <h2>
                 وظایف مهم
             </h2>
-
 
         </div>
 
@@ -381,14 +405,15 @@
 
             {% for todo in todos %}
 
-
                 <div
                     class="todo-card"
                     data-todo-id="{{ todo.id }}"
                 >
 
 
-                    <!-- Complete / incomplete toggle -->
+                    <!-- ==================================================
+                         COMPLETE
+                    ================================================== -->
 
                     <form
                         method="POST"
@@ -397,7 +422,6 @@
                     >
 
                         {% csrf_token %}
-
 
                         <button
                             type="submit"
@@ -411,24 +435,25 @@
 
                         </button>
 
-
                     </form>
 
 
 
-                    <!-- Task content -->
+                    <!-- ==================================================
+                         TODO CONTENT
+                    ================================================== -->
 
                     <div class="todo-content">
 
 
-                        <!-- Task title -->
+                        <!-- Title -->
 
                         <div class="todo-title">
                             {{ todo.title }}
                         </div>
 
 
-                        <!-- Task description -->
+                        <!-- Description -->
 
                         {% if todo.description %}
 
@@ -439,10 +464,9 @@
                         {% endif %}
 
 
-                        <!-- Task category -->
+                        <!-- Category -->
 
                         <div class="todo-category">
-
 
                             {% if todo.category == "public" %}
 
@@ -458,20 +482,20 @@
 
                             {% endif %}
 
-
                         </div>
-
 
                     </div>
 
 
 
-                    <!-- Task actions -->
+                    <!-- ==================================================
+                         TODO ACTIONS
+                    ================================================== -->
 
                     <div class="todo-actions">
 
 
-                        <!-- Task status -->
+                        <!-- Status -->
 
                         <span
                             class="status {% if todo.completed %}completed{% endif %}"
@@ -491,7 +515,7 @@
 
 
 
-                        <!-- Toggle important status -->
+                        <!-- Important -->
 
                         <form
                             method="POST"
@@ -500,7 +524,6 @@
                         >
 
                             {% csrf_token %}
-
 
                             <button
                                 type="submit"
@@ -512,12 +535,11 @@
 
                             </button>
 
-
                         </form>
 
 
 
-                        <!-- Edit task -->
+                        <!-- Edit -->
 
                         <a
                             href="{% url 'edit_todo' todo.id %}"
@@ -530,7 +552,7 @@
 
 
 
-                        <!-- Delete task -->
+                        <!-- Delete -->
 
                         <form
                             method="POST"
@@ -539,7 +561,6 @@
                         >
 
                             {% csrf_token %}
-
 
                             <button
                                 type="submit"
@@ -550,12 +571,13 @@
 
                             </button>
 
-
                         </form>
 
 
 
-                        <!-- Task dates -->
+                        <!-- ==================================================
+                             TASK DATES
+                        ================================================== -->
 
                         <div class="todo-dates">
 
@@ -614,9 +636,7 @@
 
                         </div>
 
-
                     </div>
-
 
                 </div>
 
@@ -624,37 +644,106 @@
             {% empty %}
 
 
-                <!-- Empty task list state -->
+                <!-- ==================================================
+                     EMPTY STATE
+                ================================================== -->
 
                 <div class="empty-state">
-
 
                     <div class="empty-icon">
                         ★
                     </div>
 
-
                     <h3>
                         هیچ وظیفه مهمی وجود ندارد
                     </h3>
-
 
                     <p>
                         یک وظیفه را به عنوان مهم علامت‌گذاری کنید تا در اینجا نمایش داده شود.
                     </p>
 
-
                 </div>
 
-
             {% endfor %}
-
 
         </section>
 
 
-    </main>
 
+        <!-- ==================================================
+             PAGINATION
+        ================================================== -->
+
+        {% if page_obj.paginator.num_pages > 1 %}
+
+            <div class="pagination">
+
+
+                <!-- Previous -->
+
+                {% if page_obj.has_previous %}
+
+                    <a
+                        href="?page={{ page_obj.previous_page_number }}"
+                        class="pagination-button"
+                    >
+                        قبلی
+                    </a>
+
+                {% endif %}
+
+
+
+                <!-- Page numbers -->
+
+                <div class="pagination-pages">
+
+                    {% for page in page_numbers %}
+
+                        {% if page.number == page_obj.number %}
+
+                            <span
+                                class="pagination-page active"
+                            >
+                                {{ page.display }}
+                            </span>
+
+                        {% else %}
+
+                            <a
+                                href="?page={{ page.number }}"
+                                class="pagination-page"
+                            >
+                                {{ page.display }}
+                            </a>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+                </div>
+
+
+
+                <!-- Next -->
+
+                {% if page_obj.has_next %}
+
+                    <a
+                        href="?page={{ page_obj.next_page_number }}"
+                        class="pagination-button"
+                    >
+                        بعدی
+                    </a>
+
+                {% endif %}
+
+
+            </div>
+
+        {% endif %}
+
+    </main>
 
 </div>
 
@@ -663,8 +752,6 @@
 <!-- ==================================================
      JAVASCRIPT
 ================================================== -->
-
-<!-- Todo JavaScript -->
 
 <script
     src="{% static 'tasks/todo.js' %}"
