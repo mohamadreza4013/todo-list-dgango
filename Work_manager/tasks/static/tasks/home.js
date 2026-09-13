@@ -220,11 +220,8 @@ if (createTaskForm) {
 
                 /*
                  * Reload the first page so Django
-                 * recalculates:
-                 *
-                 * - task list
-                 * - statistics
-                 * - pagination
+                 * recalculates the task list,
+                 * statistics and pagination.
                  */
 
                 window.location.href =
@@ -412,7 +409,7 @@ function updateTopicOptions(
 
     /*
      * Select the requested topic
-     * when it exists in the current category.
+     * when it exists.
      */
 
     if (selectedTopicId !== null) {
@@ -443,8 +440,8 @@ function updateTopicOptions(
 
 
     /*
-     * If no topic is selected,
-     * automatically select the first one.
+     * Select the first topic when
+     * no topic is currently selected.
      */
 
     if (
@@ -751,7 +748,7 @@ if (saveTopicButton) {
 
 
                 // --------------------------------------------------
-                // UPDATE SELECT
+                // UPDATE TOPIC SELECT
                 // --------------------------------------------------
 
                 updateTopicOptions(
@@ -798,6 +795,124 @@ if (saveTopicButton) {
             }
 
         }
+    );
+
+}
+
+
+// ==================================================
+// TOPIC FILTER
+// ==================================================
+
+function applyTopicFilter() {
+
+    const currentTopicFilter =
+        document.querySelector(
+            "#topic-filter"
+        );
+
+
+    if (!currentTopicFilter) {
+        return;
+    }
+
+
+    const currentUrl =
+        new URL(
+            window.location.href
+        );
+
+
+    const selectedTopicId =
+        currentTopicFilter.value;
+
+
+    /*
+     * Every new filter starts
+     * from page 1.
+     */
+
+    currentUrl.searchParams.delete(
+        "page"
+    );
+
+
+    /*
+     * Set or remove the topic parameter.
+     */
+
+    if (selectedTopicId) {
+
+        currentUrl.searchParams.set(
+            "topic",
+            selectedTopicId
+        );
+
+    }
+
+    else {
+
+        currentUrl.searchParams.delete(
+            "topic"
+        );
+
+    }
+
+
+    /*
+     * Keep the existing:
+     *
+     * - scope
+     * - status filter
+     *
+     * and only change the topic.
+     */
+
+    loadPage(
+        currentUrl.toString()
+    );
+
+}
+
+
+// ==================================================
+// BIND TOPIC FILTER
+// ==================================================
+
+function bindTopicFilterEvents() {
+
+    const currentTopicFilter =
+        document.querySelector(
+            "#topic-filter"
+        );
+
+
+    if (!currentTopicFilter) {
+        return;
+    }
+
+
+    /*
+     * Prevent duplicate event bindings.
+     */
+
+    if (
+        currentTopicFilter.dataset.bound ===
+        "true"
+    ) {
+
+        return;
+
+    }
+
+
+    currentTopicFilter.dataset.bound =
+        "true";
+
+
+    currentTopicFilter.addEventListener(
+        "change",
+        applyTopicFilter
     );
 
 }
@@ -966,7 +1081,7 @@ async function loadPage(url) {
 
 
         // ==================================================
-        // FILTER BUTTONS
+        // FILTER AREA
         // ==================================================
 
         const currentFilters =
@@ -986,8 +1101,9 @@ async function loadPage(url) {
             newFilters
         ) {
 
-            currentFilters.innerHTML =
-                newFilters.innerHTML;
+            currentFilters.replaceWith(
+                newFilters
+            );
 
         }
 
@@ -1011,10 +1127,17 @@ async function loadPage(url) {
 
 
         // ==================================================
-        // REBIND FILTERS
+        // REBIND STATUS FILTERS
         // ==================================================
 
         bindFilterEvents();
+
+
+        // ==================================================
+        // REBIND TOPIC FILTER
+        // ==================================================
+
+        bindTopicFilterEvents();
 
 
         // ==================================================
@@ -1040,7 +1163,7 @@ async function loadPage(url) {
 
 
 // ==================================================
-// FILTERS
+// STATUS FILTERS
 // ==================================================
 
 function bindFilterEvents() {
@@ -1287,7 +1410,7 @@ document.addEventListener(
         );
 
 
-        // Initialize filters.
+        // Initialize status filters.
         bindFilterEvents();
 
 
@@ -1297,6 +1420,10 @@ document.addEventListener(
 
         // Initialize topic options.
         updateTopicOptions();
+
+
+        // Initialize Topic Filter.
+        bindTopicFilterEvents();
 
     }
 );

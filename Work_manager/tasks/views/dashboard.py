@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db.models import Q
 
 import jdatetime
 
@@ -105,6 +106,10 @@ def home(request):
 
     if request.method == "POST":
 
+        # --------------------------------------------------
+        # GET FORM DATA
+        # --------------------------------------------------
+
         title = request.POST.get(
             "title",
             ""
@@ -121,18 +126,19 @@ def home(request):
         )
 
         topic_id = request.POST.get(
-            "topic"
-        )
+            "topic",
+            ""
+        ).strip()
 
         start_date_str = request.POST.get(
             "start_date",
             ""
-        )
+        ).strip()
 
         deadline_str = request.POST.get(
             "deadline",
             ""
-        )
+        ).strip()
 
         # ==================================================
         # VALIDATE CATEGORY
@@ -155,7 +161,7 @@ def home(request):
 
             try:
 
-                topic = Topic.objects.get(
+                selected_topic = Topic.objects.get(
                     id=topic_id,
                     is_active=True
                 )
@@ -167,9 +173,10 @@ def home(request):
                 if category == "public":
 
                     # Public tasks can only use public topics.
-                    if not topic.is_public:
 
-                        topic = None
+                    if selected_topic.is_public:
+
+                        topic = selected_topic
 
                 # --------------------------------------------------
                 # PERSONAL TASK
@@ -177,14 +184,15 @@ def home(request):
 
                 else:
 
-                    # Personal tasks can only use topics
-                    # created by the current user.
+                    # Personal tasks can only use
+                    # personal topics belonging to the user.
+
                     if (
-                        topic.is_public
-                        or topic.user != request.user
+                        not selected_topic.is_public
+                        and selected_topic.user == request.user
                     ):
 
-                        topic = None
+                        topic = selected_topic
 
             except (
                 Topic.DoesNotExist,
@@ -195,23 +203,19 @@ def home(request):
                 topic = None
 
         # ==================================================
-        # CONVERT JALALI START DATE
+        # CONVERT DATES
         # ==================================================
 
         start_date = parse_jalali_date(
             start_date_str
         )
 
-        # ==================================================
-        # CONVERT JALALI DEADLINE
-        # ==================================================
-
         deadline = parse_jalali_date(
             deadline_str
         )
 
         # ==================================================
-        # CREATE TASK
+        # CREATE TODO
         # ==================================================
 
         todo = Todo.objects.create(
@@ -239,10 +243,10 @@ def home(request):
         google_calendar_synced = False
         google_event_link = None
 
-        # Only sync when:
-        # 1. The task has a deadline.
-        # 2. The current user connected Google Calendar.
-        # 3. The task does not already have a Google event.
+        # Sync only when:
+        # 1. Deadline exists.
+        # 2. Google Calendar is connected.
+        # 3. No event exists yet.
 
         if (
             deadline
@@ -270,15 +274,16 @@ def home(request):
 
             except Exception as error:
 
-                # Keep TaskFlow working even if
-                # Google Calendar has an error.
+                # Google Calendar errors should not
+                # break TaskFlow.
+
                 print(
                     "Google Calendar sync error:",
                     error
                 )
 
         # ==================================================
-        # CONVERT DATES TO JALALI STRINGS
+        # FORMAT DATES
         # ==================================================
 
         start_date_jalali = (
@@ -308,7 +313,7 @@ def home(request):
         )
 
         # ==================================================
-        # RETURN JSON RESPONSE
+        # JSON RESPONSE
         # ==================================================
 
         return JsonResponse({
@@ -353,11 +358,29 @@ def home(request):
     # ==================================================
 
     scope = request.GET.get(
-        "scope"
-    )
+        "scope",
+        ""
+    ).strip()
 
     filter_type = request.GET.get(
-        "filter"
+        "filter",
+        ""
+    ).strip()
+
+    topic_id = request.GET.get(
+        "topic",
+        ""
+    ).strip()
+
+    # ==================================================
+    # BASE TASK QUERY
+    # ==================================================
+
+    # Start with all Todo objects and load Topic
+    # together with each task.
+
+    todos = Todo.objects.select_related(
+        "topic"
     )
 
     # ==================================================
@@ -366,8 +389,17 @@ def home(request):
 
     if scope == "my":
 
-        # Show only the current user's tasks.
-        todos = Todo.objects.filter(
+        # --------------------------------------------------
+        # MY TASKS
+        # --------------------------------------------------
+        #
+        # Show only tasks created by the current user.
+        #
+        # This includes both:
+        # - personal tasks created by the user
+        # - public tasks created by the user
+
+        todos = todos.filter(
             user=request.user
         )
 
@@ -375,15 +407,20 @@ def home(request):
 
     else:
 
+        # --------------------------------------------------
+        # DASHBOARD
+        # --------------------------------------------------
+        #
         # Show:
-        # - all public tasks
-        # - current user's personal tasks
-        todos = (
-            Todo.objects.filter(
+        # - every public task
+        # - personal tasks belonging to the user
+
+        todos = todos.filter(
+            Q(
                 category="public"
             )
             |
-            Todo.objects.filter(
+            Q(
                 category="personal",
                 user=request.user
             )
@@ -392,10 +429,12 @@ def home(request):
         my_tasks = False
 
     # ==================================================
-    # TASK STATUS FILTER
+    # STATUS / IMPORTANCE FILTER
     # ==================================================
 
     if filter_type == "active":
+
+        # Show only incomplete tasks.
 
         todos = todos.filter(
             completed=False
@@ -403,9 +442,69 @@ def home(request):
 
     elif filter_type == "completed":
 
+        # Show only completed tasks.
+
         todos = todos.filter(
             completed=True
         )
+
+    elif filter_type == "important":
+
+        # Show only important tasks.
+
+        todos = todos.filter(
+            important=True
+        )
+
+    # ==================================================
+    # TOPIC FILTER
+    # ==================================================
+
+    selected_topic = None
+
+    if topic_id:
+
+        try:
+
+            selected_topic = Topic.objects.get(
+                id=topic_id,
+                is_active=True
+            )
+
+            # --------------------------------------------------
+            # CHECK TOPIC ACCESS
+            # --------------------------------------------------
+
+            if selected_topic.is_public:
+
+                # Public topics can be used by everyone.
+
+                todos = todos.filter(
+                    topic=selected_topic
+                )
+
+            elif selected_topic.user == request.user:
+
+                # Personal topics can only be used
+                # by their owner.
+
+                todos = todos.filter(
+                    topic=selected_topic
+                )
+
+            else:
+
+                # Invalid personal topic.
+
+                selected_topic = None
+
+        except (
+            Topic.DoesNotExist,
+            ValueError,
+            TypeError,
+        ):
+
+            selected_topic = None
 
     # ==================================================
     # ORDER TASKS
@@ -419,8 +518,7 @@ def home(request):
     # STATISTICS
     # ==================================================
 
-    # Calculate statistics BEFORE pagination.
-    # This ensures the numbers represent all matching tasks.
+    # Calculate statistics before pagination.
 
     total_tasks = todos.count()
 
@@ -436,18 +534,15 @@ def home(request):
     # PAGINATION
     # ==================================================
 
-    # Number of tasks displayed on each page.
     paginator = Paginator(
         todos,
         5
     )
 
-    # Get requested page number.
     page_number = request.GET.get(
         "page"
     )
 
-    # Get current page.
     page_obj = paginator.get_page(
         page_number
     )
@@ -456,20 +551,18 @@ def home(request):
     # COMPACT PAGE NUMBERS
     # ==================================================
 
-    # Example:
-    # 1, 2, 3, ..., 9, 10
-
-    raw_page_numbers = paginator.get_elided_page_range(
-        number=page_obj.number,
-        on_each_side=1,
-        on_ends=1
+    raw_page_numbers = (
+        paginator.get_elided_page_range(
+            number=page_obj.number,
+            on_each_side=1,
+            on_ends=1
+        )
     )
 
     page_numbers = []
 
     for page in raw_page_numbers:
 
-        # Django uses this value for the ellipsis.
         if page == paginator.ELLIPSIS:
 
             page_numbers.append({
@@ -487,16 +580,16 @@ def home(request):
             })
 
     # ==================================================
-    # PREPARE DATES FOR CURRENT PAGE
+    # PREPARE JALALI DATES
     # ==================================================
 
-    # Only prepare dates for tasks shown
-    # on the current page.
+    # Only prepare dates for tasks
+    # displayed on the current page.
 
     for todo in page_obj:
 
         # --------------------------------------------------
-        # Creation date
+        # CREATION DATE
         # --------------------------------------------------
 
         todo.created_at_jalali_str = (
@@ -510,7 +603,7 @@ def home(request):
         )
 
         # --------------------------------------------------
-        # Start date
+        # START DATE
         # --------------------------------------------------
 
         if todo.start_date:
@@ -528,7 +621,7 @@ def home(request):
             todo.start_date_jalali_str = None
 
         # --------------------------------------------------
-        # Completion date
+        # COMPLETION DATE
         # --------------------------------------------------
 
         if todo.end_date:
@@ -546,7 +639,7 @@ def home(request):
             todo.end_date_jalali_str = None
 
         # --------------------------------------------------
-        # Deadline
+        # DEADLINE
         # --------------------------------------------------
 
         if todo.deadline:
@@ -567,7 +660,8 @@ def home(request):
     # TOPIC LISTS
     # ==================================================
 
-    # Public topics are created and managed by the admin.
+    # Public topics created by the admin.
+
     public_topics = Topic.objects.filter(
         is_public=True,
         is_active=True
@@ -575,13 +669,22 @@ def home(request):
         "name"
     )
 
-    # Personal topics belong only to the current user.
+    # Personal topics belonging to the current user.
+
     personal_topics = Topic.objects.filter(
         user=request.user,
         is_public=False,
         is_active=True
     ).order_by(
         "name"
+    )
+
+    # Topics available for the Topic filter.
+
+    filter_topics = (
+        list(public_topics)
+        +
+        list(personal_topics)
     )
 
     # ==================================================
@@ -606,13 +709,20 @@ def home(request):
         # Django pagination object.
         "page_obj": page_obj,
 
-        # Compact pagination numbers.
+        # Pagination numbers.
         "page_numbers": page_numbers,
 
-        # Current filters.
+        # Current status / importance filter.
         "filter_type": filter_type,
 
+        # Current scope.
         "my_tasks": my_tasks,
+
+        # Current Topic filter.
+        "selected_topic": selected_topic,
+
+        # Available Topic filters.
+        "filter_topics": filter_topics,
 
         # Statistics.
         "total_tasks": total_tasks,
@@ -621,7 +731,7 @@ def home(request):
 
         "remaining_tasks": remaining_tasks,
 
-        # Topic lists.
+        # Topics for task creation.
         "public_topics": public_topics,
 
         "personal_topics": personal_topics,
