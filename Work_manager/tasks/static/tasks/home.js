@@ -1402,6 +1402,12 @@ async function loadPage(
         );
 
 
+        // Refresh comment counts for the
+        // newly loaded task cards.
+
+        loadAllCommentCounts();
+
+
         // ==================================================
         // PERSIAN DIGITS
         // ==================================================
@@ -1469,10 +1475,8 @@ function bindFilterEvents() {
                         let url;
 
 
-                        // "همه" must remove only
-                        // the status filter.
-                        // Preserve search, topic,
-                        // important and date filters.
+                        // "همه" removes only the
+                        // status filter.
 
                         if (
                             button.dataset.filterAction ===
@@ -1766,18 +1770,8 @@ function bindCalendarInputs() {
 
 
 // ==================================================
-// ACTIVE FILTER CHIPS
+// ACTIVE FILTERS
 // ==================================================
-
-/*
- * These events are handled through document-level
- * delegation below.
- *
- * We intentionally do not attach individual
- * listeners here because .task-filters is replaced
- * by AJAX and duplicate listeners can cause the
- * request to run twice.
- */
 
 function bindActiveFilterEvents() {
     return;
@@ -1829,6 +1823,1010 @@ function bindPaginationEvents() {
         );
 
 }
+
+
+// ==================================================
+// COMMENTS
+// ==================================================
+//
+// Comment functionality uses event delegation because
+// .todo-list is replaced during AJAX filtering,
+// searching, and pagination.
+//
+// GET:
+// /todo/<todo_id>/comments/
+//
+// POST:
+// /todo/<todo_id>/comments/create/
+//
+
+
+// ==================================================
+// COMMENTS ELEMENTS
+// ==================================================
+
+const commentsModal =
+    document.querySelector(
+        "#comments-modal"
+    );
+
+const commentsModalClose =
+    document.querySelector(
+        "#comments-modal-close"
+    );
+
+const commentsModalOverlay =
+    document.querySelector(
+        "#comments-modal-overlay"
+    );
+
+const commentsModalTitle =
+    document.querySelector(
+        "#comments-modal-title"
+    );
+
+const commentsModalCount =
+    document.querySelector(
+        "#comments-modal-count"
+    );
+
+const commentsError =
+    document.querySelector(
+        "#comments-error"
+    );
+
+const commentsList =
+    document.querySelector(
+        "#comments-list"
+    );
+
+const commentForm =
+    document.querySelector(
+        "#comment-form"
+    );
+
+const commentText =
+    document.querySelector(
+        "#comment-text"
+    );
+
+
+// ==================================================
+// CURRENT COMMENT TASK
+// ==================================================
+
+let currentCommentTodoId = null;
+
+
+// ==================================================
+// UPDATE COMMENT MODAL COUNT
+// ==================================================
+
+function updateCommentsModalCount(
+    count
+) {
+
+    if (!commentsModalCount) {
+        return;
+    }
+
+
+    commentsModalCount.textContent =
+        `(${toPersianDigits(count)})`;
+
+}
+
+
+// ==================================================
+// UPDATE CARD COMMENT COUNT
+// ==================================================
+
+function updateCommentCount(
+    todoId,
+    count
+) {
+
+    const countElement =
+        document.querySelector(
+            `.comment-count[data-comment-count-for="${todoId}"]`
+        );
+
+
+    if (!countElement) {
+        return;
+    }
+
+
+    countElement.textContent =
+        toPersianDigits(count);
+
+}
+
+
+// ==================================================
+// UPDATE BOTH COMMENT COUNTS
+// ==================================================
+
+function updateAllCommentCounts(
+    todoId,
+    count
+) {
+
+    updateCommentCount(
+        todoId,
+        count
+    );
+
+
+    if (
+        currentCommentTodoId &&
+        String(currentCommentTodoId) ===
+        String(todoId)
+    ) {
+
+        updateCommentsModalCount(
+            count
+        );
+
+    }
+
+}
+
+
+// ==================================================
+// CLOSE COMMENTS MODAL
+// ==================================================
+
+function closeCommentsModal() {
+
+    if (!commentsModal) {
+        return;
+    }
+
+
+    commentsModal.hidden = true;
+
+
+    currentCommentTodoId = null;
+
+
+    if (commentsError) {
+
+        commentsError.hidden = true;
+
+        commentsError.textContent = "";
+
+    }
+
+
+    if (commentsList) {
+
+        commentsList.innerHTML = `
+            <div class="comments-empty">
+                هنوز کامنتی ثبت نشده است.
+            </div>
+        `;
+
+    }
+
+
+    if (commentText) {
+
+        commentText.value = "";
+
+    }
+
+
+    updateCommentsModalCount(
+        0
+    );
+
+}
+
+
+// ==================================================
+// OPEN COMMENTS MODAL
+// ==================================================
+
+async function openCommentsModal(
+    todoId,
+    todoTitle = ""
+) {
+
+    if (!commentsModal) {
+        return;
+    }
+
+
+    currentCommentTodoId =
+        String(todoId);
+
+
+    commentsModal.hidden =
+        false;
+
+
+    if (commentsError) {
+
+        commentsError.hidden = true;
+
+        commentsError.textContent = "";
+
+    }
+
+
+    // Set the title immediately.
+    // The actual count is updated after the
+    // server response.
+
+    if (commentsModalTitle) {
+
+        commentsModalTitle.textContent =
+            todoTitle
+                ? `کامنت‌های «${todoTitle}»`
+                : "کامنت‌های این وظیفه";
+
+    }
+
+
+    updateCommentsModalCount(
+        0
+    );
+
+
+    if (commentsList) {
+
+        commentsList.innerHTML = "";
+
+    }
+
+
+    if (commentText) {
+
+        commentText.value = "";
+
+    }
+
+
+    try {
+
+        await loadComments(
+            todoId
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Error loading comments:",
+            error
+        );
+
+
+        if (commentsList) {
+
+            commentsList.innerHTML = "";
+
+        }
+
+
+        if (commentsError) {
+
+            commentsError.textContent =
+                error.message ||
+                "دریافت کامنت‌ها با خطا مواجه شد.";
+
+            commentsError.hidden =
+                false;
+
+        }
+
+    }
+
+
+    if (commentText) {
+
+        commentText.focus();
+
+    }
+
+}
+
+
+// ==================================================
+// LOAD COMMENTS
+// ==================================================
+
+async function loadComments(
+    todoId
+) {
+
+    const response =
+        await fetch(
+            `/todo/${todoId}/comments/`,
+            {
+                method: "GET",
+
+                headers: {
+                    "X-Requested-With":
+                        "XMLHttpRequest",
+                },
+            }
+        );
+
+
+    const data =
+        await response.json();
+
+
+    if (
+        !response.ok ||
+        !data.success
+    ) {
+
+        throw new Error(
+            data.error ||
+            "خطا در دریافت کامنت‌ها."
+        );
+
+    }
+
+
+    const comments =
+        Array.isArray(
+            data.comments
+        )
+            ? data.comments
+            : [];
+
+
+    const count =
+        typeof data.count === "number"
+            ? data.count
+            : comments.length;
+
+
+    // Make sure the response still belongs
+    // to the currently opened task.
+
+    if (
+        currentCommentTodoId ===
+        String(todoId)
+    ) {
+
+        renderComments(
+            comments
+        );
+
+        updateCommentsModalCount(
+            count
+        );
+
+    }
+
+
+    // Always update the card count.
+
+    updateCommentCount(
+        todoId,
+        count
+    );
+
+
+    return data;
+
+}
+
+
+// ==================================================
+// RENDER COMMENTS
+// ==================================================
+
+function renderComments(
+    comments
+) {
+
+    if (!commentsList) {
+        return;
+    }
+
+
+    commentsList.innerHTML = "";
+
+
+    if (!comments.length) {
+
+        const emptyElement =
+            document.createElement(
+                "div"
+            );
+
+
+        emptyElement.className =
+            "comments-empty";
+
+
+        emptyElement.textContent =
+            "هنوز کامنتی ثبت نشده است.";
+
+
+        commentsList.appendChild(
+            emptyElement
+        );
+
+
+        return;
+
+    }
+
+
+    comments.forEach(
+        function (comment) {
+
+            const commentElement =
+                document.createElement(
+                    "div"
+                );
+
+
+            commentElement.className =
+                "comment-item";
+
+
+            const header =
+                document.createElement(
+                    "div"
+                );
+
+
+            header.className =
+                "comment-header";
+
+
+            const username =
+                document.createElement(
+                    "span"
+                );
+
+
+            username.className =
+                "comment-username";
+
+
+            username.textContent =
+                comment.username ||
+                "کاربر";
+
+
+            const date =
+                document.createElement(
+                    "span"
+                );
+
+
+            date.className =
+                "comment-date";
+
+
+            date.textContent =
+                toPersianDigits(
+                    comment.created_at || ""
+                );
+
+
+            header.appendChild(
+                username
+            );
+
+
+            header.appendChild(
+                date
+            );
+
+
+            const text =
+                document.createElement(
+                    "div"
+                );
+
+
+            text.className =
+                "comment-text";
+
+
+            // Use textContent so comment text
+            // cannot inject HTML or JavaScript.
+
+            text.textContent =
+                comment.text || "";
+
+
+            commentElement.appendChild(
+                header
+            );
+
+
+            commentElement.appendChild(
+                text
+            );
+
+
+            if (
+                comment.updated_at &&
+                comment.updated_at !==
+                comment.created_at
+            ) {
+
+                const edited =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                edited.className =
+                    "comment-edited";
+
+
+                edited.textContent =
+                    "ویرایش‌شده: " +
+                    toPersianDigits(
+                        comment.updated_at
+                    );
+
+
+                commentElement.appendChild(
+                    edited
+                );
+
+            }
+
+
+            commentsList.appendChild(
+                commentElement
+            );
+
+        }
+    );
+
+}
+
+
+// ==================================================
+// CREATE COMMENT
+// ==================================================
+
+async function createComment() {
+
+    if (
+        !currentCommentTodoId ||
+        !commentText
+    ) {
+
+        return;
+
+    }
+
+
+    const text =
+        commentText.value.trim();
+
+
+    if (!text) {
+
+        commentText.focus();
+
+        return;
+
+    }
+
+
+    if (text.length > 5000) {
+
+        if (commentsError) {
+
+            commentsError.textContent =
+                "کامنت نمی‌تواند بیشتر از ۵۰۰۰ کاراکتر باشد.";
+
+            commentsError.hidden =
+                false;
+
+        }
+
+        return;
+
+    }
+
+
+    const submitButton =
+        commentForm
+            ? commentForm.querySelector(
+                ".comment-submit-button"
+            )
+            : null;
+
+
+    if (submitButton) {
+
+        submitButton.disabled =
+            true;
+
+        submitButton.textContent =
+            "در حال ارسال...";
+
+    }
+
+
+    if (commentsError) {
+
+        commentsError.hidden =
+            true;
+
+        commentsError.textContent =
+            "";
+
+    }
+
+
+    try {
+
+        const todoId =
+            currentCommentTodoId;
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "text",
+            text
+        );
+
+
+        const response =
+            await fetch(
+                `/todo/${todoId}/comments/create/`,
+                {
+                    method: "POST",
+
+                    body: formData,
+
+                    headers: {
+                        "X-CSRFToken":
+                            getCSRFToken(),
+
+                        "X-Requested-With":
+                            "XMLHttpRequest",
+                    },
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !data.success
+        ) {
+
+            throw new Error(
+                data.error ||
+                "خطا در ایجاد کامنت."
+            );
+
+        }
+
+
+        if (commentText) {
+
+            commentText.value = "";
+
+        }
+
+
+        // Use the returned count immediately.
+
+        const count =
+            typeof data.count === "number"
+                ? data.count
+                : null;
+
+
+        if (count !== null) {
+
+            updateAllCommentCounts(
+                todoId,
+                count
+            );
+
+        }
+
+
+        // Refresh the complete list so that
+        // ordering and timestamps remain authoritative.
+
+        await loadComments(
+            todoId
+        );
+
+
+        if (commentText) {
+
+            commentText.focus();
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Error creating comment:",
+            error
+        );
+
+
+        if (commentsError) {
+
+            commentsError.textContent =
+                error.message ||
+                "خطا در ارسال کامنت.";
+
+            commentsError.hidden =
+                false;
+
+        }
+
+    }
+
+    finally {
+
+        if (submitButton) {
+
+            submitButton.disabled =
+                false;
+
+            submitButton.textContent =
+                "ارسال کامنت";
+
+        }
+
+    }
+
+}
+
+
+// ==================================================
+// LOAD ONE COMMENT COUNT
+// ==================================================
+
+async function loadCommentCount(
+    todoId
+) {
+
+    try {
+
+        const response =
+            await fetch(
+                `/todo/${todoId}/comments/`,
+                {
+                    method: "GET",
+
+                    headers: {
+                        "X-Requested-With":
+                            "XMLHttpRequest",
+                    },
+                }
+            );
+
+
+        if (!response.ok) {
+            return;
+        }
+
+
+        const data =
+            await response.json();
+
+
+        if (!data.success) {
+            return;
+        }
+
+
+        const count =
+            typeof data.count === "number"
+                ? data.count
+                : (
+                    Array.isArray(
+                        data.comments
+                    )
+                        ? data.comments.length
+                        : 0
+                );
+
+
+        updateCommentCount(
+            todoId,
+            count
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Error loading comment count:",
+            error
+        );
+
+    }
+
+}
+
+
+// ==================================================
+// LOAD ALL COMMENT COUNTS
+// ==================================================
+
+function loadAllCommentCounts() {
+
+    const commentButtons =
+        document.querySelectorAll(
+            ".comment-button[data-todo-id]"
+        );
+
+
+    commentButtons.forEach(
+        function (button) {
+
+            const todoId =
+                button.dataset.todoId;
+
+
+            if (!todoId) {
+                return;
+            }
+
+
+            loadCommentCount(
+                todoId
+            );
+
+        }
+    );
+
+}
+
+
+// ==================================================
+// COMMENTS MODAL CLOSE EVENTS
+// ==================================================
+
+if (commentsModalClose) {
+
+    commentsModalClose.addEventListener(
+        "click",
+        closeCommentsModal
+    );
+
+}
+
+
+if (commentsModalOverlay) {
+
+    commentsModalOverlay.addEventListener(
+        "click",
+        closeCommentsModal
+    );
+
+}
+
+
+// ==================================================
+// COMMENT FORM SUBMIT
+// ==================================================
+
+if (commentForm) {
+
+    commentForm.addEventListener(
+        "submit",
+        function (event) {
+
+            event.preventDefault();
+
+            createComment();
+
+        }
+    );
+
+}
+
+
+// ==================================================
+// GLOBAL COMMENT EVENT DELEGATION
+// ==================================================
+
+document.addEventListener(
+    "click",
+    function (event) {
+
+        const commentButton =
+            event.target.closest(
+                ".comment-button"
+            );
+
+
+        if (!commentButton) {
+            return;
+        }
+
+
+        event.preventDefault();
+        event.stopPropagation();
+
+
+        const todoId =
+            commentButton.dataset.todoId;
+
+
+        if (!todoId) {
+            return;
+        }
+
+
+        const todoCard =
+            commentButton.closest(
+                ".todo-card"
+            );
+
+
+        const titleElement =
+            todoCard
+                ? todoCard.querySelector(
+                    ".todo-title"
+                )
+                : null;
+
+
+        const todoTitle =
+            titleElement
+                ? titleElement.textContent.trim()
+                : "";
+
+
+        openCommentsModal(
+            todoId,
+            todoTitle
+        );
+
+    }
+);
+
+
+// ==================================================
+// ESCAPE KEY - CLOSE COMMENTS MODAL
+// ==================================================
+
+document.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (
+            event.key === "Escape" &&
+            commentsModal &&
+            !commentsModal.hidden
+        ) {
+
+            closeCommentsModal();
+
+        }
+
+    }
+);
 
 
 // ==================================================
@@ -2098,6 +3096,13 @@ document.addEventListener(
         // --------------------------------------------------
 
         bindSearchEvents();
+
+
+        // --------------------------------------------------
+        // Comment counts
+        // --------------------------------------------------
+
+        loadAllCommentCounts();
 
     }
 );

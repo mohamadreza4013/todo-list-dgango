@@ -1,4 +1,5 @@
 @charset "UTF-8";
+
 @font-face {
     font-family: "Vazirmatn";
     src: url("fonts/Vazirmatn-Regular.woff2") format("woff2");
@@ -22,6 +23,8 @@
     font-style: normal;
     font-display: swap;
 }
+
+
 /* =========================================================
    01. RESET & GLOBAL
 ========================================================= */
@@ -46,17 +49,18 @@ body {
 
     direction: rtl;
 }
+
 button,
 input,
 textarea,
 select {
     font-family: inherit;
 }
+
 .app {
     display: flex;
     width: 100%;
     min-height: 100vh;
-
     direction: rtl;
 }
 
@@ -124,9 +128,6 @@ select {
     direction: rtl;
 }
 
-
-/* ---------- Logo ---------- */
-
 .logo {
     display: flex;
     align-items: center;
@@ -166,9 +167,6 @@ select {
 
     letter-spacing: -0.5px;
 }
-
-
-/* ---------- Navigation ---------- */
 
 .nav {
     display: flex;
@@ -225,9 +223,6 @@ select {
 .sidebar .nav-item span {
     margin-left: 10px;
 }
-
-
-/* ---------- Sidebar Bottom ---------- */
 
 .sidebar-bottom {
     width: 100%;
@@ -573,9 +568,6 @@ select {
     color: #ffffff;
 }
 
-
-/* ---------- Important Filter ---------- */
-
 .filter-button.important-filter {
     display: inline-flex;
     align-items: center;
@@ -683,13 +675,21 @@ select {
 
 .date-filters {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
+    flex-direction: column;
 
-    gap: 8px;
+    gap: 16px;
 
     width: 100%;
     margin-top: 10px;
+}
+
+.date-filter-row {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 16px;
 }
 
 .date-filter-group {
@@ -697,6 +697,8 @@ select {
     align-items: center;
 
     gap: 6px;
+
+    min-width: 0;
 }
 
 .date-filter-label {
@@ -708,7 +710,21 @@ select {
     white-space: nowrap;
 }
 
+.date-filter-inputs {
+    display: flex;
+
+    gap: 8px;
+
+    min-width: 0;
+
+    flex: 1;
+}
+
 .date-filter-input {
+    flex: 1;
+
+    min-width: 0;
+
     width: 125px;
     min-height: 38px;
 
@@ -833,9 +849,6 @@ select {
     color: #4338ca;
 }
 
-
-/* ---------- Clear All ---------- */
-
 .clear-all-filters {
     display: inline-flex;
     align-items: center;
@@ -909,9 +922,6 @@ select {
     transform: translateY(-1px);
 }
 
-
-/* ---------- Content ---------- */
-
 .todo-content {
     flex: 1;
     min-width: 0;
@@ -931,9 +941,6 @@ select {
 
     font-size: 12px;
 }
-
-
-/* ---------- Meta ---------- */
 
 .todo-meta {
     display: flex;
@@ -1067,9 +1074,6 @@ select {
     flex-shrink: 0;
 }
 
-
-/* ---------- Complete ---------- */
-
 .complete-button {
     display: flex;
     align-items: center;
@@ -1108,9 +1112,6 @@ select {
     border-color: #4f46e5;
     background: #4f46e5;
 }
-
-
-/* ---------- Important ---------- */
 
 .important-button {
     display: inline-flex;
@@ -1573,9 +1574,6 @@ select {
         0 0 0 4px rgba(99, 102, 241, 0.1);
 }
 
-
-/* ---------- Topic Modal Actions ---------- */
-
 .create-topic-actions {
     display: flex;
     justify-content: flex-start;
@@ -1751,9 +1749,6 @@ select {
     color: #334155;
 }
 
-
-/* ---------- Create Task Form ---------- */
-
 .create-task-form {
     display: flex;
     flex-direction: column;
@@ -1774,9 +1769,6 @@ select {
     font-size: 13px;
     font-weight: 700;
 }
-
-
-/* ---------- Create Task Inputs ---------- */
 
 .create-task-field input,
 .create-task-field textarea,
@@ -1823,9 +1815,6 @@ select {
     box-shadow:
         0 0 0 4px rgba(99, 102, 241, 0.1);
 }
-
-
-/* ---------- Topic Row ---------- */
 
 .topic-input-row {
     display: grid;
@@ -1877,9 +1866,6 @@ select {
     cursor: not-allowed;
 }
 
-
-/* ---------- Task Error ---------- */
-
 .create-task-error {
     padding: 10px 12px;
 
@@ -1894,9 +1880,6 @@ select {
 .create-task-error[hidden] {
     display: none;
 }
-
-
-/* ---------- Task Actions ---------- */
 
 .create-task-actions {
     display: flex;
@@ -2102,7 +2085,553 @@ select {
 
 
 /* =========================================================
-   26. RESPONSIVE — TABLET
+   26. COMMENTS MODAL
+========================================================= */
+
+.comments-modal {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 12000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    direction: rtl;
+}
+
+.comments-modal[hidden] {
+    display: none;
+}
+
+
+/* ---------- Overlay ---------- */
+
+.comments-modal-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    background: rgba(15, 23, 42, 0.45);
+}
+
+
+/* ---------- Container ---------- */
+
+.comments-modal-container {
+    position: relative;
+
+    z-index: 1;
+
+    width: min(600px, calc(100% - 20px));
+
+    /*
+       The modal can grow naturally,
+       but it can never become taller than the viewport.
+    */
+    height: auto;
+    max-height: calc(100vh - 60px);
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 15px 40px rgba(15, 23, 42, 0.16);
+}
+
+
+/* ---------- Header ---------- */
+
+.comments-modal-header {
+    display: flex;
+    align-items: center;
+
+    min-height: 58px;
+
+    padding: 14px 20px;
+
+    border-bottom: 1px solid #f0f1f3;
+
+    background: #ffffff;
+
+    flex-shrink: 0;
+}
+
+.comments-modal-header h2 {
+    margin: 0;
+
+    color: #1f2937;
+
+    font-size: 16px;
+    font-weight: 700;
+}
+
+
+/* ---------- Close ---------- */
+
+.comments-modal-close {
+    position: absolute;
+
+    top: 11px;
+    left: 12px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+
+    padding: 0;
+
+    border: 1px solid transparent;
+    border-radius: 8px;
+
+    background: #f9fafb;
+    color: #6b7280;
+
+    font-family: Arial, sans-serif;
+    font-size: 21px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.comments-modal-close:hover {
+    border-color: #e5e7eb;
+
+    background: #f3f4f6;
+    color: #374151;
+}
+
+
+/* =========================================================
+   COMMENTS SCROLL AREA
+========================================================= */
+
+/*
+   The comments list is the only scrollable part of the modal.
+
+   This means:
+   - One very long comment will be contained here.
+   - Many comments will be contained here.
+   - The modal header remains fixed.
+   - The comment form remains fixed.
+   - The whole page will not become unnecessarily tall.
+*/
+
+.comments-list {
+    flex: 0 1 auto;
+
+    width: 100%;
+
+    /*
+       The list can grow naturally when there are only
+       a few comments, but it cannot become taller than this.
+    */
+    max-height: 360px;
+
+    /*
+       IMPORTANT:
+       This creates the vertical scrollbar when the
+       content becomes taller than max-height.
+    */
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    min-height: 0;
+
+    padding: 8px 10px;
+
+    background: #f8fafc;
+
+    /*
+       Firefox scrollbar.
+    */
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+
+/*
+   Chromium / Edge / Chrome scrollbar.
+*/
+
+.comments-list::-webkit-scrollbar {
+    width: 7px;
+}
+
+.comments-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.comments-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+
+    border-radius: 10px;
+}
+
+.comments-list::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+
+/* ---------- Comment Item ---------- */
+
+.comment-item {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+
+    margin-bottom: 6px;
+    padding: 8px 10px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 1px 3px rgba(15, 23, 42, 0.03);
+
+    /*
+       Very long text must wrap instead of
+       making the page wider.
+    */
+    min-width: 0;
+    max-width: 100%;
+}
+
+.comment-item:last-child {
+    margin-bottom: 0;
+}
+
+
+/* ---------- Comment Header ---------- */
+
+.comment-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 8px;
+
+    margin-bottom: 3px;
+
+    min-width: 0;
+}
+
+.comment-author {
+    min-width: 0;
+
+    color: #374151;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    overflow-wrap: anywhere;
+}
+
+.comment-date {
+    flex-shrink: 0;
+
+    color: #9ca3af;
+
+    font-size: 9px;
+}
+
+
+/* ---------- Comment Text ---------- */
+
+.comment-item-text {
+    width: 100%;
+
+    margin: 0;
+
+    color: #4b5563;
+
+    font-size: 11px;
+    line-height: 1.6;
+
+    /*
+       Preserve line breaks in the comment.
+    */
+    white-space: pre-wrap;
+
+    /*
+       Very long words, URLs, or strings without spaces
+       will still wrap inside the comment box.
+    */
+    overflow-wrap: anywhere;
+    word-break: break-word;
+
+    /*
+       Prevent the text itself from forcing the
+       comments list wider.
+    */
+    min-width: 0;
+    max-width: 100%;
+}
+
+
+/* ---------- Empty ---------- */
+
+.comments-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+
+    min-height: 0;
+    height: auto;
+
+    padding: 14px 8px;
+
+    color: #9ca3af;
+
+    font-size: 11px;
+
+    text-align: center;
+}
+
+
+/* ---------- Error ---------- */
+
+.comments-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+
+    min-height: 0;
+    height: auto;
+
+    padding: 14px 8px;
+
+    color: #dc2626;
+
+    font-size: 11px;
+
+    text-align: center;
+}
+
+
+/* ---------- Comment Form ---------- */
+
+.comment-form {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+
+    padding: 12px 14px;
+
+    border-top: 1px solid #e5e7eb;
+
+    background: #ffffff;
+
+    flex-shrink: 0;
+}
+
+
+/* ---------- Textarea ---------- */
+
+.comment-textarea {
+    width: 100%;
+
+    min-height: 65px;
+    max-height: 130px;
+
+    padding: 8px 10px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 9px;
+
+    background: #f9fafb;
+    color: #1f2937;
+
+    font-family: inherit;
+    font-size: 11px;
+    line-height: 1.7;
+
+    direction: rtl;
+    text-align: right;
+
+    outline: none;
+
+    resize: vertical;
+
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.comment-textarea:hover {
+    border-color: #d1d5db;
+}
+
+.comment-textarea:focus {
+    border-color: #6366f1;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.comment-textarea::placeholder {
+    color: #9ca3af;
+}
+
+
+/* ---------- Submit ---------- */
+
+.comment-submit-button {
+    align-self: flex-start;
+
+    min-height: 34px;
+
+    padding: 0 13px;
+
+    border: 1px solid #6366f1;
+    border-radius: 8px;
+
+    background: #6366f1;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.comment-submit-button:hover:not(:disabled) {
+    background: #4f46e5;
+    border-color: #4f46e5;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 4px 10px rgba(99, 102, 241, 0.16);
+}
+
+.comment-submit-button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.comment-submit-button:disabled {
+    background: #a5b4fc;
+    border-color: #a5b4fc;
+
+    cursor: not-allowed;
+
+    opacity: 0.75;
+}
+
+
+/* =========================================================
+   27. COMMENT BUTTON ON TODO CARD
+========================================================= */
+
+.comment-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 3px;
+
+    min-width: 32px;
+    width: 32px;
+    height: 32px;
+
+    padding: 0;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    background: #ffffff;
+    color: #9ca3af;
+
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.comment-button:hover {
+    border-color: #c7d2fe;
+
+    background: #eef2ff;
+    color: #6366f1;
+
+    transform: translateY(-1px);
+}
+
+.comment-button:active {
+    transform: translateY(0);
+}
+
+
+/* ---------- Count ---------- */
+
+.comment-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 14px;
+    height: 14px;
+
+    color: #6b7280;
+
+    font-size: 9px;
+    font-weight: 600;
+
+    line-height: 1;
+}
+
+.comment-button:hover .comment-count {
+    color: #4f46e5;
+}
+
+
+/* =========================================================
+   28. RESPONSIVE — TABLET
 ========================================================= */
 
 @media (max-width: 900px) {
@@ -2133,7 +2662,7 @@ select {
 
 
 /* =========================================================
-   27. RESPONSIVE — 768px
+   29. RESPONSIVE — 768px
 ========================================================= */
 
 @media (max-width: 768px) {
@@ -2156,11 +2685,8 @@ select {
         min-width: 0;
     }
 
-    .date-filters {
-        flex-direction: column;
-        align-items: stretch;
-
-        gap: 10px;
+    .date-filter-row {
+        grid-template-columns: 1fr;
     }
 
     .date-filter-group {
@@ -2207,11 +2733,26 @@ select {
 
         padding: 0 7px;
     }
+
+    .comments-modal {
+        padding: 15px;
+    }
+
+    .comments-modal-container {
+        max-height: calc(100vh - 30px);
+    }
+
+    .comments-list {
+        /*
+           On tablets, keep the list reasonably sized.
+        */
+        max-height: 40vh;
+    }
 }
 
 
 /* =========================================================
-   28. RESPONSIVE — MOBILE
+   30. RESPONSIVE — MOBILE
 ========================================================= */
 
 @media (max-width: 650px) {
@@ -2345,14 +2886,107 @@ select {
         gap: 5px;
     }
 
+    .date-filter-inputs {
+        width: 100%;
+    }
+
     .date-filter-input {
         width: 100%;
+    }
+
+    .comments-modal {
+        padding: 10px;
+    }
+
+    .comments-modal-container {
+        width: 100%;
+
+        border-radius: 12px;
+
+        max-height: calc(100vh - 20px);
+    }
+
+    .comments-modal-header {
+        min-height: 52px;
+
+        padding: 12px 16px;
+    }
+
+    .comments-modal-header h2 {
+        font-size: 15px;
+    }
+
+    .comments-modal-close {
+        top: 9px;
+        left: 9px;
+
+        width: 30px;
+        height: 30px;
+
+        font-size: 19px;
+    }
+
+    .comments-list {
+        /*
+           Mobile:
+           comments use up to 42% of the viewport height.
+           After that, the list itself scrolls.
+        */
+        max-height: 42vh;
+
+        padding: 8px;
+    }
+
+    .comment-item {
+        padding: 8px 10px;
+
+        border-radius: 8px;
+    }
+
+    .comment-author {
+        font-size: 10px;
+    }
+
+    .comment-date {
+        font-size: 8px;
+    }
+
+    .comment-item-text {
+        font-size: 11px;
+
+        /*
+           Keep long messages inside the modal.
+        */
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    .comment-form {
+        gap: 7px;
+
+        padding: 10px;
+    }
+
+    .comment-textarea {
+        min-height: 62px;
+
+        font-size: 11px;
+    }
+
+    .comment-submit-button {
+        align-self: stretch;
+
+        width: 100%;
+
+        min-height: 35px;
+
+        font-size: 10px;
     }
 }
 
 
 /* =========================================================
-   29. RESPONSIVE — SMALL MOBILE
+   31. RESPONSIVE — SMALL MOBILE
 ========================================================= */
 
 @media (max-width: 480px) {
@@ -2377,40 +3011,11 @@ select {
         padding: 0 6px;
     }
 }
-.date-filters {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
 
-.date-filter-row {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
-}
 
-.date-filter-group {
-    min-width: 0;
-}
-
-.date-filter-inputs {
-    display: flex;
-    gap: 8px;
-}
-
-.date-filter-input {
-    flex: 1;
-    min-width: 0;
-}
-
-@media (max-width: 768px) {
-    .date-filter-row {
-        grid-template-columns: 1fr;
-    }
-}
-/* =================================================
-   TASK SEARCH
-   ================================================== */
+/* =========================================================
+   32. TASK SEARCH
+========================================================= */
 
 .task-search {
     width: 100%;
@@ -2419,20 +3024,19 @@ select {
 
 .task-search-wrapper {
     position: relative;
+
     width: 100%;
+
     display: flex;
     align-items: center;
 }
 
-
-/* --------------------------------------------------
-   Search icon
-   -------------------------------------------------- */
-
 .task-search-icon {
     position: absolute;
+
     right: 16px;
     top: 50%;
+
     transform: translateY(-50%);
 
     display: flex;
@@ -2451,11 +3055,6 @@ select {
 
     z-index: 2;
 }
-
-
-/* --------------------------------------------------
-   Search input
-   -------------------------------------------------- */
 
 .task-search-input {
     width: 100%;
@@ -2487,20 +3086,10 @@ select {
         background-color 0.2s ease;
 }
 
-
-/* --------------------------------------------------
-   Placeholder
-   -------------------------------------------------- */
-
 .task-search-input::placeholder {
     color: #9ca3af;
     opacity: 1;
 }
-
-
-/* --------------------------------------------------
-   Focus
-   -------------------------------------------------- */
 
 .task-search-input:focus {
     border-color: #6366f1;
@@ -2510,11 +3099,6 @@ select {
 
     background: #ffffff;
 }
-
-
-/* --------------------------------------------------
-   Clear button
-   -------------------------------------------------- */
 
 .task-search-clear {
     position: absolute;
@@ -2554,30 +3138,23 @@ select {
         background-color 0.15s ease;
 }
 
-
 .task-search-clear:hover {
     color: #4b5563;
     background: #f3f4f6;
 }
 
-
 .task-search-clear:active {
     background: #e5e7eb;
 }
-
-
-/* --------------------------------------------------
-   Search with active value
-   -------------------------------------------------- */
 
 .task-search-input:not(:placeholder-shown) {
     color: #111827;
 }
 
 
-/* ==================================================
-   RESPONSIVE
-   ================================================== */
+/* =========================================================
+   33. SEARCH RESPONSIVE
+========================================================= */
 
 @media (max-width: 768px) {
 
@@ -2598,6 +3175,7 @@ select {
 
     .task-search-icon {
         right: 14px;
+
         font-size: 15px;
     }
 
@@ -2609,5 +3187,4 @@ select {
 
         font-size: 20px;
     }
-
 }

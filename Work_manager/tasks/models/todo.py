@@ -313,3 +313,116 @@ class GoogleAccount(models.Model):
 
     def __str__(self):
         return self.google_email or self.user.username
+# =========================================================
+# TODO COMMENT MODEL
+# =========================================================
+
+# The TodoComment model represents a comment written
+# by a user on a Todo.
+#
+# Each comment contains:
+#
+# - The Todo it belongs to
+# - The user who wrote it
+# - The comment text
+# - Creation date
+# - Last update date
+class TodoComment(models.Model):
+
+
+    # =====================================================
+    # TODO
+    # =====================================================
+
+    # Defines the Todo that this comment belongs to.
+    #
+    # on_delete=models.CASCADE:
+    # If the Todo is deleted, all of its comments
+    # will also be deleted.
+    #
+    # related_name="comments":
+    # Allows us to access comments of a Todo like this:
+    #
+    # todo.comments.all()
+    todo = models.ForeignKey(
+        Todo,
+        on_delete=models.CASCADE,
+        related_name="comments"
+    )
+
+
+    # =====================================================
+    # USER / AUTHOR
+    # =====================================================
+
+    # Defines the user who wrote the comment.
+    #
+    # on_delete=models.CASCADE:
+    # If the user is deleted, their comments
+    # will also be deleted.
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="todo_comments"
+    )
+
+
+    # =====================================================
+    # COMMENT TEXT
+    # =====================================================
+
+    # Stores the actual comment text.
+    #
+    # TextField allows comments to contain
+    # longer text.
+    text = models.TextField()
+
+
+    # =====================================================
+    # CREATED AT
+    # =====================================================
+
+    # Stores when the comment was created.
+    #
+    # auto_now_add=True:
+    # Django automatically sets this value
+    # when the comment is created.
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+
+    # =====================================================
+    # UPDATED AT
+    # =====================================================
+
+    # Stores when the comment was last modified.
+    #
+    # auto_now=True:
+    # Django automatically updates this value
+    # whenever the comment is saved.
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+
+    # =====================================================
+    # META
+    # =====================================================
+
+    class Meta:
+
+        # Show older comments first.
+        ordering = ["created_at"]
+
+
+    # =====================================================
+    # STRING REPRESENTATION
+    # =====================================================
+
+    def __str__(self):
+
+        return (
+            f"{self.user} - "
+            f"{self.todo.title}"
+        )

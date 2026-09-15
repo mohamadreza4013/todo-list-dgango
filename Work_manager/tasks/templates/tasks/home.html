@@ -5,7 +5,7 @@
 <html lang="fa" dir="rtl">
 
 <head>
-    
+
 <meta charset="UTF-8">
 
 <meta
@@ -1316,6 +1316,33 @@
                     </form>
 
 
+                    <!-- COMMENTS -->
+
+                    <button
+                        type="button"
+                        class="comment-button"
+                        data-todo-id="{{ todo.id }}"
+                        title="مشاهده و افزودن کامنت"
+                        aria-label="مشاهده و افزودن کامنت"
+                    >
+
+                        <span
+                            class="comment-button-icon"
+                            aria-hidden="true"
+                        >
+                            💬
+                        </span>
+
+                        <span
+                            class="comment-count"
+                            data-comment-count-for="{{ todo.id }}"
+                        >
+                            {{ todo.comment_count }}
+                        </span>
+
+                    </button>
+
+
                     <!-- EDIT -->
 
                     <a
@@ -1504,7 +1531,7 @@
             {% if page_obj.has_next %}
 
                 <a
-                    href="?{% if my_tasks %}scope=my&{% endif %}{% if search_query %}search={{ search_query|urlencode }}&{% endif %}{% if filter_type %}filter={{ filter_type }}&{% endif %}{% if important_filter %}important=1&{% endif %}{% if selected_topic %}topic={{ selected_topic.id }}&{% endif %}{% if start_date_from_value %}start_date_from={{ start_date_from_value }}&{% endif %}{% if start_date_to_value %}start_date_to={{ start_date_to_value }}&{% endif %}{% if end_date_from_value %}end_date_from={{ end_date_from_value }}&{% endif %}{% if end_date_to_value %}end_date_to={{ end_date_to_value }}&{% endif %}{% if deadline_from_value %}deadline_from={{ deadline_from_value }}&{% endif %}{% if deadline_to_value %}deadline_to={{ deadline_to_value }}&{% endif %}{% if created_at_from_value %}created_at_from={{ created_at_from_value }}&{% endif %}{% if created_at_to_value %}created_at_to={{ created_at_to_value }}&{% endif %}page={{ page_obj.next_page_number }}"
+                    href="?{% if my_tasks %}scope=my&{% endif %}{% if search_query %}search={{ search_query|urlencode }}&{% endif %}{% if filter_type %}filter={{ filter_type }}&{% endif %}{% if important_filter %}important=1&{% endif %}{% if selected_topic %}topic={{ selected_topic.id }}&{% endif %}{% if start_date_from_value %}start_date_from={{ start_date_from_value }}&{% endif %}{% if start_date_to_value %}start_date_to={{ start_date_to_value }}&{% endif %}{% if end_date_from_value %}end_date_from={{ end_date_from_value }}&{% endif %}{% if end_date_to_value %}end_date_to={{ end_date_to_value }}&{% endif %}{% if deadline_from_value %}deadline_from={{ deadline_from_value }}&{% endif %}{% if deadline_to_value %}deadline_to={{ deadline_to_value }}&{% endif %}{% if created_at_from_value %}&created_at_from={{ created_at_from_value }}{% endif %}{% if created_at_to_value %}&created_at_to={{ created_at_to_value }}{% endif %}page={{ page_obj.next_page_number }}"
                     class="pagination-button"
                 >
 
@@ -1522,6 +1549,152 @@
 
 </div>
 
+
+
+<!-- ==================================================
+     COMMENTS MODAL
+================================================== -->
+
+<div
+    id="comments-modal"
+    class="comments-modal"
+    hidden
+>
+
+
+    <!-- ==================================================
+         OVERLAY
+    ================================================== -->
+
+    <div
+        class="comments-modal-overlay"
+        id="comments-modal-overlay"
+    ></div>
+
+
+    <!-- ==================================================
+         CONTAINER
+    ================================================== -->
+
+    <div
+        class="comments-modal-container"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="comments-modal-title"
+    >
+
+
+        <!-- CLOSE -->
+
+        <button
+            type="button"
+            id="comments-modal-close"
+            class="comments-modal-close"
+            aria-label="بستن کامنت‌ها"
+        >
+
+            ×
+
+        </button>
+
+
+        <!-- HEADER -->
+
+        <div class="comments-modal-header">
+
+            <div class="comments-modal-title-wrapper">
+
+                <h2 id="comments-modal-title">
+
+                    کامنت‌های این وظیفه
+
+                    <span
+                        id="comments-modal-count"
+                        class="comments-modal-count"
+                    >
+                        (۰)
+                    </span>
+
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <!-- ERROR -->
+
+        <div
+            id="comments-error"
+            class="comments-error"
+            hidden
+        ></div>
+
+
+        <!-- COMMENTS LIST -->
+
+        <div
+            id="comments-list"
+            class="comments-list"
+        >
+
+            <div class="comments-empty">
+
+                هنوز کامنتی ثبت نشده است.
+
+            </div>
+
+        </div>
+
+
+        <!-- CREATE COMMENT -->
+
+        <form
+            id="comment-form"
+            class="comment-form"
+        >
+
+            {% csrf_token %}
+
+
+            <textarea
+                id="comment-text"
+                name="text"
+                class="comment-textarea"
+                placeholder="کامنت خود را بنویسید..."
+                rows="4"
+                maxlength="5000"
+                autocomplete="off"
+            ></textarea>
+
+
+            <div class="comment-form-footer">
+
+                <span class="comment-character-limit">
+                    حداکثر ۵۰۰۰ کاراکتر
+                </span>
+
+
+                <button
+                    type="submit"
+                    id="comment-submit-button"
+                    class="comment-submit-button"
+                >
+
+                    ارسال کامنت
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
 <!-- ==================================================
      CALENDAR PICKER MODAL
 ================================================== -->
@@ -1531,7 +1704,7 @@
     class="calendar-picker-modal"
     hidden
 >
-    
+
 <div class="calendar-picker-overlay"></div>
 
 
@@ -1625,6 +1798,8 @@
 
 
 </div>
+
+
 
 <!-- ==================================================
      JAVASCRIPT

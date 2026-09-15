@@ -1,4 +1,3 @@
-
 {% load static %}
 
 <!DOCTYPE html>
@@ -86,15 +85,23 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
+
             min-height: 42px;
             padding: 0 18px;
+
             border-radius: 10px;
+
             text-decoration: none;
+
             font-size: 13px;
             font-weight: 600;
+
             transition: 0.2s ease;
+
             border: none;
+
             cursor: pointer;
+
             font-family: inherit;
         }
 
@@ -128,7 +135,10 @@
 
         .landing-grid {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
             gap: 20px;
         }
 
@@ -139,6 +149,7 @@
             background: #fff;
 
             border: 1px solid #eef0f4;
+
             border-radius: 16px;
 
             overflow: hidden;
@@ -166,6 +177,7 @@
 
         .landing-panel-header {
             display: flex;
+
             align-items: center;
             justify-content: space-between;
 
@@ -179,6 +191,7 @@
 
         .landing-panel-title {
             display: flex;
+
             align-items: center;
 
             gap: 9px;
@@ -252,6 +265,7 @@
 
         .landing-task {
             display: flex;
+
             align-items: center;
             justify-content: space-between;
 
@@ -270,6 +284,7 @@
 
         .landing-task-main {
             min-width: 0;
+
             flex: 1;
         }
 
@@ -285,18 +300,21 @@
             font-weight: 600;
 
             text-overflow: ellipsis;
+
             white-space: nowrap;
         }
 
 
         .landing-task-title.completed {
             color: #9ca3af;
+
             text-decoration: line-through;
         }
 
 
         .landing-task-meta {
             display: flex;
+
             align-items: center;
 
             flex-wrap: wrap;
@@ -324,18 +342,21 @@
 
         .landing-task-category.public {
             background: #eef2ff;
+
             color: #4f46e5;
         }
 
 
         .landing-task-category.personal {
             background: #f3f4f6;
+
             color: #4b5563;
         }
 
 
         .landing-task-topic {
             background: #f0fdf4;
+
             color: #15803d;
         }
 
@@ -345,6 +366,14 @@
         ================================================== */
 
         .landing-task-side {
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: flex-start;
+
+            justify-content: center;
+
             flex-shrink: 0;
 
             min-width: 90px;
@@ -372,6 +401,75 @@
             font-size: 15px;
 
             margin-left: 4px;
+        }
+
+
+        /* ==================================================
+           TASK COMMENTS
+        ================================================== */
+
+        .landing-task-comments {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: flex-start;
+
+            gap: 4px;
+
+            margin-top: 4px;
+
+            direction: rtl;
+
+            max-width: 100%;
+
+            line-height: 1.4;
+
+            white-space: nowrap;
+        }
+
+
+        .landing-comments-icon {
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+
+            font-size: 12px;
+
+            line-height: 1;
+        }
+
+
+        .landing-comments-count {
+            color: #4f46e5;
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            line-height: 1.4;
+        }
+
+
+        .landing-comments-last-author {
+            display: inline-block;
+
+            max-width: 85px;
+
+            overflow: hidden;
+
+            color: #9ca3af;
+
+            font-size: 9px;
+
+            line-height: 1.4;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
         }
 
 
@@ -414,6 +512,7 @@
 
             .landing-header {
                 align-items: flex-start;
+
                 flex-direction: column;
             }
 
@@ -440,6 +539,11 @@
 
             .landing-task-side {
                 min-width: 75px;
+            }
+
+
+            .landing-comments-last-author {
+                max-width: 65px;
             }
 
         }
@@ -874,6 +978,31 @@
 
                                     </span>
 
+
+                                    {% if todo.comment_count > 0 %}
+
+                                        <div class="landing-task-comments">
+
+                                            <span class="landing-comments-icon">
+                                                💬
+                                            </span>
+
+                                            <span class="landing-comments-count">
+                                                {{ todo.comment_count }}
+                                            </span>
+
+                                            {% if todo.last_comment_author %}
+
+                                                <span class="landing-comments-last-author">
+                                                    · آخرین: {{ todo.last_comment_author }}
+                                                </span>
+
+                                            {% endif %}
+
+                                        </div>
+
+                                    {% endif %}
+
                                 </div>
 
                             </div>
@@ -1001,6 +1130,31 @@
 
                                     {% endif %}
 
+
+                                    {% if todo.comment_count > 0 %}
+
+                                        <div class="landing-task-comments">
+
+                                            <span class="landing-comments-icon">
+                                                💬
+                                            </span>
+
+                                            <span class="landing-comments-count">
+                                                {{ todo.comment_count }}
+                                            </span>
+
+                                            {% if todo.last_comment_author %}
+
+                                                <span class="landing-comments-last-author">
+                                                    · آخرین: {{ todo.last_comment_author }}
+                                                </span>
+
+                                            {% endif %}
+
+                                        </div>
+
+                                    {% endif %}
+
                                 </div>
 
                             </div>
@@ -1120,6 +1274,31 @@
 
                                     </span>
 
+
+                                    {% if todo.comment_count > 0 %}
+
+                                        <div class="landing-task-comments">
+
+                                            <span class="landing-comments-icon">
+                                                💬
+                                            </span>
+
+                                            <span class="landing-comments-count">
+                                                {{ todo.comment_count }}
+                                            </span>
+
+                                            {% if todo.last_comment_author %}
+
+                                                <span class="landing-comments-last-author">
+                                                    · آخرین: {{ todo.last_comment_author }}
+                                                </span>
+
+                                            {% endif %}
+
+                                        </div>
+
+                                    {% endif %}
+
                                 </div>
 
                             </div>
@@ -1238,6 +1417,31 @@
                                         {{ todo.deadline_jalali_str }}
 
                                     </span>
+
+
+                                    {% if todo.comment_count > 0 %}
+
+                                        <div class="landing-task-comments">
+
+                                            <span class="landing-comments-icon">
+                                                💬
+                                            </span>
+
+                                            <span class="landing-comments-count">
+                                                {{ todo.comment_count }}
+                                            </span>
+
+                                            {% if todo.last_comment_author %}
+
+                                                <span class="landing-comments-last-author">
+                                                    · آخرین: {{ todo.last_comment_author }}
+                                                </span>
+
+                                            {% endif %}
+
+                                        </div>
+
+                                    {% endif %}
 
                                 </div>
 

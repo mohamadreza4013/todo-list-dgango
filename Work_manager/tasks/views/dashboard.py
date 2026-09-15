@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.utils import timezone
 
 import jdatetime
@@ -388,6 +388,10 @@ def home(request):
 
             "created_at": created_at_jalali,
 
+            # New tasks have no comments yet.
+
+            "comment_count": 0,
+
             "google_calendar_synced": (
                 google_calendar_synced
             ),
@@ -407,20 +411,10 @@ def home(request):
         ""
     ).strip()
 
-    # Status filter:
-    # active / completed
-
     filter_type = request.GET.get(
         "filter",
         ""
     ).strip()
-
-    # Independent important filter.
-    #
-    # This allows combinations such as:
-    # active + important
-    # completed + important
-    # topic + important
 
     important_filter = (
         request.GET.get(
@@ -429,8 +423,6 @@ def home(request):
         ).strip()
         == "1"
     )
-
-    # Topic filter.
 
     topic_id = request.GET.get(
         "topic",
@@ -441,8 +433,6 @@ def home(request):
     # SEARCH
     # ==================================================
 
-    # Search in task title and description.
-
     search_query = request.GET.get(
         "search",
         ""
@@ -451,8 +441,6 @@ def home(request):
     # ==================================================
     # GET DATE FILTER PARAMETERS
     # ==================================================
-
-    # Start date.
 
     start_date_from_str = request.GET.get(
         "start_date_from",
@@ -464,8 +452,6 @@ def home(request):
         ""
     ).strip()
 
-    # Deadline.
-
     deadline_from_str = request.GET.get(
         "deadline_from",
         ""
@@ -476,8 +462,6 @@ def home(request):
         ""
     ).strip()
 
-    # Creation date.
-
     created_at_from_str = request.GET.get(
         "created_at_from",
         ""
@@ -487,8 +471,6 @@ def home(request):
         "created_at_to",
         ""
     ).strip()
-
-    # Completion / end date.
 
     end_date_from_str = request.GET.get(
         "end_date_from",
@@ -504,8 +486,6 @@ def home(request):
     # PARSE DATE FILTERS
     # ==================================================
 
-    # Start date.
-
     start_date_from = parse_jalali_date(
         start_date_from_str
     )
@@ -513,8 +493,6 @@ def home(request):
     start_date_to = parse_jalali_date(
         start_date_to_str
     )
-
-    # Deadline.
 
     deadline_from = parse_jalali_date(
         deadline_from_str
@@ -524,8 +502,6 @@ def home(request):
         deadline_to_str
     )
 
-    # Creation date.
-
     created_at_from = parse_jalali_date(
         created_at_from_str
     )
@@ -533,8 +509,6 @@ def home(request):
     created_at_to = parse_jalali_date(
         created_at_to_str
     )
-
-    # Completion / end date.
 
     end_date_from = parse_jalali_date(
         end_date_from_str
@@ -548,11 +522,17 @@ def home(request):
     # BASE TASK QUERY
     # ==================================================
 
-    # Start with all Todo objects and load Topic
-    # together with each task.
+    # Load topics together with tasks.
+    #
+    # Count comments in the same query so that
+    # {{ todo.comment_count }} is available in the template.
 
-    todos = Todo.objects.select_related(
-        "topic"
+    todos = (
+        Todo.objects
+        .select_related("topic")
+        .annotate(
+            comment_count=Count("comments")
+        )
     )
 
     # ==================================================
@@ -561,16 +541,6 @@ def home(request):
 
     if scope == "my":
 
-        # --------------------------------------------------
-        # MY TASKS
-        # --------------------------------------------------
-        #
-        # Show only tasks created by the current user.
-        #
-        # This includes:
-        # - personal tasks created by the user
-        # - public tasks created by the user
-
         todos = todos.filter(
             user=request.user
         )
@@ -578,14 +548,6 @@ def home(request):
         my_tasks = True
 
     else:
-
-        # --------------------------------------------------
-        # DASHBOARD
-        # --------------------------------------------------
-        #
-        # Show:
-        # - every public task
-        # - personal tasks belonging to the user
 
         todos = todos.filter(
             Q(
@@ -606,8 +568,6 @@ def home(request):
 
     if search_query:
 
-        # Search both title and description.
-
         todos = todos.filter(
             Q(
                 title__icontains=search_query
@@ -624,15 +584,11 @@ def home(request):
 
     if filter_type == "active":
 
-        # Show only incomplete tasks.
-
         todos = todos.filter(
             completed=False
         )
 
     elif filter_type == "completed":
-
-        # Show only completed tasks.
 
         todos = todos.filter(
             completed=True
@@ -643,8 +599,6 @@ def home(request):
     # ==================================================
 
     if important_filter:
-
-        # Show only important tasks.
 
         todos = todos.filter(
             important=True
@@ -665,13 +619,7 @@ def home(request):
                 is_active=True
             )
 
-            # --------------------------------------------------
-            # CHECK TOPIC ACCESS
-            # --------------------------------------------------
-
             if selected_topic.is_public:
-
-                # Public topics can be used by everyone.
 
                 todos = todos.filter(
                     topic=selected_topic
@@ -679,16 +627,11 @@ def home(request):
 
             elif selected_topic.user == request.user:
 
-                # Personal topics can only be used
-                # by their owner.
-
                 todos = todos.filter(
                     topic=selected_topic
                 )
 
             else:
-
-                # Invalid personal topic.
 
                 selected_topic = None
 
@@ -735,12 +678,6 @@ def home(request):
     # ==================================================
     # CREATION DATE FILTER
     # ==================================================
-
-    # created_at is a Gregorian DateTimeField.
-    #
-    # The user enters a Jalali date.
-    # Convert the Jalali boundary to the corresponding
-    # Gregorian datetime boundary.
 
     if created_at_from:
 
@@ -793,9 +730,6 @@ def home(request):
     # ==================================================
     # STATISTICS
     # ==================================================
-
-    # Calculate statistics after all filters
-    # and before pagination.
 
     total_tasks = todos.count()
 
@@ -859,9 +793,6 @@ def home(request):
     # ==================================================
     # PREPARE JALALI DATES
     # ==================================================
-
-    # Only prepare dates for tasks
-    # displayed on the current page.
 
     for todo in page_obj:
 
@@ -937,8 +868,6 @@ def home(request):
     # FORMAT CURRENT FILTER VALUES
     # ==================================================
 
-    # Start date.
-
     start_date_from_value = (
         format_jalali_date(
             start_date_from
@@ -954,8 +883,6 @@ def home(request):
         if start_date_to
         else ""
     )
-
-    # Deadline.
 
     deadline_from_value = (
         format_jalali_date(
@@ -973,8 +900,6 @@ def home(request):
         else ""
     )
 
-    # Creation date.
-
     created_at_from_value = (
         format_jalali_date(
             created_at_from
@@ -990,8 +915,6 @@ def home(request):
         if created_at_to
         else ""
     )
-
-    # Completion / end date.
 
     end_date_from_value = (
         format_jalali_date(
@@ -1013,16 +936,12 @@ def home(request):
     # TOPIC LISTS
     # ==================================================
 
-    # Public topics created by the admin.
-
     public_topics = Topic.objects.filter(
         is_public=True,
         is_active=True
     ).order_by(
         "name"
     )
-
-    # Personal topics belonging to the current user.
 
     personal_topics = Topic.objects.filter(
         user=request.user,
@@ -1031,8 +950,6 @@ def home(request):
     ).order_by(
         "name"
     )
-
-    # Topics available for the Topic filter.
 
     filter_topics = (
         list(public_topics)
@@ -1053,11 +970,6 @@ def home(request):
     # ==================================================
     # ACTIVE FILTER QUERY
     # ==================================================
-
-    # Build a query string without the page parameter.
-    #
-    # This is useful for pagination and for preserving
-    # all active filters while moving between pages.
 
     filter_query_parts = []
 
@@ -1265,8 +1177,6 @@ def home(request):
         # DATE FILTERS
         # --------------------------------------------------
 
-        # Start date.
-
         "start_date_from_value": (
             start_date_from_value
         ),
@@ -1274,8 +1184,6 @@ def home(request):
         "start_date_to_value": (
             start_date_to_value
         ),
-
-        # Deadline.
 
         "deadline_from_value": (
             deadline_from_value
@@ -1285,8 +1193,6 @@ def home(request):
             deadline_to_value
         ),
 
-        # Creation date.
-
         "created_at_from_value": (
             created_at_from_value
         ),
@@ -1294,8 +1200,6 @@ def home(request):
         "created_at_to_value": (
             created_at_to_value
         ),
-
-        # Completion / end date.
 
         "end_date_from_value": (
             end_date_from_value

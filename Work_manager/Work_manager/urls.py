@@ -10,6 +10,11 @@ from tasks.views.google import (
     google_callback
 )
 
+from tasks.views.comments import (
+    todo_comments,
+    create_todo_comment
+)
+
 from tasks.views import (
     landing,
     home,
@@ -116,6 +121,23 @@ urlpatterns = [
         "todo/<int:todo_id>/delete/",
         delete_todo,
         name="delete_todo"
+    ),
+
+
+    # ==================================================
+    # TODO - COMMENTS
+    # ==================================================
+
+    path(
+        "todo/<int:todo_id>/comments/",
+        todo_comments,
+        name="todo_comments"
+    ),
+
+    path(
+        "todo/<int:todo_id>/comments/create/",
+        create_todo_comment,
+        name="create_todo_comment"
     ),
 
 

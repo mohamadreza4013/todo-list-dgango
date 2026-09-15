@@ -1,10 +1,10 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Q, Count, OuterRef, Subquery
 from django.shortcuts import render
 
 import jdatetime
 
-from ..models import Todo, Topic
+from ..models import Todo, Topic, TodoComment
 
 
 # ==================================================
@@ -51,17 +51,48 @@ def landing(request):
     """
 
     # ==================================================
+    # LATEST COMMENTER
+    # ==================================================
+
+    # Get the username of the most recent commenter
+    # for each task.
+
+    latest_comment_author = Subquery(
+        TodoComment.objects.filter(
+            todo=OuterRef("pk")
+        ).order_by(
+            "-created_at"
+        ).values(
+            "user__username"
+        )[:1]
+    )
+
+    # ==================================================
     # ACCESSIBLE TASKS
     # ==================================================
 
-    accessible_tasks = Todo.objects.select_related(
-        "topic"
-    ).filter(
-        Q(category="public")
-        |
-        Q(
-            category="personal",
-            user=request.user
+    # Annotate every accessible task with:
+    #
+    # 1. comment_count:
+    #    Total number of comments.
+    #
+    # 2. last_comment_author:
+    #    Username of the person who wrote the latest comment.
+
+    accessible_tasks = (
+        Todo.objects
+        .select_related("topic")
+        .annotate(
+            comment_count=Count("comments"),
+            last_comment_author=latest_comment_author,
+        )
+        .filter(
+            Q(category="public")
+            |
+            Q(
+                category="personal",
+                user=request.user
+            )
         )
     )
 
@@ -88,6 +119,7 @@ def landing(request):
     # ==================================================
 
     # Get today's Jalali date.
+
     today = jdatetime.date.today()
 
     # ==================================================

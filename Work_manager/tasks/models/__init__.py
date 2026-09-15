@@ -9,6 +9,6 @@
 
 
 # Import the Todo model
-from .todo import Todo
+from .todo import Todo, TodoComment
 from .todo import GoogleAccount
 from .Topic import Topic

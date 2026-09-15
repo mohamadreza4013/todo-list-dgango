@@ -194,7 +194,7 @@ def edit_todo(request, todo_id):
         and todo.user != request.user
     ):
 
-        return redirect("home")
+        return redirect("dashboard")
 
     # ==================================================
     # POST
@@ -422,7 +422,8 @@ def edit_todo(request, todo_id):
                     error
                 )
 
-        return redirect("home")
+        # Redirect to the dashboard after editing.
+        return redirect("dashboard")
 
     # ==================================================
     # GET
