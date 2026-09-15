@@ -5,30 +5,23 @@
 const createTaskButton =
     document.querySelector("#create-task-button");
 
-
 const createTaskModal =
     document.querySelector("#create-task-modal");
-
 
 const createTaskClose =
     document.querySelector("#create-task-close");
 
-
 const cancelTaskButton =
     document.querySelector("#cancel-task-button");
-
 
 const createTaskForm =
     document.querySelector("#create-task-form");
 
-
 const saveTaskButton =
     document.querySelector("#save-task-button");
 
-
 const createTaskError =
     document.querySelector("#create-task-error");
-
 
 const taskTitleInput =
     document.querySelector("#task-title");
@@ -51,17 +44,12 @@ if (createTaskButton) {
             createTaskModal.hidden = false;
 
             if (createTaskError) {
-
                 createTaskError.hidden = true;
-
                 createTaskError.textContent = "";
-
             }
 
             if (taskTitleInput) {
-
                 taskTitleInput.focus();
-
             }
 
         }
@@ -83,11 +71,8 @@ function closeCreateTaskModal() {
     createTaskModal.hidden = true;
 
     if (createTaskError) {
-
         createTaskError.hidden = true;
-
         createTaskError.textContent = "";
-
     }
 
 }
@@ -148,11 +133,8 @@ if (createTaskForm) {
             event.preventDefault();
 
             if (createTaskError) {
-
                 createTaskError.hidden = true;
-
                 createTaskError.textContent = "";
-
             }
 
             if (saveTaskButton) {
@@ -166,9 +148,11 @@ if (createTaskForm) {
 
             try {
 
+                // Send the task to the dedicated create endpoint.
+
                 const response =
                     await fetch(
-                        window.location.href,
+                        "/todo/create/",
                         {
                             method: "POST",
 
@@ -202,10 +186,8 @@ if (createTaskForm) {
                 }
 
 
-                /*
-                 * New tasks are the newest tasks,
-                 * therefore they belong to page 1.
-                 */
+                // New tasks belong to page 1.
+                // Keep all currently active filters.
 
                 const currentUrl =
                     new URL(
@@ -217,12 +199,6 @@ if (createTaskForm) {
                     "page"
                 );
 
-
-                /*
-                 * Reload the first page so Django
-                 * recalculates the task list,
-                 * statistics and pagination.
-                 */
 
                 window.location.href =
                     currentUrl.toString();
@@ -272,34 +248,26 @@ if (createTaskForm) {
 const categorySelect =
     document.querySelector("#task-category");
 
-
 const topicSelect =
     document.querySelector("#task-topic");
-
 
 const createTopicButton =
     document.querySelector("#create-topic-button");
 
-
 const createTopicModal =
     document.querySelector("#create-topic-modal");
-
 
 const createTopicClose =
     document.querySelector("#create-topic-close");
 
-
 const cancelTopicButton =
     document.querySelector("#cancel-topic-button");
-
 
 const saveTopicButton =
     document.querySelector("#save-topic-button");
 
-
 const newTopicInput =
     document.querySelector("#new-topic-name");
-
 
 const createTopicError =
     document.querySelector("#create-topic-error");
@@ -349,17 +317,8 @@ function updateTopicOptions(
         categorySelect.value;
 
 
-    /*
-     * Remove all current options.
-     */
-
     topicSelect.innerHTML = "";
 
-
-    /*
-     * Get topics that belong to
-     * the selected category.
-     */
 
     const matchingTopics =
         topicOptions.filter(
@@ -373,10 +332,6 @@ function updateTopicOptions(
             }
         );
 
-
-    /*
-     * Add matching topics.
-     */
 
     matchingTopics.forEach(
         function (topic) {
@@ -407,11 +362,6 @@ function updateTopicOptions(
     );
 
 
-    /*
-     * Select the requested topic
-     * when it exists.
-     */
-
     if (selectedTopicId !== null) {
 
         const selectedOption =
@@ -439,11 +389,6 @@ function updateTopicOptions(
     }
 
 
-    /*
-     * Select the first topic when
-     * no topic is currently selected.
-     */
-
     if (
         topicSelect.options.length > 0 &&
         topicSelect.value === ""
@@ -454,19 +399,9 @@ function updateTopicOptions(
     }
 
 
-    /*
-     * Disable the select when
-     * no topics are available.
-     */
-
     topicSelect.disabled =
         matchingTopics.length === 0;
 
-
-    /*
-     * New personal topics can only
-     * be created for personal tasks.
-     */
 
     if (createTopicButton) {
 
@@ -505,11 +440,6 @@ if (createTopicButton) {
     createTopicButton.addEventListener(
         "click",
         function () {
-
-            /*
-             * Only personal topics can be
-             * created by the current user.
-             */
 
             if (
                 categorySelect &&
@@ -633,10 +563,6 @@ if (saveTopicButton) {
                     : "";
 
 
-            // --------------------------------------------------
-            // VALIDATE NAME
-            // --------------------------------------------------
-
             if (!name) {
 
                 if (createTopicError) {
@@ -652,10 +578,6 @@ if (saveTopicButton) {
 
             }
 
-
-            // --------------------------------------------------
-            // DISABLE SAVE BUTTON
-            // --------------------------------------------------
 
             saveTopicButton.disabled = true;
 
@@ -674,10 +596,6 @@ if (saveTopicButton) {
                     name
                 );
 
-
-                // --------------------------------------------------
-                // SEND REQUEST
-                // --------------------------------------------------
 
                 const response =
                     await fetch(
@@ -715,10 +633,6 @@ if (saveTopicButton) {
                 }
 
 
-                // --------------------------------------------------
-                // CREATE NEW TOPIC
-                // --------------------------------------------------
-
                 const newTopic =
                     data.topic;
 
@@ -728,10 +642,6 @@ if (saveTopicButton) {
                         newTopic.id
                     );
 
-
-                // --------------------------------------------------
-                // UPDATE INTERNAL TOPIC LIST
-                // --------------------------------------------------
 
                 topicOptions.push({
 
@@ -747,18 +657,10 @@ if (saveTopicButton) {
                 });
 
 
-                // --------------------------------------------------
-                // UPDATE TOPIC SELECT
-                // --------------------------------------------------
-
                 updateTopicOptions(
                     newTopicValue
                 );
 
-
-                // --------------------------------------------------
-                // CLOSE MODAL
-                // --------------------------------------------------
 
                 closeCreateTopicModal();
 
@@ -801,19 +703,183 @@ if (saveTopicButton) {
 
 
 // ==================================================
-// TOPIC FILTER
+// CSRF TOKEN
 // ==================================================
 
-function applyTopicFilter() {
+function getCSRFToken() {
 
-    const currentTopicFilter =
-        document.querySelector(
-            "#topic-filter"
+    const cookie =
+        document.cookie
+            .split("; ")
+            .find(
+                function (row) {
+                    return row.startsWith(
+                        "csrftoken="
+                    );
+                }
+            );
+
+    return cookie
+        ? decodeURIComponent(
+            cookie.split("=")[1]
+        )
+        : "";
+
+}
+
+
+// ==================================================
+// PERSIAN / ENGLISH DIGITS
+// ==================================================
+
+function toPersianDigits(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return value;
+
+    }
+
+
+    return String(value).replace(
+        /\d/g,
+        function (digit) {
+
+            return "۰۱۲۳۴۵۶۷۸۹"[digit];
+
+        }
+    );
+
+}
+
+
+function toEnglishDigits(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return value;
+
+    }
+
+
+    return String(value).replace(
+        /[۰-۹]/g,
+        function (digit) {
+
+            return String(
+                "۰۱۲۳۴۵۶۷۸۹".indexOf(
+                    digit
+                )
+            );
+
+        }
+    );
+
+}
+
+
+// ==================================================
+// CONVERT TEXT NODES TO PERSIAN DIGITS
+// ==================================================
+
+function convertTextNodesToPersianDigits(
+    element
+) {
+
+    if (!element) {
+        return;
+    }
+
+
+    const walker =
+        document.createTreeWalker(
+            element,
+            NodeFilter.SHOW_TEXT
         );
 
 
-    if (!currentTopicFilter) {
+    const textNodes = [];
+
+
+    while (
+        walker.nextNode()
+    ) {
+
+        textNodes.push(
+            walker.currentNode
+        );
+
+    }
+
+
+    textNodes.forEach(
+        function (node) {
+
+            // Do not modify form controls.
+
+            const parent =
+                node.parentElement;
+
+
+            if (
+                parent &&
+                (
+                    parent.tagName === "INPUT" ||
+                    parent.tagName === "TEXTAREA" ||
+                    parent.tagName === "SELECT"
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            node.nodeValue =
+                toPersianDigits(
+                    node.nodeValue
+                );
+
+        }
+    );
+
+}
+
+
+// ==================================================
+// SEARCH
+// ==================================================
+
+let searchDebounceTimer = null;
+
+
+// ==================================================
+// APPLY SEARCH
+// ==================================================
+
+function applySearch(
+    value = null
+) {
+
+    const searchInput =
+        document.querySelector(
+            "#task-search"
+        );
+
+
+    if (
+        value === null &&
+        !searchInput
+    ) {
+
         return;
+
     }
 
 
@@ -823,29 +889,25 @@ function applyTopicFilter() {
         );
 
 
-    const selectedTopicId =
-        currentTopicFilter.value;
+    const searchValue =
+        value !== null
+            ? value.trim()
+            : searchInput.value.trim();
 
 
-    /*
-     * Every new filter starts
-     * from page 1.
-     */
+    // Always return to page 1
+    // when the search changes.
 
     currentUrl.searchParams.delete(
         "page"
     );
 
 
-    /*
-     * Set or remove the topic parameter.
-     */
-
-    if (selectedTopicId) {
+    if (searchValue) {
 
         currentUrl.searchParams.set(
-            "topic",
-            selectedTopicId
+            "search",
+            searchValue
         );
 
     }
@@ -853,20 +915,11 @@ function applyTopicFilter() {
     else {
 
         currentUrl.searchParams.delete(
-            "topic"
+            "search"
         );
 
     }
 
-
-    /*
-     * Keep the existing:
-     *
-     * - scope
-     * - status filter
-     *
-     * and only change the topic.
-     */
 
     loadPage(
         currentUrl.toString()
@@ -876,44 +929,242 @@ function applyTopicFilter() {
 
 
 // ==================================================
-// BIND TOPIC FILTER
+// CLEAR SEARCH
 // ==================================================
 
-function bindTopicFilterEvents() {
+function clearSearch() {
 
-    const currentTopicFilter =
-        document.querySelector(
-            "#topic-filter"
+    clearTimeout(
+        searchDebounceTimer
+    );
+
+
+    const currentUrl =
+        new URL(
+            window.location.href
         );
 
 
-    if (!currentTopicFilter) {
+    currentUrl.searchParams.delete(
+        "search"
+    );
+
+
+    currentUrl.searchParams.delete(
+        "page"
+    );
+
+
+    loadPage(
+        currentUrl.toString()
+    );
+
+}
+
+
+// ==================================================
+// BIND SEARCH EVENTS
+// ==================================================
+
+function bindSearchEvents(
+    preserveFocus = false,
+    cursorPosition = null
+) {
+
+    const searchInput =
+        document.querySelector(
+            "#task-search"
+        );
+
+
+    if (!searchInput) {
         return;
     }
 
 
-    /*
-     * Prevent duplicate event bindings.
-     */
-
     if (
-        currentTopicFilter.dataset.bound ===
+        searchInput.dataset.bound !==
         "true"
     ) {
 
-        return;
+        searchInput.dataset.bound =
+            "true";
+
+
+        // --------------------------------------------------
+        // Search while typing with debounce.
+        // --------------------------------------------------
+
+        searchInput.addEventListener(
+            "input",
+            function () {
+
+                clearTimeout(
+                    searchDebounceTimer
+                );
+
+
+                const value =
+                    searchInput.value;
+
+
+                searchDebounceTimer =
+                    setTimeout(
+                        function () {
+
+                            const currentSearch =
+                                new URL(
+                                    window.location.href
+                                )
+                                    .searchParams
+                                    .get("search") || "";
+
+
+                            if (
+                                value.trim() ===
+                                currentSearch.trim()
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            applySearch(
+                                value
+                            );
+
+                        },
+                        500
+                    );
+
+            }
+        );
+
+
+        // --------------------------------------------------
+        // Enter performs the search immediately.
+        // --------------------------------------------------
+
+        searchInput.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Enter"
+                ) {
+
+                    event.preventDefault();
+
+
+                    clearTimeout(
+                        searchDebounceTimer
+                    );
+
+
+                    applySearch(
+                        searchInput.value
+                    );
+
+                }
+
+
+                // Escape clears the search.
+
+                if (
+                    event.key === "Escape"
+                ) {
+
+                    event.preventDefault();
+
+
+                    clearSearch();
+
+                }
+
+            }
+        );
 
     }
 
 
-    currentTopicFilter.dataset.bound =
-        "true";
+    // --------------------------------------------------
+    // Clear button
+    // --------------------------------------------------
+
+    const clearButton =
+        document.querySelector(
+            "#clear-task-search"
+        );
 
 
-    currentTopicFilter.addEventListener(
-        "change",
-        applyTopicFilter
-    );
+    if (
+        clearButton &&
+        clearButton.dataset.bound !== "true"
+    ) {
+
+        clearButton.dataset.bound =
+            "true";
+
+
+        clearButton.addEventListener(
+            "click",
+            function (event) {
+
+                event.preventDefault();
+
+                clearSearch();
+
+            }
+        );
+
+    }
+
+
+    // --------------------------------------------------
+    // Restore focus after AJAX replacement.
+    // --------------------------------------------------
+
+    if (preserveFocus) {
+
+        const newInput =
+            document.querySelector(
+                "#task-search"
+            );
+
+
+        if (newInput) {
+
+            newInput.focus();
+
+
+            const position =
+                cursorPosition !== null
+                    ? Math.min(
+                        cursorPosition,
+                        newInput.value.length
+                    )
+                    : newInput.value.length;
+
+
+            try {
+
+                newInput.setSelectionRange(
+                    position,
+                    position
+                );
+
+            }
+
+            catch (error) {
+
+                // Some input types do not support selection.
+
+            }
+
+        }
+
+    }
 
 }
 
@@ -922,9 +1173,31 @@ function bindTopicFilterEvents() {
 // LOAD PAGE CONTENT
 // ==================================================
 
-async function loadPage(url) {
+async function loadPage(
+    url,
+    pushHistory = true
+) {
 
     try {
+
+        // --------------------------------------------------
+        // Remember search focus and cursor position.
+        // --------------------------------------------------
+
+        const activeElement =
+            document.activeElement;
+
+
+        const wasSearchFocused =
+            activeElement &&
+            activeElement.id === "task-search";
+
+
+        const searchCursorPosition =
+            wasSearchFocused
+                ? activeElement.selectionStart
+                : null;
+
 
         const response =
             await fetch(
@@ -1005,10 +1278,6 @@ async function loadPage(url) {
             );
 
 
-        /*
-         * Replace existing pagination.
-         */
-
         if (
             currentPagination &&
             newPagination
@@ -1019,11 +1288,6 @@ async function loadPage(url) {
             );
 
         }
-
-        /*
-         * Add pagination when the
-         * current page previously had none.
-         */
 
         else if (
             !currentPagination &&
@@ -1037,11 +1301,6 @@ async function loadPage(url) {
             );
 
         }
-
-        /*
-         * Remove pagination when
-         * only one page remains.
-         */
 
         else if (
             currentPagination &&
@@ -1112,32 +1371,35 @@ async function loadPage(url) {
         // UPDATE URL
         // ==================================================
 
-        window.history.pushState(
-            {},
-            "",
-            url
-        );
+        if (pushHistory) {
+
+            window.history.pushState(
+                {},
+                "",
+                url
+            );
+
+        }
 
 
         // ==================================================
-        // REBIND PAGINATION
+        // REBIND EVENTS
         // ==================================================
 
         bindPaginationEvents();
 
-
-        // ==================================================
-        // REBIND STATUS FILTERS
-        // ==================================================
-
         bindFilterEvents();
 
-
-        // ==================================================
-        // REBIND TOPIC FILTER
-        // ==================================================
-
         bindTopicFilterEvents();
+
+        bindDateFilterEvents();
+
+        bindCalendarInputs();
+
+        bindSearchEvents(
+            wasSearchFocused,
+            searchCursorPosition
+        );
 
 
         // ==================================================
@@ -1163,6 +1425,14 @@ async function loadPage(url) {
 
 
 // ==================================================
+// EXPOSE LOAD PAGE
+// ==================================================
+
+window.loadPage =
+    loadPage;
+
+
+// ==================================================
 // STATUS FILTERS
 // ==================================================
 
@@ -1174,10 +1444,6 @@ function bindFilterEvents() {
         )
         .forEach(
             function (button) {
-
-                /*
-                 * Prevent multiple event bindings.
-                 */
 
                 if (
                     button.dataset.bound ===
@@ -1199,8 +1465,50 @@ function bindFilterEvents() {
 
                         event.preventDefault();
 
+
+                        let url;
+
+
+                        // "همه" must remove only
+                        // the status filter.
+                        // Preserve search, topic,
+                        // important and date filters.
+
+                        if (
+                            button.dataset.filterAction ===
+                            "clear-status"
+                        ) {
+
+                            url =
+                                new URL(
+                                    window.location.href
+                                );
+
+
+                            url.searchParams.delete(
+                                "filter"
+                            );
+
+                        }
+
+                        else {
+
+                            url =
+                                new URL(
+                                    button.href,
+                                    window.location.origin
+                                );
+
+                        }
+
+
+                        url.searchParams.delete(
+                            "page"
+                        );
+
+
                         loadPage(
-                            button.href
+                            url.toString()
                         );
 
                     }
@@ -1209,6 +1517,270 @@ function bindFilterEvents() {
             }
         );
 
+}
+
+
+// ==================================================
+// TOPIC FILTER
+// ==================================================
+
+function applyTopicFilter() {
+
+    const currentTopicFilter =
+        document.querySelector(
+            "#topic-filter"
+        );
+
+
+    if (!currentTopicFilter) {
+        return;
+    }
+
+
+    const currentUrl =
+        new URL(
+            window.location.href
+        );
+
+
+    const selectedTopicId =
+        currentTopicFilter.value;
+
+
+    currentUrl.searchParams.delete(
+        "page"
+    );
+
+
+    if (selectedTopicId) {
+
+        currentUrl.searchParams.set(
+            "topic",
+            selectedTopicId
+        );
+
+    }
+
+    else {
+
+        currentUrl.searchParams.delete(
+            "topic"
+        );
+
+    }
+
+
+    loadPage(
+        currentUrl.toString()
+    );
+
+}
+
+
+function bindTopicFilterEvents() {
+
+    const currentTopicFilter =
+        document.querySelector(
+            "#topic-filter"
+        );
+
+
+    if (!currentTopicFilter) {
+        return;
+    }
+
+
+    if (
+        currentTopicFilter.dataset.bound ===
+        "true"
+    ) {
+
+        return;
+
+    }
+
+
+    currentTopicFilter.dataset.bound =
+        "true";
+
+
+    currentTopicFilter.addEventListener(
+        "change",
+        applyTopicFilter
+    );
+
+}
+
+
+// ==================================================
+// DATE FILTERS
+// ==================================================
+
+function applyDateFilter() {
+
+    const input =
+        this;
+
+
+    if (!input) {
+        return;
+    }
+
+
+    const parameter =
+        input.dataset.filterParam;
+
+
+    if (!parameter) {
+        return;
+    }
+
+
+    const currentUrl =
+        new URL(
+            window.location.href
+        );
+
+
+    currentUrl.searchParams.delete(
+        "page"
+    );
+
+
+    const value =
+        input.value.trim();
+
+
+    if (value) {
+
+        // Store dates with English digits in URL.
+        // UI continues to display Persian digits.
+
+        currentUrl.searchParams.set(
+            parameter,
+            toEnglishDigits(value)
+        );
+
+    }
+
+    else {
+
+        currentUrl.searchParams.delete(
+            parameter
+        );
+
+    }
+
+
+    loadPage(
+        currentUrl.toString()
+    );
+
+}
+
+
+function bindDateFilterEvents() {
+
+    document
+        .querySelectorAll(
+            ".task-filters .date-filter-input"
+        )
+        .forEach(
+            function (input) {
+
+                if (
+                    input.dataset.bound ===
+                    "true"
+                ) {
+
+                    return;
+
+                }
+
+
+                input.dataset.bound =
+                    "true";
+
+
+                input.addEventListener(
+                    "change",
+                    applyDateFilter
+                );
+
+            }
+        );
+
+}
+
+
+// ==================================================
+// CUSTOM CALENDAR
+// ==================================================
+
+function bindCalendarInputs() {
+
+    document
+        .querySelectorAll(
+            ".task-filters .jalali-date-input"
+        )
+        .forEach(
+            function (input) {
+
+                if (
+                    input.dataset.calendarBound ===
+                    "true"
+                ) {
+
+                    return;
+
+                }
+
+
+                input.dataset.calendarBound =
+                    "true";
+
+
+                input.addEventListener(
+                    "click",
+                    function () {
+
+                        if (
+                            window.MyCalendar &&
+                            typeof window.MyCalendar.open ===
+                            "function"
+                        ) {
+
+                            window.MyCalendar.open(
+                                input
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+// ==================================================
+// ACTIVE FILTER CHIPS
+// ==================================================
+
+/*
+ * These events are handled through document-level
+ * delegation below.
+ *
+ * We intentionally do not attach individual
+ * listeners here because .task-filters is replaced
+ * by AJAX and duplicate listeners can cause the
+ * request to run twice.
+ */
+
+function bindActiveFilterEvents() {
+    return;
 }
 
 
@@ -1225,10 +1797,6 @@ function bindPaginationEvents() {
         .forEach(
             function (button) {
 
-                /*
-                 * Prevent multiple event bindings.
-                 */
-
                 if (
                     button.dataset.bound ===
                     "true"
@@ -1249,6 +1817,7 @@ function bindPaginationEvents() {
 
                         event.preventDefault();
 
+
                         loadPage(
                             button.href
                         );
@@ -1263,74 +1832,142 @@ function bindPaginationEvents() {
 
 
 // ==================================================
-// PERSIAN DIGITS
+// GLOBAL FILTER EVENT DELEGATION
 // ==================================================
 
-function toPersianDigits(value) {
+/*
+ * The .task-filters element is replaced
+ * by AJAX.
+ *
+ * Event delegation on document means
+ * these buttons continue to work after
+ * AJAX replacements.
+ */
 
-    if (
-        value === null ||
-        value === undefined
-    ) {
+document.addEventListener(
+    "click",
+    function (event) {
 
-        return value;
+        // --------------------------------------------------
+        // REMOVE ONE FILTER
+        // --------------------------------------------------
 
-    }
-
-
-    return String(value).replace(
-        /\d/g,
-        function (digit) {
-
-            return "۰۱۲۳۴۵۶۷۸۹"[digit];
-
-        }
-    );
-
-}
-
-
-// ==================================================
-// CONVERT TEXT NODES TO PERSIAN DIGITS
-// ==================================================
-
-function convertTextNodesToPersianDigits(
-    element
-) {
-
-    const walker =
-        document.createTreeWalker(
-            element,
-            NodeFilter.SHOW_TEXT
-        );
+        const removeButton =
+            event.target.closest(
+                "[data-remove-filter]"
+            );
 
 
-    const textNodes = [];
+        if (removeButton) {
+
+            event.preventDefault();
+            event.stopPropagation();
 
 
-    while (
-        walker.nextNode()
-    ) {
-
-        textNodes.push(
-            walker.currentNode
-        );
-
-    }
+            const parameter =
+                removeButton.dataset.removeFilter;
 
 
-    textNodes.forEach(
-        function (node) {
+            if (!parameter) {
+                return;
+            }
 
-            node.nodeValue =
-                toPersianDigits(
-                    node.nodeValue
+
+            const currentUrl =
+                new URL(
+                    window.location.href
                 );
 
-        }
-    );
 
-}
+            currentUrl.searchParams.delete(
+                parameter
+            );
+
+
+            currentUrl.searchParams.delete(
+                "page"
+            );
+
+
+            loadPage(
+                currentUrl.toString()
+            );
+
+
+            return;
+
+        }
+
+
+        // --------------------------------------------------
+        // CLEAR ALL FILTERS
+        // --------------------------------------------------
+
+        const clearAllButton =
+            event.target.closest(
+                ".clear-all-filters"
+            );
+
+
+        if (clearAllButton) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+
+            const currentUrl =
+                new URL(
+                    window.location.href
+                );
+
+
+            // Keep only scope.
+
+            const scope =
+                currentUrl.searchParams.get(
+                    "scope"
+                );
+
+
+            currentUrl.search =
+                "";
+
+
+            if (scope) {
+
+                currentUrl.searchParams.set(
+                    "scope",
+                    scope
+                );
+
+            }
+
+
+            loadPage(
+                currentUrl.toString()
+            );
+
+        }
+
+    }
+);
+
+
+// ==================================================
+// BROWSER BACK / FORWARD
+// ==================================================
+
+window.addEventListener(
+    "popstate",
+    function () {
+
+        loadPage(
+            window.location.href,
+            false
+        );
+
+    }
+);
 
 
 // ==================================================
@@ -1364,9 +2001,19 @@ const observer =
                                 Node.ELEMENT_NODE
                             ) {
 
-                                convertTextNodesToPersianDigits(
-                                    node
-                                );
+                                // Avoid processing the
+                                // entire document repeatedly.
+
+                                if (
+                                    node !==
+                                    document.body
+                                ) {
+
+                                    convertTextNodesToPersianDigits(
+                                        node
+                                    );
+
+                                }
 
                             }
 
@@ -1381,22 +2028,6 @@ const observer =
 
 
 // ==================================================
-// BROWSER BACK / FORWARD
-// ==================================================
-
-window.addEventListener(
-    "popstate",
-    function () {
-
-        loadPage(
-            window.location.href
-        );
-
-    }
-);
-
-
-// ==================================================
 // INITIALIZATION
 // ==================================================
 
@@ -1404,26 +2035,69 @@ document.addEventListener(
     "DOMContentLoaded",
     function () {
 
-        // Convert existing numbers.
+        // --------------------------------------------------
+        // Convert existing numbers
+        // --------------------------------------------------
+
         convertTextNodesToPersianDigits(
             document.body
         );
 
 
-        // Initialize status filters.
+        // --------------------------------------------------
+        // Status filters
+        // --------------------------------------------------
+
         bindFilterEvents();
 
 
-        // Initialize pagination.
+        // --------------------------------------------------
+        // Pagination
+        // --------------------------------------------------
+
         bindPaginationEvents();
 
 
-        // Initialize topic options.
+        // --------------------------------------------------
+        // Topic options
+        // --------------------------------------------------
+
         updateTopicOptions();
 
 
-        // Initialize Topic Filter.
+        // --------------------------------------------------
+        // Topic filter
+        // --------------------------------------------------
+
         bindTopicFilterEvents();
+
+
+        // --------------------------------------------------
+        // Date filters
+        // --------------------------------------------------
+
+        bindDateFilterEvents();
+
+
+        // --------------------------------------------------
+        // Active filter chips
+        // --------------------------------------------------
+
+        bindActiveFilterEvents();
+
+
+        // --------------------------------------------------
+        // Calendar inputs
+        // --------------------------------------------------
+
+        bindCalendarInputs();
+
+
+        // --------------------------------------------------
+        // Search
+        // --------------------------------------------------
+
+        bindSearchEvents();
 
     }
 );

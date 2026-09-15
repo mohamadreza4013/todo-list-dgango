@@ -1,1124 +1,1162 @@
 {% load static %}
-{% load jformat %}
 
 <!DOCTYPE html>
+
 <html lang="fa" dir="rtl">
 
 <head>
+    
+<meta charset="UTF-8">
 
-    <meta charset="UTF-8">
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<title>TaskFlow | داشبورد</title>
 
-    <title>TaskFlow | مدیریت وظایف</title>
 
-    <!-- TaskFlow CSS -->
+<!-- ==================================================
+     TASKFLOW CSS
+================================================== -->
 
-    <link
-        rel="stylesheet"
-        href="{% static 'tasks/style.css' %}"
-    >
+<link
+    rel="stylesheet"
+    href="{% static 'tasks/style.css' %}"
+>
 
-    <!-- Calendar CSS -->
 
-    <link
-        rel="stylesheet"
-        href="{% static 'calendar/calendar.css' %}"
-    >
+<!-- ==================================================
+     CALENDAR CSS
+================================================== -->
+
+<link
+    rel="stylesheet"
+    href="{% static 'calendar/calendar.css' %}"
+>
 
 </head>
-
 
 <body>
 
 <div class="app">
 
+<!-- ==================================================
+     SIDEBAR
+================================================== -->
+
+<aside class="sidebar">
+
 
     <!-- ==================================================
-         SIDEBAR
+         LOGO
     ================================================== -->
 
-    <aside class="sidebar">
+    <div class="logo">
+
+        <div class="logo-icon">
+            ✓
+        </div>
+
+        <span>
+            تسک‌فلو
+        </span>
+
+    </div>
 
 
-        <!-- ==================================================
-             LOGO
-        ================================================== -->
+    <!-- ==================================================
+         WORKSPACE NAVIGATION TITLE
+    ================================================== -->
 
-        <div class="logo">
+    <div class="nav-title">
+        فضای کاری
+    </div>
 
-            <div class="logo-icon">
-                ✓
-            </div>
+
+    <!-- ==================================================
+         MAIN NAVIGATION
+    ================================================== -->
+
+    <nav class="nav">
+
+
+        <!-- MAIN HOME -->
+
+        <a
+            href="{% url 'home' %}"
+            class="nav-item"
+        >
 
             <span>
-                تسک‌فلو
+                ⌂
             </span>
 
-        </div>
+            صفحه اصلی
+
+        </a>
 
 
-        <!-- ==================================================
-             WORKSPACE NAVIGATION TITLE
-        ================================================== -->
+        <!-- DASHBOARD -->
 
-        <div class="nav-title">
-            فضای کاری
-        </div>
+        <a
+            href="{% url 'dashboard' %}"
+            class="nav-item {% if not my_tasks %}active{% endif %}"
+        >
 
+            <span>
+                ▦
+            </span>
 
-        <!-- ==================================================
-             MAIN NAVIGATION
-        ================================================== -->
+            داشبورد
 
-        <nav class="nav">
-
-
-            <!-- Dashboard -->
-
-            <a
-                href="{% url 'home' %}"
-                class="nav-item {% if not my_tasks %}active{% endif %}"
-            >
-
-                <span>
-                    ▦
-                </span>
-
-                داشبورد
-
-            </a>
+        </a>
 
 
-            <!-- My Tasks -->
+        <!-- MY TASKS -->
 
-            <a
-                href="{% url 'home' %}?scope=my"
-                class="nav-item {% if my_tasks %}active{% endif %}"
-            >
+        <a
+            href="{% url 'dashboard' %}?scope=my"
+            class="nav-item {% if my_tasks %}active{% endif %}"
+        >
 
-                <span>
-                    ✓
-                </span>
+            <span>
+                ✓
+            </span>
 
-                وظایف من
+            وظایف من
 
-            </a>
-
-
-            <!-- Logout -->
-
-            <a
-                href="{% url 'logout_confirm' %}"
-                class="nav-item"
-            >
-
-                <span>
-                    ↪
-                </span>
-
-                خروج
-
-            </a>
-
-        </nav>
+        </a>
 
 
-        <!-- ==================================================
-             SIDEBAR BOTTOM
-        ================================================== -->
+        <!-- LOGOUT -->
 
-        <div class="sidebar-bottom">
+        <a
+            href="{% url 'logout_confirm' %}"
+            class="nav-item"
+        >
 
+            <span>
+                ↪
+            </span>
 
-            <!-- ==================================================
-                 GOOGLE CALENDAR
-            ================================================== -->
+            خروج
 
-            <div class="nav">
+        </a>
 
-                {% if google_connected %}
-
-                    <div class="nav-item google-connected">
-
-                        <span>
-                            ✓
-                        </span>
-
-                        Google Calendar متصل است
-
-                    </div>
-
-                {% else %}
-
-                    <a
-                        href="{% url 'google_connect' %}"
-                        class="nav-item"
-                    >
-
-                        <span>
-                            📅
-                        </span>
-
-                        اتصال به Google Calendar
-
-                    </a>
-
-                {% endif %}
-
-            </div>
+    </nav>
 
 
-            <!-- ==================================================
-                 SETTINGS
-            ================================================== -->
+    <!-- ==================================================
+         SIDEBAR BOTTOM
+    ================================================== -->
 
-            <div class="nav">
+    <div class="sidebar-bottom">
+
+
+        <!-- GOOGLE CALENDAR -->
+
+        <div class="nav">
+
+            {% if google_connected %}
+
+                <div class="nav-item google-connected">
+
+                    <span>
+                        ✓
+                    </span>
+
+                    Google Calendar متصل است
+
+                </div>
+
+            {% else %}
 
                 <a
-                    href="#"
+                    href="{% url 'google_connect' %}"
                     class="nav-item"
                 >
 
                     <span>
-                        ⚙
+                        📅
                     </span>
 
-                    تنظیمات
+                    اتصال به Google Calendar
 
                 </a>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- SETTINGS -->
+
+        <div class="nav">
+
+            <a
+                href="#"
+                class="nav-item"
+            >
+
+                <span>
+                    ⚙
+                </span>
+
+                تنظیمات
+
+            </a>
+
+        </div>
+
+
+        <!-- USER PROFILE -->
+
+        <div class="profile">
+
+            <div class="avatar">
+
+                {% if user.first_name and user.last_name %}
+
+                    {{ user.first_name|first }}{{ user.last_name|first }}
+
+                {% elif user.first_name %}
+
+                    {{ user.first_name|first }}
+
+                {% else %}
+
+                    {{ user.username|first }}
+
+                {% endif %}
 
             </div>
 
 
-            <!-- ==================================================
-                 USER PROFILE
-            ================================================== -->
+            <div class="profile-info">
 
-            <div class="profile">
+                <span class="profile-name">
 
+                    {% if user.first_name %}
 
-                <!-- User avatar -->
+                        {{ user.first_name }}
 
-                <div class="avatar">
+                        {% if user.last_name %}
 
-                    {% if user.first_name and user.last_name %}
+                            {{ user.last_name }}
 
-                        {{ user.first_name|first }}{{ user.last_name|first }}
-
-                    {% elif user.first_name %}
-
-                        {{ user.first_name|first }}
+                        {% endif %}
 
                     {% else %}
 
-                        {{ user.username|first }}
+                        {{ user.username }}
 
                     {% endif %}
 
-                </div>
+                </span>
 
 
-                <!-- User information -->
+                <span class="profile-email">
 
-                <div class="profile-info">
+                    {% if user.email %}
 
+                        {{ user.email }}
 
-                    <!-- User name -->
+                    {% else %}
 
-                    <span class="profile-name">
+                        حساب کاربری
 
-                        {% if user.first_name %}
+                    {% endif %}
 
-                            {{ user.first_name }}
-
-                            {% if user.last_name %}
-
-                                {{ user.last_name }}
-
-                            {% endif %}
-
-                        {% else %}
-
-                            {{ user.username }}
-
-                        {% endif %}
-
-                    </span>
-
-
-                    <!-- User email -->
-
-                    <span class="profile-email">
-
-                        {% if user.email %}
-
-                            {{ user.email }}
-
-                        {% else %}
-
-                            حساب کاربری
-
-                        {% endif %}
-
-                    </span>
-
-                </div>
+                </span>
 
             </div>
 
         </div>
 
-    </aside>
+    </div>
 
-
-
-    <!-- ==================================================
-         MAIN CONTENT
-    ================================================== -->
-
-    <main class="main">
-
-
-        <!-- ==================================================
-             TOPBAR
-        ================================================== -->
-
-        <div class="topbar">
-
-            <div class="welcome">
-
-                <h1>
-                    مدیریت وظایف
-                </h1>
-
-                <p>
-                    وظایف خود را مدیریت کنید.
-                </p>
-
-            </div>
-
-
-            <!-- ==================================================
-                 CREATE TASK BUTTON
-            ================================================== -->
-
-            <button
-                type="button"
-                id="create-task-button"
-                class="create-task-button"
-            >
-
-                + ایجاد وظیفه
-
-            </button>
-
-        </div>
-
-
-
-        <!-- ==================================================
-             STATISTICS
-        ================================================== -->
-
-        <section class="stats">
-
-
-            <!-- Total tasks -->
-
-            <div class="stat-card">
-
-                <div class="stat-header">
-
-                    <span class="stat-title">
-                        کل وظایف
-                    </span>
-
-                    <div class="stat-icon">
-                        ✓
-                    </div>
-
-                </div>
-
-                <div class="stat-number">
-                    {{ total_tasks }}
-                </div>
-
-            </div>
-
-
-            <!-- Completed tasks -->
-
-            <div class="stat-card">
-
-                <div class="stat-header">
-
-                    <span class="stat-title">
-                        انجام‌شده
-                    </span>
-
-                    <div class="stat-icon">
-                        ✓
-                    </div>
-
-                </div>
-
-                <div class="stat-number">
-                    {{ completed_tasks }}
-                </div>
-
-            </div>
-
-
-            <!-- Remaining tasks -->
-
-            <div class="stat-card">
-
-                <div class="stat-header">
-
-                    <span class="stat-title">
-                        باقی‌مانده
-                    </span>
-
-                    <div class="stat-icon">
-                        ○
-                    </div>
-
-                </div>
-
-                <div class="stat-number">
-                    {{ remaining_tasks }}
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- ==================================================
-             TASK FILTERS
-        ================================================== -->
-
-        <div class="task-filters">
-
-
-            <!-- ==================================================
-                 STATUS / IMPORTANCE FILTERS
-            ================================================== -->
-
-            <div class="status-filters">
-
-
-                <!-- ==================================================
-                     ALL TASKS
-                ================================================== -->
-
-                <a
-                    href="{% url 'home' %}{% if my_tasks or selected_topic %}?{% endif %}{% if my_tasks %}scope=my{% endif %}{% if my_tasks and selected_topic %}&{% endif %}{% if selected_topic %}topic={{ selected_topic.id }}{% endif %}"
-                    class="filter-button {% if not filter_type %}active{% endif %}"
-                >
-
-                    همه
-
-                </a>
-
-
-                <!-- ==================================================
-                     ACTIVE TASKS
-                ================================================== -->
-
-                <a
-                    href="{% url 'home' %}?{% if my_tasks %}scope=my&{% endif %}filter=active{% if selected_topic %}&topic={{ selected_topic.id }}{% endif %}"
-                    class="filter-button {% if filter_type == 'active' %}active{% endif %}"
-                >
-
-                    در حال انجام
-
-                </a>
-
-
-                <!-- ==================================================
-                     COMPLETED TASKS
-                ================================================== -->
-
-                <a
-                    href="{% url 'home' %}?{% if my_tasks %}scope=my&{% endif %}filter=completed{% if selected_topic %}&topic={{ selected_topic.id }}{% endif %}"
-                    class="filter-button {% if filter_type == 'completed' %}active{% endif %}"
-                >
-
-                    انجام‌شده
-
-                </a>
-
-
-                <!-- ==================================================
-                     IMPORTANT TASKS
-                ================================================== -->
-
-                <a
-                    href="{% url 'home' %}?{% if my_tasks %}scope=my&{% endif %}filter=important{% if selected_topic %}&topic={{ selected_topic.id }}{% endif %}"
-                    class="filter-button {% if filter_type == 'important' %}active{% endif %}"
-                >
-
-                    <span class="filter-icon">
-                        ★
-                    </span>
-
-                    مهم
-
-                </a>
-
-            </div>
-
-
-            <!-- ==================================================
-                 TOPIC FILTER
-            ================================================== -->
-
-            <div class="topic-filter">
-
-
-                <label
-                    for="topic-filter"
-                    class="topic-filter-label"
-                >
-
-                    موضوع:
-
-                </label>
-
-
-                <select
-                    id="topic-filter"
-                    class="topic-filter-select"
-                >
-
-
-                    <!-- All topics -->
-
-                    <option
-                        value=""
-                        {% if not selected_topic %}selected{% endif %}
-                    >
-
-                        همه موضوع‌ها
-
-                    </option>
-
-
-                    <!-- Available topics -->
-
-                    {% for topic in filter_topics %}
-
-                        <option
-                            value="{{ topic.id }}"
-                            {% if selected_topic and selected_topic.id == topic.id %}selected{% endif %}
-                        >
-
-                            {{ topic.name }}
-
-                            {% if topic.is_public %}
-                                (عمومی)
-                            {% endif %}
-
-                        </option>
-
-                    {% endfor %}
-
-                </select>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- ==================================================
-             TODO LIST
-        ================================================== -->
-
-        <section class="todo-list">
-
-
-            {% for todo in todos %}
-
-                <div
-                    class="todo-card"
-                    data-todo-id="{{ todo.id }}"
-                >
-
-
-                    <!-- ==================================================
-                         COMPLETE / INCOMPLETE
-                    ================================================== -->
-
-                    <form
-                        method="POST"
-                        action="{% url 'toggle_todo' todo.id %}"
-                        class="complete-form toggle-complete-form"
-                    >
-
-                        {% csrf_token %}
-
-                        <button
-                            type="submit"
-                            class="complete-button {% if todo.completed %}completed{% endif %}"
-                            title="{% if todo.completed %}علامت‌گذاری به‌عنوان انجام‌نشده{% else %}علامت‌گذاری به‌عنوان انجام‌شده{% endif %}"
-                        >
-
-                            {% if todo.completed %}
-                                ✓
-                            {% endif %}
-
-                        </button>
-
-                    </form>
-
-
-
-                    <!-- ==================================================
-                         TASK CONTENT
-                    ================================================== -->
-
-                    <div class="todo-content">
-
-
-                        <!-- Task title -->
-
-                        <div class="todo-title">
-                            {{ todo.title }}
-                        </div>
-
-
-                        <!-- Task description -->
-
-                        {% if todo.description %}
-
-                            <div class="todo-description">
-                                {{ todo.description }}
-                            </div>
-
-                        {% endif %}
-
-
-                        <!-- ==================================================
-                             TASK META
-                        ================================================== -->
-
-                        <div class="todo-meta">
-
-
-                            <!-- ==================================================
-                                 TASK CATEGORY
-                            ================================================== -->
-
-                            {% if todo.category == "public" %}
-
-                                <span class="category-badge public">
-                                    عمومی
-                                </span>
-
-                            {% else %}
-
-                                <span class="category-badge personal">
-                                    شخصی
-                                </span>
-
-                            {% endif %}
-
-
-                            <!-- ==================================================
-                                 TASK TOPIC
-                            ================================================== -->
-
-                            {% if todo.topic %}
-
-                                <span class="topic-badge">
-
-                                    <span class="topic-icon">
-                                        #
-                                    </span>
-
-                                    <span class="topic-name">
-                                        {{ todo.topic.name }}
-                                    </span>
-
-                                </span>
-
-                            {% endif %}
-
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- ==================================================
-                         TASK ACTIONS
-                    ================================================== -->
-
-                    <div class="todo-actions">
-
-
-                        <!-- ==================================================
-                             STATUS
-                        ================================================== -->
-
-                        <span
-                            class="status {% if todo.completed %}completed{% endif %}"
-                        >
-
-                            {% if todo.completed %}
-
-                                انجام‌شده
-
-                            {% else %}
-
-                                در انتظار
-
-                            {% endif %}
-
-                        </span>
-
-
-                        <!-- ==================================================
-                             IMPORTANT
-                        ================================================== -->
-
-                        <form
-                            method="POST"
-                            action="{% url 'toggle_important' todo.id %}"
-                            class="toggle-important-form"
-                        >
-
-                            {% csrf_token %}
-
-                            <button
-                                type="submit"
-                                class="important-button {% if todo.important %}important{% endif %}"
-                                title="{% if todo.important %}حذف از وظایف مهم{% else %}افزودن به وظایف مهم{% endif %}"
-                            >
-
-                                ★
-
-                            </button>
-
-                        </form>
-
-
-                        <!-- ==================================================
-                             EDIT
-                        ================================================== -->
-
-                        <a
-                            href="{% url 'edit_todo' todo.id %}"
-                            class="edit-button"
-                        >
-
-                            ✎ ویرایش
-
-                        </a>
-
-
-                        <!-- ==================================================
-                             DELETE
-                        ================================================== -->
-
-                        <form
-                            method="POST"
-                            action="{% url 'delete_todo' todo.id %}"
-                            class="delete-form"
-                        >
-
-                            {% csrf_token %}
-
-                            <button
-                                type="submit"
-                                class="delete-button"
-                            >
-
-                                🗑 حذف
-
-                            </button>
-
-                        </form>
-
-
-                        <!-- ==================================================
-                             TASK DATES
-                        ================================================== -->
-
-                        <div class="todo-dates">
-
-
-                            <!-- Creation date -->
-
-                            <span class="todo-date">
-
-                                ایجاد:
-                                {{ todo.created_at_jalali_str }}
-
-                            </span>
-
-
-                            <!-- Start date -->
-
-                            {% if todo.start_date_jalali_str %}
-
-                                <span class="todo-date">
-
-                                    شروع:
-                                    {{ todo.start_date_jalali_str }}
-
-                                </span>
-
-                            {% endif %}
-
-
-                            <!-- Deadline -->
-
-                            {% if todo.deadline_jalali_str %}
-
-                                <span class="todo-date">
-
-                                    مهلت:
-                                    {{ todo.deadline_jalali_str }}
-
-                                </span>
-
-                            {% endif %}
-
-
-                            <!-- Completion date -->
-
-                            {% if todo.end_date_jalali_str %}
-
-                                <span class="todo-date end-date">
-
-                                    اتمام:
-                                    {{ todo.end_date_jalali_str }}
-
-                                </span>
-
-                            {% endif %}
-
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-            {% empty %}
-
-                <!-- ==================================================
-                     EMPTY TASK LIST
-                ================================================== -->
-
-                <div class="empty-state">
-
-                    <div class="empty-icon">
-                        ✓
-                    </div>
-
-                    <h3>
-                        هنوز وظیفه‌ای ندارید
-                    </h3>
-
-                    <p>
-                        اولین وظیفه خود را ایجاد کنید تا شروع کنیم.
-                    </p>
-
-                </div>
-
-            {% endfor %}
-
-        </section>
-
-
-
-        <!-- ==================================================
-             PAGINATION
-        ================================================== -->
-
-        {% if page_obj.paginator.num_pages > 1 %}
-
-            <div class="pagination">
-
-
-                <!-- ==================================================
-                     PREVIOUS PAGE
-                ================================================== -->
-
-                {% if page_obj.has_previous %}
-
-                    <a
-                        href="?{% if my_tasks %}scope=my&{% endif %}{% if filter_type %}filter={{ filter_type }}&{% endif %}{% if selected_topic %}topic={{ selected_topic.id }}&{% endif %}page={{ page_obj.previous_page_number }}"
-                        class="pagination-button"
-                    >
-
-                        قبلی
-
-                    </a>
-
-                {% endif %}
-
-
-                <!-- ==================================================
-                     PAGE NUMBERS
-                ================================================== -->
-
-                <div class="pagination-pages">
-
-                    {% for page in page_numbers %}
-
-                        {% if page.number is None %}
-
-                            <span
-                                class="pagination-page dots"
-                                aria-hidden="true"
-                            >
-
-                                …
-
-                            </span>
-
-                        {% elif page.number == page_obj.number %}
-
-                            <span
-                                class="pagination-page active"
-                                aria-current="page"
-                            >
-
-                                {{ page.display }}
-
-                            </span>
-
-                        {% else %}
-
-                            <a
-                                href="?{% if my_tasks %}scope=my&{% endif %}{% if filter_type %}filter={{ filter_type }}&{% endif %}{% if selected_topic %}topic={{ selected_topic.id }}&{% endif %}page={{ page.number }}"
-                                class="pagination-page"
-                            >
-
-                                {{ page.display }}
-
-                            </a>
-
-                        {% endif %}
-
-                    {% endfor %}
-
-                </div>
-
-
-                <!-- ==================================================
-                     NEXT PAGE
-                ================================================== -->
-
-                {% if page_obj.has_next %}
-
-                    <a
-                        href="?{% if my_tasks %}scope=my&{% endif %}{% if filter_type %}filter={{ filter_type }}&{% endif %}{% if selected_topic %}topic={{ selected_topic.id }}&{% endif %}page={{ page_obj.next_page_number }}"
-                        class="pagination-button"
-                    >
-
-                        بعدی
-
-                    </a>
-
-                {% endif %}
-
-            </div>
-
-        {% endif %}
-
-    </main>
-
-</div>
+</aside>
 
 
 
 <!-- ==================================================
-     CREATE TASK MODAL
+     MAIN CONTENT
 ================================================== -->
 
-<div
-    id="create-task-modal"
-    class="create-task-modal"
-    hidden
->
-
-    <div class="create-task-overlay"></div>
+<main class="main">
 
 
-    <div class="create-task-container">
+    <!-- ==================================================
+         TOPBAR
+    ================================================== -->
+
+    <div class="topbar">
+
+        <div class="welcome">
+
+            <h1>
+                داشبورد
+            </h1>
+
+            <p>
+                وظایف خود را مدیریت کنید.
+            </p>
+
+        </div>
+
+    </div>
 
 
-        <!-- Close button -->
 
-        <button
-            type="button"
-            id="create-task-close"
-            class="create-task-close"
-            aria-label="بستن"
-        >
+    <!-- ==================================================
+         STATISTICS
+    ================================================== -->
 
-            ×
-
-        </button>
+    <section class="stats">
 
 
-        <!-- Modal title -->
+        <!-- TOTAL TASKS -->
 
-        <h2>
-            ایجاد وظیفه جدید
-        </h2>
+        <div class="stat-card">
+
+            <div class="stat-header">
+
+                <span class="stat-title">
+                    کل وظایف
+                </span>
+
+                <div class="stat-icon">
+                    ✓
+                </div>
+
+            </div>
+
+            <div class="stat-number">
+                {{ total_tasks }}
+            </div>
+
+        </div>
 
 
-        <!-- Create task form -->
+        <!-- COMPLETED TASKS -->
 
-        <form
-            method="POST"
-            class="create-task-form"
-            id="create-task-form"
-        >
+        <div class="stat-card">
 
-            {% csrf_token %}
+            <div class="stat-header">
+
+                <span class="stat-title">
+                    انجام‌شده
+                </span>
+
+                <div class="stat-icon">
+                    ✓
+                </div>
+
+            </div>
+
+            <div class="stat-number">
+                {{ completed_tasks }}
+            </div>
+
+        </div>
 
 
-            <!-- ==================================================
-                 TITLE
-            ================================================== -->
+        <!-- REMAINING TASKS -->
 
-            <div class="create-task-field">
+        <div class="stat-card">
 
-                <label for="task-title">
-                    عنوان وظیفه
-                </label>
+            <div class="stat-header">
+
+                <span class="stat-title">
+                    باقی‌مانده
+                </span>
+
+                <div class="stat-icon">
+                    ○
+                </div>
+
+            </div>
+
+            <div class="stat-number">
+                {{ remaining_tasks }}
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==================================================
+         TASK FILTERS
+    ================================================== -->
+
+    <div class="task-filters">
+
+
+        <!-- ==================================================
+             FILTER HEADER
+        ================================================== -->
+
+        <div class="filter-header">
+
+            <div class="filter-title">
+
+                <span class="filter-title-icon">
+                    ⚙
+                </span>
+
+                فیلتر وظایف
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ==================================================
+             SEARCH
+        ================================================== -->
+
+        <div class="task-search">
+
+            <div class="task-search-wrapper">
+
+                <span
+                    class="task-search-icon"
+                    aria-hidden="true"
+                >
+                    🔍
+                </span>
+
 
                 <input
                     type="text"
-                    name="title"
-                    id="task-title"
-                    placeholder="چه کاری باید انجام دهید؟"
-                    required
+                    id="task-search"
+                    class="task-search-input"
+                    placeholder="جستجوی وظایف..."
+                    value="{{ search_query }}"
+                    autocomplete="off"
+                    aria-label="جستجوی وظایف"
                 >
 
-            </div>
 
-
-            <!-- ==================================================
-                 DESCRIPTION
-            ================================================== -->
-
-            <div class="create-task-field">
-
-                <label for="task-description">
-                    توضیحات
-                </label>
-
-                <textarea
-                    name="description"
-                    id="task-description"
-                    placeholder="توضیحات را اضافه کنید..."
-                    rows="3"
-                ></textarea>
-
-            </div>
-
-
-            <!-- ==================================================
-                 CATEGORY
-            ================================================== -->
-
-            <div class="create-task-field">
-
-                <label for="task-category">
-                    نوع وظیفه
-                </label>
-
-                <select
-                    name="category"
-                    id="task-category"
-                    class="task-category-input"
-                >
-
-                    <option value="personal">
-                        شخصی
-                    </option>
-
-                    <option value="public">
-                        عمومی
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <!-- ==================================================
-                 TOPIC
-            ================================================== -->
-
-            <div class="create-task-field">
-
-                <label for="task-topic">
-                    موضوع
-                </label>
-
-
-                <div class="topic-input-row">
-
-                    <select
-                        name="topic"
-                        id="task-topic"
-                        class="task-topic-input"
-                    >
-
-                        {% for topic in personal_topics %}
-
-                            <option
-                                value="{{ topic.id }}"
-                                data-category="personal"
-                            >
-
-                                {{ topic.name }}
-
-                            </option>
-
-                        {% endfor %}
-
-
-                        {% for topic in public_topics %}
-
-                            <option
-                                value="{{ topic.id }}"
-                                data-category="public"
-                            >
-
-                                {{ topic.name }}
-
-                            </option>
-
-                        {% endfor %}
-
-                    </select>
-
+                {% if search_query %}
 
                     <button
                         type="button"
-                        id="create-topic-button"
-                        class="create-topic-button"
+                        id="clear-task-search"
+                        class="task-search-clear"
+                        aria-label="پاک کردن جستجو"
                     >
 
-                        + موضوع جدید
+                        ×
+
+                    </button>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ==================================================
+             STATUS FILTERS
+        ================================================== -->
+
+        <div class="status-filters">
+
+
+            <!-- ALL -->
+
+            <a
+                href="{% url 'dashboard' %}{% if my_tasks or search_query %}?{% if my_tasks %}scope=my{% endif %}{% if my_tasks and search_query %}&{% endif %}{% if search_query %}search={{ search_query|urlencode }}{% endif %}{% endif %}"
+                class="filter-button {% if not filter_type %}active{% endif %}"
+                data-filter-action="clear-status"
+            >
+
+                همه
+
+            </a>
+
+
+            <!-- ACTIVE -->
+
+            <a
+                href="{% url 'dashboard' %}?{% if my_tasks %}scope=my&{% endif %}filter=active{% if search_query %}&search={{ search_query|urlencode }}{% endif %}{% if important_filter %}&important=1{% endif %}{% if selected_topic %}&topic={{ selected_topic.id }}{% endif %}{% if start_date_from_value %}&start_date_from={{ start_date_from_value }}{% endif %}{% if start_date_to_value %}&start_date_to={{ start_date_to_value }}{% endif %}{% if end_date_from_value %}&end_date_from={{ end_date_from_value }}{% endif %}{% if end_date_to_value %}&end_date_to={{ end_date_to_value }}{% endif %}{% if deadline_from_value %}&deadline_from={{ deadline_from_value }}{% endif %}{% if deadline_to_value %}&deadline_to={{ deadline_to_value }}{% endif %}{% if created_at_from_value %}&created_at_from={{ created_at_from_value }}{% endif %}{% if created_at_to_value %}&created_at_to={{ created_at_to_value }}{% endif %}"
+                class="filter-button {% if filter_type == 'active' %}active{% endif %}"
+            >
+
+                در حال انجام
+
+            </a>
+
+
+            <!-- COMPLETED -->
+
+            <a
+                href="{% url 'dashboard' %}?{% if my_tasks %}scope=my&{% endif %}filter=completed{% if search_query %}&search={{ search_query|urlencode }}{% endif %}{% if important_filter %}&important=1{% endif %}{% if selected_topic %}&topic={{ selected_topic.id }}{% endif %}{% if start_date_from_value %}&start_date_from={{ start_date_from_value }}{% endif %}{% if start_date_to_value %}&start_date_to={{ start_date_to_value }}{% endif %}{% if end_date_from_value %}&end_date_from={{ end_date_from_value }}{% endif %}{% if end_date_to_value %}&end_date_to={{ end_date_to_value }}{% endif %}{% if deadline_from_value %}&deadline_from={{ deadline_from_value }}{% endif %}{% if deadline_to_value %}&deadline_to={{ deadline_to_value }}{% endif %}{% if created_at_from_value %}&created_at_from={{ created_at_from_value }}{% endif %}{% if created_at_to_value %}&created_at_to={{ created_at_to_value }}{% endif %}"
+                class="filter-button {% if filter_type == 'completed' %}active{% endif %}"
+            >
+
+                انجام‌شده
+
+            </a>
+
+
+            <!-- IMPORTANT -->
+
+            <a
+                href="{% url 'dashboard' %}?{% if my_tasks %}scope=my&{% endif %}{% if filter_type %}filter={{ filter_type }}&{% endif %}{% if search_query %}search={{ search_query|urlencode }}&{% endif %}important={% if important_filter %}0{% else %}1{% endif %}{% if selected_topic %}&topic={{ selected_topic.id }}{% endif %}{% if start_date_from_value %}&start_date_from={{ start_date_from_value }}{% endif %}{% if start_date_to_value %}&start_date_to={{ start_date_to_value }}{% endif %}{% if end_date_from_value %}&end_date_from={{ end_date_from_value }}{% endif %}{% if end_date_to_value %}&end_date_to={{ end_date_to_value }}{% endif %}{% if deadline_from_value %}&deadline_from={{ deadline_from_value }}{% endif %}{% if deadline_to_value %}&deadline_to={{ deadline_to_value }}{% endif %}{% if created_at_from_value %}&created_at_from={{ created_at_from_value }}{% endif %}{% if created_at_to_value %}&created_at_to={{ created_at_to_value }}{% endif %}"
+                class="filter-button {% if important_filter %}active{% endif %}"
+            >
+
+                <span class="filter-icon">
+                    ★
+                </span>
+
+                مهم
+
+            </a>
+
+        </div>
+
+
+
+        <!-- ==================================================
+             TOPIC FILTER
+        ================================================== -->
+
+        <div class="topic-filter">
+
+            <label
+                for="topic-filter"
+                class="topic-filter-label"
+            >
+
+                موضوع:
+
+            </label>
+
+
+            <select
+                id="topic-filter"
+                class="topic-filter-select"
+            >
+
+                <option
+                    value=""
+                    {% if not selected_topic %}selected{% endif %}
+                >
+
+                    همه موضوع‌ها
+
+                </option>
+
+
+                {% for topic in filter_topics %}
+
+                    <option
+                        value="{{ topic.id }}"
+                        {% if selected_topic and selected_topic.id == topic.id %}selected{% endif %}
+                    >
+
+                        {{ topic.name }}
+
+                        {% if topic.is_public %}
+                            (عمومی)
+                        {% endif %}
+
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+
+        <!-- ==================================================
+             DATE FILTERS
+        ================================================== -->
+
+        <div class="date-filters">
+
+            <!-- Row 1 -->
+
+            <div class="date-filter-row">
+
+
+                <div class="date-filter-group">
+
+                    <label class="date-filter-label">
+                        تاریخ شروع
+                    </label>
+
+
+                    <div class="date-filter-inputs">
+
+                        <input
+                            type="text"
+                            id="start-date-from"
+                            class="jalali-date-input date-filter-input"
+                            placeholder="از تاریخ"
+                            value="{{ start_date_from_value }}"
+                            autocomplete="off"
+                            readonly
+                            data-filter-param="start_date_from"
+                        >
+
+
+                        <input
+                            type="text"
+                            id="start-date-to"
+                            class="jalali-date-input date-filter-input"
+                            placeholder="تا تاریخ"
+                            value="{{ start_date_to_value }}"
+                            autocomplete="off"
+                            readonly
+                            data-filter-param="start_date_to"
+                        >
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="date-filter-group">
+
+                    <label class="date-filter-label">
+                        مهلت
+                    </label>
+
+
+                    <div class="date-filter-inputs">
+
+                        <input
+                            type="text"
+                            id="deadline-from"
+                            class="jalali-date-input date-filter-input"
+                            placeholder="از تاریخ"
+                            value="{{ deadline_from_value }}"
+                            autocomplete="off"
+                            readonly
+                            data-filter-param="deadline_from"
+                        >
+
+
+                        <input
+                            type="text"
+                            id="deadline-to"
+                            class="jalali-date-input date-filter-input"
+                            placeholder="تا تاریخ"
+                            value="{{ deadline_to_value }}"
+                            autocomplete="off"
+                            readonly
+                            data-filter-param="deadline_to"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Row 2 -->
+
+            <div class="date-filter-row">
+
+
+                <div class="date-filter-group">
+
+                    <label class="date-filter-label">
+                        تاریخ ایجاد
+                    </label>
+
+
+                    <div class="date-filter-inputs">
+
+                        <input
+                            type="text"
+                            id="created-at-from"
+                            class="jalali-date-input date-filter-input"
+                            placeholder="از تاریخ"
+                            value="{{ created_at_from_value }}"
+                            autocomplete="off"
+                            readonly
+                            data-filter-param="created_at_from"
+                        >
+
+
+                        <input
+                            type="text"
+                            id="created-at-to"
+                            class="jalali-date-input date-filter-input"
+                            placeholder="تا تاریخ"
+                            value="{{ created_at_to_value }}"
+                            autocomplete="off"
+                            readonly
+                            data-filter-param="created_at_to"
+                        >
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="date-filter-group">
+
+                    <label class="date-filter-label">
+                        تاریخ پایان
+                    </label>
+
+
+                    <div class="date-filter-inputs">
+
+                        <input
+                            type="text"
+                            id="end-date-from"
+                            class="jalali-date-input date-filter-input"
+                            placeholder="از تاریخ"
+                            value="{{ end_date_from_value }}"
+                            autocomplete="off"
+                            readonly
+                            data-filter-param="end_date_from"
+                        >
+
+
+                        <input
+                            type="text"
+                            id="end-date-to"
+                            class="jalali-date-input date-filter-input"
+                            placeholder="تا تاریخ"
+                            value="{{ end_date_to_value }}"
+                            autocomplete="off"
+                            readonly
+                            data-filter-param="end_date_to"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ==================================================
+             ACTIVE FILTERS
+        ================================================== -->
+
+        {% if search_query or filter_type or important_filter or selected_topic or start_date_from_value or start_date_to_value or end_date_from_value or end_date_to_value or deadline_from_value or deadline_to_value or created_at_from_value or created_at_to_value %}
+
+            <div class="active-filters">
+
+
+                <div class="active-filters-title">
+
+                    فیلترهای فعال:
+
+                </div>
+
+
+                <div class="active-filter-list">
+
+
+                    <!-- SEARCH CHIP -->
+
+                    {% if search_query %}
+
+                        <div class="active-filter-chip">
+
+                            <span class="active-filter-chip-label">
+
+                                جستجو:
+                                {{ search_query }}
+
+                            </span>
+
+
+                            <button
+                                type="button"
+                                class="remove-filter-button active-filter-remove"
+                                data-remove-filter="search"
+                                aria-label="حذف جستجو"
+                            >
+
+                                ×
+
+                            </button>
+
+                        </div>
+
+                    {% endif %}
+
+
+
+                    <!-- STATUS CHIP -->
+
+                    {% if filter_type %}
+
+                        <div class="active-filter-chip">
+
+                            <span class="active-filter-chip-label">
+
+                                {% if filter_type == "active" %}
+
+                                    وضعیت: در حال انجام
+
+                                {% elif filter_type == "completed" %}
+
+                                    وضعیت: انجام‌شده
+
+                                {% endif %}
+
+                            </span>
+
+
+                            <button
+                                type="button"
+                                class="remove-filter-button active-filter-remove"
+                                data-remove-filter="filter"
+                                aria-label="حذف فیلتر وضعیت"
+                            >
+
+                                ×
+
+                            </button>
+
+                        </div>
+
+                    {% endif %}
+
+
+
+                    <!-- IMPORTANT CHIP -->
+
+                    {% if important_filter %}
+
+                        <div class="active-filter-chip">
+
+                            <span class="active-filter-chip-label">
+                                ★ مهم
+                            </span>
+
+
+                            <button
+                                type="button"
+                                class="remove-filter-button active-filter-remove"
+                                data-remove-filter="important"
+                                aria-label="حذف فیلتر مهم"
+                            >
+
+                                ×
+
+                            </button>
+
+                        </div>
+
+                    {% endif %}
+
+
+
+                    <!-- TOPIC CHIP -->
+
+                    {% if selected_topic %}
+
+                        <div class="active-filter-chip">
+
+                            <span class="active-filter-chip-label">
+
+                                موضوع:
+                                {{ selected_topic.name }}
+
+                            </span>
+
+
+                            <button
+                                type="button"
+                                class="remove-filter-button active-filter-remove"
+                                data-remove-filter="topic"
+                                aria-label="حذف فیلتر موضوع"
+                            >
+
+                                ×
+
+                            </button>
+
+                        </div>
+
+                    {% endif %}
+
+
+
+                    <!-- START DATE FROM -->
+
+                    {% if start_date_from_value %}
+
+                        <div class="active-filter-chip">
+
+                            <span class="active-filter-chip-label">
+
+                                شروع از:
+                                {{ start_date_from_value }}
+
+                            </span>
+
+
+                            <button
+                                type="button"
+                                class="remove-filter-button active-filter-remove"
+                                data-remove-filter="start_date_from"
+                                aria-label="حذف تاریخ شروع از"
+                            >
+
+                                ×
+
+                            </button>
+
+                        </div>
+
+                    {% endif %}
+
+
+
+                    <!-- START DATE TO -->
+
+                    {% if start_date_to_value %}
+
+                        <div class="active-filter-chip">
+
+                            <span class="active-filter-chip-label">
+
+                                شروع تا:
+                                {{ start_date_to_value }}
+
+                            </span>
+
+
+                            <button
+                                type="button"
+                                class="remove-filter-button active-filter-remove"
+                                data-remove-filter="start_date_to"
+                                aria-label="حذف تاریخ شروع تا"
+                            >
+
+                                ×
+
+                            </button>
+
+                        </div>
+
+                    {% endif %}
+
+
+
+                    <!-- END DATE FROM -->
+
+                    {% if end_date_from_value %}
+
+                        <div class="active-filter-chip">
+
+                            <span class="active-filter-chip-label">
+
+                                اتمام از:
+                                {{ end_date_from_value }}
+
+                            </span>
+
+
+                            <button
+                                type="button"
+                                class="remove-filter-button active-filter-remove"
+                                data-remove-filter="end_date_from"
+                                aria-label="حذف تاریخ اتمام از"
+                            >
+
+                                ×
+
+                            </button>
+
+                        </div>
+
+                    {% endif %}
+
+
+
+                    <!-- END DATE TO -->
+
+                    {% if end_date_to_value %}
+
+                        <div class="active-filter-chip">
+
+                            <span class="active-filter-chip-label">
+
+                                اتمام تا:
+                                {{ end_date_to_value }}
+
+                            </span>
+
+
+                            <button
+                                type="button"
+                                class="remove-filter-button active-filter-remove"
+                                data-remove-filter="end_date_to"
+                                aria-label="حذف تاریخ اتمام تا"
+                            >
+
+                                ×
+
+                            </button>
+
+                        </div>
+
+                    {% endif %}
+
+
+
+                    <!-- DEADLINE FROM -->
+
+                    {% if deadline_from_value %}
+
+                        <div class="active-filter-chip">
+
+                            <span class="active-filter-chip-label">
+
+                                مهلت از:
+                                {{ deadline_from_value }}
+
+                            </span>
+
+
+                            <button
+                                type="button"
+                                class="remove-filter-button active-filter-remove"
+                                data-remove-filter="deadline_from"
+                                aria-label="حذف مهلت از"
+                            >
+
+                                ×
+
+                            </button>
+
+                        </div>
+
+                    {% endif %}
+
+
+
+                    <!-- DEADLINE TO -->
+
+                    {% if deadline_to_value %}
+
+                        <div class="active-filter-chip">
+
+                            <span class="active-filter-chip-label">
+
+                                مهلت تا:
+                                {{ deadline_to_value }}
+
+                            </span>
+
+
+                            <button
+                                type="button"
+                                class="remove-filter-button active-filter-remove"
+                                data-remove-filter="deadline_to"
+                                aria-label="حذف مهلت تا"
+                            >
+
+                                ×
+
+                            </button>
+
+                        </div>
+
+                    {% endif %}
+
+
+
+                    <!-- CREATED AT FROM -->
+
+                    {% if created_at_from_value %}
+
+                        <div class="active-filter-chip">
+
+                            <span class="active-filter-chip-label">
+
+                                ایجاد از:
+                                {{ created_at_from_value }}
+
+                            </span>
+
+
+                            <button
+                                type="button"
+                                class="remove-filter-button active-filter-remove"
+                                data-remove-filter="created_at_from"
+                                aria-label="حذف تاریخ ایجاد از"
+                            >
+
+                                ×
+
+                            </button>
+
+                        </div>
+
+                    {% endif %}
+
+
+
+                    <!-- CREATED AT TO -->
+
+                    {% if created_at_to_value %}
+
+                        <div class="active-filter-chip">
+
+                            <span class="active-filter-chip-label">
+
+                                ایجاد تا:
+                                {{ created_at_to_value }}
+
+                            </span>
+
+
+                            <button
+                                type="button"
+                                class="remove-filter-button active-filter-remove"
+                                data-remove-filter="created_at_to"
+                                aria-label="حذف تاریخ ایجاد تا"
+                            >
+
+                                ×
+
+                            </button>
+
+                        </div>
+
+                    {% endif %}
+
+
+
+                    <!-- CLEAR ALL -->
+
+                    <button
+                        type="button"
+                        class="clear-all-filters"
+                    >
+
+                        پاک کردن همه
 
                     </button>
 
@@ -1126,191 +1164,363 @@
 
             </div>
 
-
-            <!-- ==================================================
-                 START DATE
-            ================================================== -->
-
-            <div class="create-task-field">
-
-                <label for="start-date">
-                    تاریخ شروع
-                </label>
-
-                <input
-                    type="text"
-                    name="start_date"
-                    id="start-date"
-                    class="jalali-date-input"
-                    placeholder="انتخاب تاریخ شروع"
-                    autocomplete="off"
-                    readonly
-                >
-
-            </div>
-
-
-            <!-- ==================================================
-                 DEADLINE
-            ================================================== -->
-
-            <div class="create-task-field">
-
-                <label for="deadline">
-                    مهلت
-                </label>
-
-                <input
-                    type="text"
-                    name="deadline"
-                    id="deadline"
-                    class="jalali-date-input"
-                    placeholder="انتخاب مهلت"
-                    autocomplete="off"
-                    readonly
-                >
-
-            </div>
-
-
-            <!-- ==================================================
-                 ERROR
-            ================================================== -->
-
-            <div
-                id="create-task-error"
-                class="create-task-error"
-                hidden
-            ></div>
-
-
-            <!-- ==================================================
-                 ACTION BUTTONS
-            ================================================== -->
-
-            <div class="create-task-actions">
-
-                <button
-                    type="button"
-                    id="cancel-task-button"
-                    class="cancel-task-button"
-                >
-
-                    انصراف
-
-                </button>
-
-
-                <button
-                    type="submit"
-                    id="save-task-button"
-                    class="save-task-button"
-                >
-
-                    ایجاد وظیفه
-
-                </button>
-
-            </div>
-
-        </form>
+        {% endif %}
 
     </div>
 
-</div>
 
 
+    <!-- ==================================================
+         TODO LIST
+    ================================================== -->
 
-<!-- ==================================================
-     CREATE TOPIC MODAL
-================================================== -->
-
-<div
-    id="create-topic-modal"
-    class="create-topic-modal"
-    hidden
->
-
-    <div class="create-topic-overlay"></div>
+    <section class="todo-list">
 
 
-    <div class="create-topic-container">
+        {% for todo in todos %}
 
-
-        <!-- Close button -->
-
-        <button
-            type="button"
-            id="create-topic-close"
-            class="create-topic-close"
-            aria-label="بستن"
-        >
-
-            ×
-
-        </button>
-
-
-        <!-- Modal title -->
-
-        <h2>
-            ایجاد موضوع جدید
-        </h2>
-
-
-        <!-- Topic input -->
-
-        <input
-            type="text"
-            id="new-topic-name"
-            class="new-topic-input"
-            placeholder="مثلاً ورزش"
-            maxlength="50"
-            autocomplete="off"
-        >
-
-
-        <!-- Topic actions -->
-
-        <div class="create-topic-actions">
-
-            <button
-                type="button"
-                id="cancel-topic-button"
-                class="cancel-topic-button"
+            <div
+                class="todo-card"
+                data-todo-id="{{ todo.id }}"
             >
 
-                انصراف
 
-            </button>
+                <!-- COMPLETE / INCOMPLETE -->
+
+                <form
+                    method="POST"
+                    action="{% url 'toggle_todo' todo.id %}"
+                    class="complete-form toggle-complete-form"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="complete-button {% if todo.completed %}completed{% endif %}"
+                        title="{% if todo.completed %}علامت‌گذاری به‌عنوان انجام‌نشده{% else %}علامت‌گذاری به‌عنوان انجام‌شده{% endif %}"
+                    >
+
+                        {% if todo.completed %}
+                            ✓
+                        {% endif %}
+
+                    </button>
+
+                </form>
 
 
-            <button
-                type="button"
-                id="save-topic-button"
-                class="save-topic-button"
-            >
 
-                ایجاد موضوع
+                <!-- TASK CONTENT -->
 
-            </button>
+                <div class="todo-content">
+
+                    <div class="todo-title">
+                        {{ todo.title }}
+                    </div>
+
+
+                    {% if todo.description %}
+
+                        <div class="todo-description">
+                            {{ todo.description }}
+                        </div>
+
+                    {% endif %}
+
+
+                    <div class="todo-meta">
+
+
+                        {% if todo.category == "public" %}
+
+                            <span class="category-badge public">
+                                عمومی
+                            </span>
+
+                        {% else %}
+
+                            <span class="category-badge personal">
+                                شخصی
+                            </span>
+
+                        {% endif %}
+
+
+                        {% if todo.topic %}
+
+                            <span class="topic-badge">
+
+                                <span class="topic-icon">
+                                    #
+                                </span>
+
+                                <span class="topic-name">
+                                    {{ todo.topic.name }}
+                                </span>
+
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- TASK ACTIONS -->
+
+                <div class="todo-actions">
+
+
+                    <!-- STATUS -->
+
+                    <span
+                        class="status {% if todo.completed %}completed{% endif %}"
+                    >
+
+                        {% if todo.completed %}
+
+                            انجام‌شده
+
+                        {% else %}
+
+                            در انتظار
+
+                        {% endif %}
+
+                    </span>
+
+
+                    <!-- IMPORTANT -->
+
+                    <form
+                        method="POST"
+                        action="{% url 'toggle_important' todo.id %}"
+                        class="toggle-important-form"
+                    >
+
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="important-button {% if todo.important %}important{% endif %}"
+                            title="{% if todo.important %}حذف از وظایف مهم{% else %}افزودن به وظایف مهم{% endif %}"
+                        >
+
+                            ★
+
+                        </button>
+
+                    </form>
+
+
+                    <!-- EDIT -->
+
+                    <a
+                        href="{% url 'edit_todo' todo.id %}"
+                        class="edit-button"
+                    >
+
+                        ✎ ویرایش
+
+                    </a>
+
+
+                    <!-- DELETE -->
+
+                    <form
+                        method="POST"
+                        action="{% url 'delete_todo' todo.id %}"
+                        class="delete-form"
+                    >
+
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="delete-button"
+                        >
+
+                            🗑 حذف
+
+                        </button>
+
+                    </form>
+
+
+                    <!-- TASK DATES -->
+
+                    <div class="todo-dates">
+
+                        <span class="todo-date">
+
+                            ایجاد:
+                            {{ todo.created_at_jalali_str }}
+
+                        </span>
+
+
+                        {% if todo.start_date_jalali_str %}
+
+                            <span class="todo-date">
+
+                                شروع:
+                                {{ todo.start_date_jalali_str }}
+
+                            </span>
+
+                        {% endif %}
+
+
+                        {% if todo.deadline_jalali_str %}
+
+                            <span class="todo-date">
+
+                                مهلت:
+                                {{ todo.deadline_jalali_str }}
+
+                            </span>
+
+                        {% endif %}
+
+
+                        {% if todo.end_date_jalali_str %}
+
+                            <span class="todo-date end-date">
+
+                                اتمام:
+                                {{ todo.end_date_jalali_str }}
+
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        {% empty %}
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    ✓
+                </div>
+
+                <h3>
+                    هنوز وظیفه‌ای ندارید
+                </h3>
+
+                <p>
+                    اولین وظیفه خود را ایجاد کنید تا شروع کنیم.
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+    </section>
+
+
+
+    <!-- ==================================================
+         PAGINATION
+    ================================================== -->
+
+    {% if page_obj.paginator.num_pages > 1 %}
+
+        <div class="pagination">
+
+
+            <!-- PREVIOUS -->
+
+            {% if page_obj.has_previous %}
+
+                <a
+                    href="?{% if my_tasks %}scope=my&{% endif %}{% if search_query %}search={{ search_query|urlencode }}&{% endif %}{% if filter_type %}filter={{ filter_type }}&{% endif %}{% if important_filter %}important=1&{% endif %}{% if selected_topic %}topic={{ selected_topic.id }}&{% endif %}{% if start_date_from_value %}start_date_from={{ start_date_from_value }}&{% endif %}{% if start_date_to_value %}start_date_to={{ start_date_to_value }}&{% endif %}{% if end_date_from_value %}end_date_from={{ end_date_from_value }}&{% endif %}{% if end_date_to_value %}end_date_to={{ end_date_to_value }}&{% endif %}{% if deadline_from_value %}deadline_from={{ deadline_from_value }}&{% endif %}{% if deadline_to_value %}deadline_to={{ deadline_to_value }}&{% endif %}{% if created_at_from_value %}created_at_from={{ created_at_from_value }}&{% endif %}{% if created_at_to_value %}created_at_to={{ created_at_to_value }}&{% endif %}page={{ page_obj.previous_page_number }}"
+                    class="pagination-button"
+                >
+
+                    قبلی
+
+                </a>
+
+            {% endif %}
+
+
+            <!-- PAGE NUMBERS -->
+
+            <div class="pagination-pages">
+
+                {% for page in page_numbers %}
+
+                    {% if page.number is None %}
+
+                        <span
+                            class="pagination-page dots"
+                            aria-hidden="true"
+                        >
+
+                            …
+
+                        </span>
+
+                    {% elif page.number == page_obj.number %}
+
+                        <span
+                            class="pagination-page active"
+                            aria-current="page"
+                        >
+
+                            {{ page.display }}
+
+                        </span>
+
+                    {% else %}
+
+                        <a
+                            href="?{% if my_tasks %}scope=my&{% endif %}{% if search_query %}search={{ search_query|urlencode }}&{% endif %}{% if filter_type %}filter={{ filter_type }}&{% endif %}{% if important_filter %}important=1&{% endif %}{% if selected_topic %}topic={{ selected_topic.id }}&{% endif %}{% if start_date_from_value %}start_date_from={{ start_date_from_value }}&{% endif %}{% if start_date_to_value %}start_date_to={{ start_date_to_value }}&{% endif %}{% if end_date_from_value %}end_date_from={{ end_date_from_value }}&{% endif %}{% if end_date_to_value %}end_date_to={{ end_date_to_value }}&{% endif %}{% if deadline_from_value %}deadline_from={{ deadline_from_value }}&{% endif %}{% if deadline_to_value %}deadline_to={{ deadline_to_value }}&{% endif %}{% if created_at_from_value %}created_at_from={{ created_at_from_value }}&{% endif %}{% if created_at_to_value %}created_at_to={{ created_at_to_value }}&{% endif %}page={{ page.number }}"
+                            class="pagination-page"
+                        >
+
+                            {{ page.display }}
+
+                        </a>
+
+                    {% endif %}
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- NEXT -->
+
+            {% if page_obj.has_next %}
+
+                <a
+                    href="?{% if my_tasks %}scope=my&{% endif %}{% if search_query %}search={{ search_query|urlencode }}&{% endif %}{% if filter_type %}filter={{ filter_type }}&{% endif %}{% if important_filter %}important=1&{% endif %}{% if selected_topic %}topic={{ selected_topic.id }}&{% endif %}{% if start_date_from_value %}start_date_from={{ start_date_from_value }}&{% endif %}{% if start_date_to_value %}start_date_to={{ start_date_to_value }}&{% endif %}{% if end_date_from_value %}end_date_from={{ end_date_from_value }}&{% endif %}{% if end_date_to_value %}end_date_to={{ end_date_to_value }}&{% endif %}{% if deadline_from_value %}deadline_from={{ deadline_from_value }}&{% endif %}{% if deadline_to_value %}deadline_to={{ deadline_to_value }}&{% endif %}{% if created_at_from_value %}created_at_from={{ created_at_from_value }}&{% endif %}{% if created_at_to_value %}created_at_to={{ created_at_to_value }}&{% endif %}page={{ page_obj.next_page_number }}"
+                    class="pagination-button"
+                >
+
+                    بعدی
+
+                </a>
+
+            {% endif %}
 
         </div>
 
+    {% endif %}
 
-        <!-- Topic error -->
-
-        <div
-            id="create-topic-error"
-            class="create-topic-error"
-            hidden
-        ></div>
-
-    </div>
+</main>
 
 </div>
-
-
 
 <!-- ==================================================
      CALENDAR PICKER MODAL
@@ -1321,133 +1531,116 @@
     class="calendar-picker-modal"
     hidden
 >
-
-    <div class="calendar-picker-overlay"></div>
-
-
-    <div class="calendar-picker-container">
+    
+<div class="calendar-picker-overlay"></div>
 
 
-        <!-- Close calendar picker -->
-
-        <button
-            type="button"
-            id="calendar-picker-close"
-            class="calendar-picker-close"
-            aria-label="بستن تقویم"
-        >
-
-            ×
-
-        </button>
+<div class="calendar-picker-container">
 
 
-        <!-- Calendar header -->
+    <!-- CLOSE -->
 
-        <div class="calendar-picker-header">
+    <button
+        type="button"
+        id="calendar-picker-close"
+        class="calendar-picker-close"
+        aria-label="بستن تقویم"
+    >
 
-            <h2>
-                انتخاب تاریخ
-            </h2>
+        ×
+
+    </button>
+
+
+    <!-- HEADER -->
+
+    <div class="calendar-picker-header">
+
+        <h2>
+            انتخاب تاریخ
+        </h2>
+
+    </div>
+
+
+    <!-- CALENDAR -->
+
+    <div class="calendar">
+
+
+        <!-- TOPBAR -->
+
+        <div class="calendar-topbar">
+
+            <button
+                type="button"
+                id="previous-month"
+                class="month-button"
+                aria-label="ماه قبل"
+            >
+
+                ‹
+
+            </button>
+
+
+            <div
+                id="month-title"
+                class="month-title"
+            ></div>
+
+
+            <button
+                type="button"
+                id="next-month"
+                class="month-button"
+                aria-label="ماه بعد"
+            >
+
+                ›
+
+            </button>
 
         </div>
 
 
-        <!-- Calendar -->
+        <!-- WEEKDAYS -->
 
-        <div class="calendar">
-
-
-            <!-- Calendar navigation -->
-
-            <div class="calendar-topbar">
+        <div
+            id="weekdays"
+            class="weekdays"
+        ></div>
 
 
-                <!-- Previous month -->
+        <!-- DAYS -->
 
-                <button
-                    type="button"
-                    id="previous-month"
-                    class="month-button"
-                    aria-label="ماه قبل"
-                >
-
-                    ‹
-
-                </button>
-
-
-                <!-- Current month title -->
-
-                <div
-                    id="month-title"
-                    class="month-title"
-                ></div>
-
-
-                <!-- Next month -->
-
-                <button
-                    type="button"
-                    id="next-month"
-                    class="month-button"
-                    aria-label="ماه بعد"
-                >
-
-                    ›
-
-                </button>
-
-            </div>
-
-
-            <!-- Weekday names -->
-
-            <div
-                id="weekdays"
-                class="weekdays"
-            ></div>
-
-
-            <!-- Calendar days -->
-
-            <div
-                id="calendar-grid"
-                class="calendar-grid"
-            ></div>
-
-        </div>
+        <div
+            id="calendar-grid"
+            class="calendar-grid"
+        ></div>
 
     </div>
 
 </div>
 
 
+</div>
 
 <!-- ==================================================
      JAVASCRIPT
 ================================================== -->
 
-<!-- Calendar JavaScript -->
-
 <script
     src="{% static 'calendar/calendar.js' %}"
 ></script>
-
-
-<!-- Todo JavaScript -->
 
 <script
     src="{% static 'tasks/todo.js' %}"
 ></script>
 
-
-<!-- Home page JavaScript -->
-
 <script
     src="{% static 'tasks/home.js' %}"
 ></script>
-
 
 </body>
 

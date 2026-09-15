@@ -145,10 +145,7 @@
 body {
     margin: 0;
 
-    font-family:
-        Tahoma,
-        Arial,
-        sans-serif;
+    font-family: inherit;
 
     background: #f5f7fb;
 

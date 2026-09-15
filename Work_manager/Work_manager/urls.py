@@ -1,43 +1,84 @@
 """
 URL configuration for Work_manager project.
 """
+
 from django.contrib import admin
 from django.urls import path, include
-from tasks.views.google import google_connect, google_callback
+
+from tasks.views.google import (
+    google_connect,
+    google_callback
+)
+
 from tasks.views import (
+    landing,
     home,
+    create_todo,
     toggle_todo,
     edit_todo,
     delete_todo,
     toggle_important,
     important_tasks,
     create_topic,
-    #register_view,
-    #login_view,
-    #logout_view
+    # register_view,
+    # login_view,
+    # logout_view
 )
 
 
 urlpatterns = [
 
-    # Admin
+    # ==================================================
+    # ADMIN
+    # ==================================================
+
     path(
         "admin/",
         admin.site.urls
     ),
-  #  path("register/", register_view, name="register"),
- #   path("login/", login_view, name="login"),
-  #  path("logout/", logout_view, name="logout"),
 
-    # Home
+    # path("register/", register_view, name="register"),
+    # path("login/", login_view, name="login"),
+    # path("logout/", logout_view, name="logout"),
+
+
+    # ==================================================
+    # MAIN HOME PAGE
+    # ==================================================
+
     path(
         "",
-        home,
+        landing,
         name="home"
     ),
 
 
-    # Todo - Complete
+    # ==================================================
+    # DASHBOARD
+    # ==================================================
+
+    path(
+        "dashboard/",
+        home,
+        name="dashboard"
+    ),
+
+
+    # ==================================================
+    # TODO - CREATE
+    # ==================================================
+
+    path(
+        "todo/create/",
+        create_todo,
+        name="create_todo"
+    ),
+
+
+    # ==================================================
+    # TODO - COMPLETE
+    # ==================================================
+
     path(
         "todo/<int:todo_id>/toggle/",
         toggle_todo,
@@ -45,7 +86,10 @@ urlpatterns = [
     ),
 
 
-    # Todo - Important
+    # ==================================================
+    # TODO - IMPORTANT
+    # ==================================================
+
     path(
         "todo/<int:todo_id>/toggle-important/",
         toggle_important,
@@ -53,7 +97,10 @@ urlpatterns = [
     ),
 
 
-    # Todo - Edit
+    # ==================================================
+    # TODO - EDIT
+    # ==================================================
+
     path(
         "todo/<int:todo_id>/edit/",
         edit_todo,
@@ -61,7 +108,10 @@ urlpatterns = [
     ),
 
 
-    # Todo - Delete
+    # ==================================================
+    # TODO - DELETE
+    # ==================================================
+
     path(
         "todo/<int:todo_id>/delete/",
         delete_todo,
@@ -69,20 +119,43 @@ urlpatterns = [
     ),
 
 
-    # Important Tasks Page
+    # ==================================================
+    # IMPORTANT TASKS PAGE
+    # ==================================================
+
     path(
         "important/",
         important_tasks,
         name="important_tasks"
     ),
-    path("calendar/",
-         include("mycalendar.urls"),
-         name="mycalendarurls"
+
+
+    # ==================================================
+    # CALENDAR
+    # ==================================================
+
+    path(
+        "calendar/",
+        include("mycalendar.urls"),
+        name="mycalendarurls"
     ),
-    path('accounts/',
-         include('accounts.urls'),
-         name="accountsurls"
-         ),
+
+
+    # ==================================================
+    # ACCOUNTS
+    # ==================================================
+
+    path(
+        "accounts/",
+        include("accounts.urls"),
+        name="accountsurls"
+    ),
+
+
+    # ==================================================
+    # GOOGLE CALENDAR
+    # ==================================================
+
     path(
         "google/connect/",
         google_connect,
@@ -94,6 +167,11 @@ urlpatterns = [
         google_callback,
         name="google_callback"
     ),
+
+
+    # ==================================================
+    # TOPICS
+    # ==================================================
 
     path(
         "topic/create/",

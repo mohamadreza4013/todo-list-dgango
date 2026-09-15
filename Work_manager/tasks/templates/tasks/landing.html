@@ -1,0 +1,1699 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>TaskFlow | صفحه اصلی</title>
+
+
+    <!-- ==================================================
+         TASKFLOW CSS
+    ================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="{% static 'tasks/style.css' %}"
+    >
+
+
+    <!-- ==================================================
+         CALENDAR CSS
+    ================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="{% static 'calendar/calendar.css' %}"
+    >
+
+
+    <style>
+
+        /* ==================================================
+           LANDING PAGE
+        ================================================== */
+
+        .landing-page {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+
+        /* ==================================================
+           LANDING HEADER
+        ================================================== */
+
+        .landing-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+
+
+        .landing-welcome h1 {
+            margin: 0;
+            font-size: 30px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+
+        .landing-welcome p {
+            margin: 8px 0 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+
+        .landing-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+
+        .landing-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 0 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+
+        .landing-action.primary {
+            background: #4f46e5;
+            color: #fff;
+        }
+
+
+        .landing-action.primary:hover {
+            background: #4338ca;
+        }
+
+
+        .landing-action.secondary {
+            background: #fff;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+        }
+
+
+        .landing-action.secondary:hover {
+            background: #f9fafb;
+        }
+
+
+        /* ==================================================
+           FOUR MAIN CARDS
+        ================================================== */
+
+        .landing-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+
+        .landing-panel {
+            min-width: 0;
+
+            background: #fff;
+
+            border: 1px solid #eef0f4;
+            border-radius: 16px;
+
+            overflow: hidden;
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                border-color 0.2s ease;
+        }
+
+
+        .landing-panel:hover {
+            transform: translateY(-2px);
+
+            border-color: #e5e7eb;
+
+            box-shadow:
+                0 8px 24px rgba(17, 24, 39, 0.06);
+        }
+
+
+        /* ==================================================
+           CARD HEADER
+        ================================================== */
+
+        .landing-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 12px;
+
+            padding: 18px 20px;
+
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+
+        .landing-panel-title {
+            display: flex;
+            align-items: center;
+
+            gap: 9px;
+
+            min-width: 0;
+        }
+
+
+        .landing-panel-icon {
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            width: 32px;
+            height: 32px;
+
+            flex-shrink: 0;
+
+            border-radius: 9px;
+
+            background: #f5f3ff;
+
+            font-size: 15px;
+        }
+
+
+        .landing-panel-header h2 {
+            margin: 0;
+
+            color: #111827;
+
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+
+        .landing-panel-link {
+            flex-shrink: 0;
+
+            color: #4f46e5;
+
+            text-decoration: none;
+
+            font-size: 12px;
+            font-weight: 600;
+
+            transition: color 0.2s ease;
+        }
+
+
+        .landing-panel-link:hover {
+            color: #4338ca;
+        }
+
+
+        /* ==================================================
+           CARD BODY
+        ================================================== */
+
+        .landing-panel-body {
+            min-height: 280px;
+
+            padding: 4px 20px 12px;
+        }
+
+
+        /* ==================================================
+           TASK ITEM
+        ================================================== */
+
+        .landing-task {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 16px;
+
+            padding: 15px 0;
+
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+
+        .landing-task:last-child {
+            border-bottom: none;
+        }
+
+
+        .landing-task-main {
+            min-width: 0;
+            flex: 1;
+        }
+
+
+        .landing-task-title {
+            display: block;
+
+            overflow: hidden;
+
+            color: #1f2937;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+
+        .landing-task-title.completed {
+            color: #9ca3af;
+            text-decoration: line-through;
+        }
+
+
+        .landing-task-meta {
+            display: flex;
+            align-items: center;
+
+            flex-wrap: wrap;
+
+            gap: 7px;
+
+            margin-top: 7px;
+        }
+
+
+        .landing-task-category,
+        .landing-task-topic {
+            display: inline-flex;
+
+            align-items: center;
+
+            padding: 4px 8px;
+
+            border-radius: 7px;
+
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+
+        .landing-task-category.public {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+
+        .landing-task-category.personal {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+
+        .landing-task-topic {
+            background: #f0fdf4;
+            color: #15803d;
+        }
+
+
+        /* ==================================================
+           TASK SIDE
+        ================================================== */
+
+        .landing-task-side {
+            flex-shrink: 0;
+
+            min-width: 90px;
+
+            text-align: left;
+        }
+
+
+        .landing-task-date {
+            display: block;
+
+            color: #9ca3af;
+
+            font-size: 11px;
+
+            line-height: 1.7;
+
+            white-space: nowrap;
+        }
+
+
+        .landing-important {
+            color: #eab308;
+
+            font-size: 15px;
+
+            margin-left: 4px;
+        }
+
+
+        /* ==================================================
+           EMPTY STATE
+        ================================================== */
+
+        .landing-empty {
+            min-height: 250px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 28px 10px;
+
+            text-align: center;
+
+            color: #9ca3af;
+
+            font-size: 13px;
+        }
+
+
+        /* ==================================================
+           RESPONSIVE
+        ================================================== */
+
+        @media (max-width: 1000px) {
+
+            .landing-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+
+        @media (max-width: 650px) {
+
+            .landing-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+
+            .landing-actions {
+                width: 100%;
+            }
+
+
+            .landing-action {
+                flex: 1;
+            }
+
+
+            .landing-panel-body {
+                min-height: 0;
+            }
+
+
+            .landing-task {
+                gap: 10px;
+            }
+
+
+            .landing-task-side {
+                min-width: 75px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+
+    <!-- ==================================================
+         SIDEBAR
+    ================================================== -->
+
+    <aside class="sidebar">
+
+
+        <!-- ==================================================
+             LOGO
+        ================================================== -->
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                ✓
+            </div>
+
+            <span>
+                تسک‌فلو
+            </span>
+
+        </div>
+
+
+        <!-- ==================================================
+             WORKSPACE NAVIGATION TITLE
+        ================================================== -->
+
+        <div class="nav-title">
+            فضای کاری
+        </div>
+
+
+        <!-- ==================================================
+             MAIN NAVIGATION
+        ================================================== -->
+
+        <nav class="nav">
+
+
+            <!-- MAIN HOME -->
+
+            <a
+                href="{% url 'home' %}"
+                class="nav-item active"
+            >
+
+                <span>
+                    ⌂
+                </span>
+
+                صفحه اصلی
+
+            </a>
+
+
+            <!-- DASHBOARD -->
+
+            <a
+                href="{% url 'dashboard' %}"
+                class="nav-item"
+            >
+
+                <span>
+                    ▦
+                </span>
+
+                داشبورد
+
+            </a>
+
+
+            <!-- MY TASKS -->
+
+            <a
+                href="{% url 'dashboard' %}?scope=my"
+                class="nav-item"
+            >
+
+                <span>
+                    ✓
+                </span>
+
+                وظایف من
+
+            </a>
+
+
+            <!-- LOGOUT -->
+
+            <a
+                href="{% url 'logout_confirm' %}"
+                class="nav-item"
+            >
+
+                <span>
+                    ↪
+                </span>
+
+                خروج
+
+            </a>
+
+        </nav>
+
+
+        <!-- ==================================================
+             SIDEBAR BOTTOM
+        ================================================== -->
+
+        <div class="sidebar-bottom">
+
+
+            <!-- GOOGLE CALENDAR -->
+
+            <div class="nav">
+
+                {% if google_connected %}
+
+                    <div class="nav-item google-connected">
+
+                        <span>
+                            ✓
+                        </span>
+
+                        Google Calendar متصل است
+
+                    </div>
+
+                {% else %}
+
+                    <a
+                        href="{% url 'google_connect' %}"
+                        class="nav-item"
+                    >
+
+                        <span>
+                            📅
+                        </span>
+
+                        اتصال به Google Calendar
+
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- CALENDAR -->
+
+            <div class="nav">
+
+                <a
+                    href="{% url 'calendar' %}"
+                    class="nav-item"
+                >
+
+                    <span>
+                        📅
+                    </span>
+
+                    تقویم
+
+                </a>
+
+            </div>
+
+
+            <!-- SETTINGS -->
+
+            <div class="nav">
+
+                <a
+                    href="#"
+                    class="nav-item"
+                >
+
+                    <span>
+                        ⚙
+                    </span>
+
+                    تنظیمات
+
+                </a>
+
+            </div>
+
+
+            <!-- USER PROFILE -->
+
+            <div class="profile">
+
+                <div class="avatar">
+
+                    {% if user.first_name and user.last_name %}
+
+                        {{ user.first_name|first }}{{ user.last_name|first }}
+
+                    {% elif user.first_name %}
+
+                        {{ user.first_name|first }}
+
+                    {% else %}
+
+                        {{ user.username|first }}
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="profile-info">
+
+                    <span class="profile-name">
+
+                        {% if user.first_name %}
+
+                            {{ user.first_name }}
+
+                            {% if user.last_name %}
+
+                                {{ user.last_name }}
+
+                            {% endif %}
+
+                        {% else %}
+
+                            {{ user.username }}
+
+                        {% endif %}
+
+                    </span>
+
+
+                    <span class="profile-email">
+
+                        {% if user.email %}
+
+                            {{ user.email }}
+
+                        {% else %}
+
+                            حساب کاربری
+
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- ==================================================
+         MAIN CONTENT
+    ================================================== -->
+
+    <main class="main">
+
+        <div class="landing-page">
+
+
+            <!-- ==================================================
+                 HEADER
+            ================================================== -->
+
+            <div class="landing-header">
+
+                <div class="landing-welcome">
+
+                    <h1>
+                        صفحه اصلی
+                    </h1>
+
+                    <p>
+                        نمای کلی از وضعیت وظایف شما
+                    </p>
+
+                </div>
+
+
+                <div class="landing-actions">
+
+                    <a
+                        href="{% url 'dashboard' %}"
+                        class="landing-action secondary"
+                    >
+
+                        مشاهده داشبورد
+
+                    </a>
+
+
+                    <button
+                        type="button"
+                        id="create-task-button"
+                        class="landing-action primary"
+                    >
+
+                        + ایجاد وظیفه
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ==================================================
+                 FOUR MAIN CARDS
+            ================================================== -->
+
+            <div class="landing-grid">
+
+
+                <!-- ==================================================
+                     1. LATEST TASKS
+                ================================================== -->
+
+                <section class="landing-panel">
+
+                    <div class="landing-panel-header">
+
+                        <div class="landing-panel-title">
+
+                            <span class="landing-panel-icon">
+                                🕘
+                            </span>
+
+                            <h2>
+                                آخرین وظایف ایجاد شده
+                            </h2>
+
+                        </div>
+
+
+                        <a
+                            href="{% url 'dashboard' %}"
+                            class="landing-panel-link"
+                        >
+
+                            مشاهده همه
+
+                        </a>
+
+                    </div>
+
+
+                    <div class="landing-panel-body">
+
+                        {% for todo in latest_tasks %}
+
+                            <div class="landing-task">
+
+                                <div class="landing-task-main">
+
+                                    <span class="landing-task-title">
+
+                                        {% if todo.important %}
+
+                                            <span class="landing-important">
+                                                ★
+                                            </span>
+
+                                        {% endif %}
+
+                                        {{ todo.title }}
+
+                                    </span>
+
+
+                                    <div class="landing-task-meta">
+
+                                        <span
+                                            class="landing-task-category {% if todo.category == 'public' %}public{% else %}personal{% endif %}"
+                                        >
+
+                                            {% if todo.category == "public" %}
+
+                                                عمومی
+
+                                            {% else %}
+
+                                                شخصی
+
+                                            {% endif %}
+
+                                        </span>
+
+
+                                        {% if todo.topic %}
+
+                                            <span class="landing-task-topic">
+
+                                                # {{ todo.topic.name }}
+
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="landing-task-side">
+
+                                    <span class="landing-task-date">
+
+                                        {{ todo.created_at_jalali_str }}
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        {% empty %}
+
+                            <div class="landing-empty">
+
+                                هنوز وظیفه‌ای ایجاد نشده است.
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- ==================================================
+                     2. IMPORTANT TASKS
+                ================================================== -->
+
+                <section class="landing-panel">
+
+                    <div class="landing-panel-header">
+
+                        <div class="landing-panel-title">
+
+                            <span class="landing-panel-icon">
+                                ⭐
+                            </span>
+
+                            <h2>
+                                وظایف مهم
+                            </h2>
+
+                        </div>
+
+
+                        <a
+                            href="{% url 'dashboard' %}?important=1"
+                            class="landing-panel-link"
+                        >
+
+                            مشاهده همه
+
+                        </a>
+
+                    </div>
+
+
+                    <div class="landing-panel-body">
+
+                        {% for todo in important_tasks %}
+
+                            <div class="landing-task">
+
+                                <div class="landing-task-main">
+
+                                    <span class="landing-task-title">
+
+                                        <span class="landing-important">
+                                            ★
+                                        </span>
+
+                                        {{ todo.title }}
+
+                                    </span>
+
+
+                                    <div class="landing-task-meta">
+
+                                        <span
+                                            class="landing-task-category {% if todo.category == 'public' %}public{% else %}personal{% endif %}"
+                                        >
+
+                                            {% if todo.category == "public" %}
+
+                                                عمومی
+
+                                            {% else %}
+
+                                                شخصی
+
+                                            {% endif %}
+
+                                        </span>
+
+
+                                        {% if todo.topic %}
+
+                                            <span class="landing-task-topic">
+
+                                                # {{ todo.topic.name }}
+
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="landing-task-side">
+
+                                    {% if todo.deadline_jalali_str %}
+
+                                        <span class="landing-task-date">
+
+                                            مهلت:
+                                            {{ todo.deadline_jalali_str }}
+
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="landing-task-date">
+
+                                            بدون مهلت
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        {% empty %}
+
+                            <div class="landing-empty">
+
+                                در حال حاضر وظیفه مهمی وجود ندارد.
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- ==================================================
+                     3. UPCOMING TASKS
+                ================================================== -->
+
+                <section class="landing-panel">
+
+                    <div class="landing-panel-header">
+
+                        <div class="landing-panel-title">
+
+                            <span class="landing-panel-icon">
+                                📅
+                            </span>
+
+                            <h2>
+                                وظایف پیش رو
+                            </h2>
+
+                        </div>
+
+
+                        <a
+                            href="{% url 'dashboard' %}"
+                            class="landing-panel-link"
+                        >
+
+                            مشاهده همه
+
+                        </a>
+
+                    </div>
+
+
+                    <div class="landing-panel-body">
+
+                        {% for todo in upcoming_tasks %}
+
+                            <div class="landing-task">
+
+                                <div class="landing-task-main">
+
+                                    <span class="landing-task-title">
+
+                                        {% if todo.important %}
+
+                                            <span class="landing-important">
+                                                ★
+                                            </span>
+
+                                        {% endif %}
+
+                                        {{ todo.title }}
+
+                                    </span>
+
+
+                                    <div class="landing-task-meta">
+
+                                        <span
+                                            class="landing-task-category {% if todo.category == 'public' %}public{% else %}personal{% endif %}"
+                                        >
+
+                                            {% if todo.category == "public" %}
+
+                                                عمومی
+
+                                            {% else %}
+
+                                                شخصی
+
+                                            {% endif %}
+
+                                        </span>
+
+
+                                        {% if todo.topic %}
+
+                                            <span class="landing-task-topic">
+
+                                                # {{ todo.topic.name }}
+
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="landing-task-side">
+
+                                    <span class="landing-task-date">
+
+                                        شروع:
+                                        {{ todo.start_date_jalali_str }}
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        {% empty %}
+
+                            <div class="landing-empty">
+
+                                هنوز وظیفه‌ای برای آینده وجود ندارد.
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- ==================================================
+                     4. UPCOMING DEADLINES
+                ================================================== -->
+
+                <section class="landing-panel">
+
+                    <div class="landing-panel-header">
+
+                        <div class="landing-panel-title">
+
+                            <span class="landing-panel-icon">
+                                ⏰
+                            </span>
+
+                            <h2>
+                                مهلت‌های پیش رو
+                            </h2>
+
+                        </div>
+
+
+                        <a
+                            href="{% url 'dashboard' %}"
+                            class="landing-panel-link"
+                        >
+
+                            مشاهده همه
+
+                        </a>
+
+                    </div>
+
+
+                    <div class="landing-panel-body">
+
+                        {% for todo in upcoming_deadlines %}
+
+                            <div class="landing-task">
+
+                                <div class="landing-task-main">
+
+                                    <span class="landing-task-title">
+
+                                        {% if todo.important %}
+
+                                            <span class="landing-important">
+                                                ★
+                                            </span>
+
+                                        {% endif %}
+
+                                        {{ todo.title }}
+
+                                    </span>
+
+
+                                    <div class="landing-task-meta">
+
+                                        <span
+                                            class="landing-task-category {% if todo.category == 'public' %}public{% else %}personal{% endif %}"
+                                        >
+
+                                            {% if todo.category == "public" %}
+
+                                                عمومی
+
+                                            {% else %}
+
+                                                شخصی
+
+                                            {% endif %}
+
+                                        </span>
+
+
+                                        {% if todo.topic %}
+
+                                            <span class="landing-task-topic">
+
+                                                # {{ todo.topic.name }}
+
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="landing-task-side">
+
+                                    <span class="landing-task-date">
+
+                                        مهلت:
+                                        {{ todo.deadline_jalali_str }}
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        {% empty %}
+
+                            <div class="landing-empty">
+
+                                در حال حاضر مهلت نزدیکی ثبت نشده است.
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+
+<!-- ==================================================
+     CREATE TASK MODAL
+================================================== -->
+
+<div
+    id="create-task-modal"
+    class="create-task-modal"
+    hidden
+>
+
+    <div class="create-task-overlay"></div>
+
+
+    <div class="create-task-container">
+
+        <button
+            type="button"
+            id="create-task-close"
+            class="create-task-close"
+            aria-label="بستن"
+        >
+
+            ×
+
+        </button>
+
+
+        <h2>
+            ایجاد وظیفه جدید
+        </h2>
+
+
+        <form
+            method="POST"
+            class="create-task-form"
+            id="create-task-form"
+        >
+
+            {% csrf_token %}
+
+
+            <div class="create-task-field">
+
+                <label for="task-title">
+                    عنوان وظیفه
+                </label>
+
+                <input
+                    type="text"
+                    name="title"
+                    id="task-title"
+                    placeholder="چه کاری باید انجام دهید؟"
+                    required
+                >
+
+            </div>
+
+
+            <div class="create-task-field">
+
+                <label for="task-description">
+                    توضیحات
+                </label>
+
+                <textarea
+                    name="description"
+                    id="task-description"
+                    placeholder="توضیحات را اضافه کنید..."
+                    rows="3"
+                ></textarea>
+
+            </div>
+
+
+            <div class="create-task-field">
+
+                <label for="task-category">
+                    نوع وظیفه
+                </label>
+
+                <select
+                    name="category"
+                    id="task-category"
+                    class="task-category-input"
+                >
+
+                    <option value="personal">
+                        شخصی
+                    </option>
+
+                    <option value="public">
+                        عمومی
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="create-task-field">
+
+                <label for="task-topic">
+                    موضوع
+                </label>
+
+
+                <div class="topic-input-row">
+
+                    <select
+                        name="topic"
+                        id="task-topic"
+                        class="task-topic-input"
+                    >
+
+                        {% for topic in personal_topics %}
+
+                            <option
+                                value="{{ topic.id }}"
+                                data-category="personal"
+                            >
+
+                                {{ topic.name }}
+
+                            </option>
+
+                        {% endfor %}
+
+
+                        {% for topic in public_topics %}
+
+                            <option
+                                value="{{ topic.id }}"
+                                data-category="public"
+                            >
+
+                                {{ topic.name }}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+
+                    <button
+                        type="button"
+                        id="create-topic-button"
+                        class="create-topic-button"
+                    >
+
+                        + موضوع جدید
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="create-task-field">
+
+                <label for="start-date">
+                    تاریخ شروع
+                </label>
+
+                <input
+                    type="text"
+                    name="start_date"
+                    id="start-date"
+                    class="jalali-date-input"
+                    placeholder="انتخاب تاریخ شروع"
+                    autocomplete="off"
+                    readonly
+                >
+
+            </div>
+
+
+            <div class="create-task-field">
+
+                <label for="deadline">
+                    مهلت
+                </label>
+
+                <input
+                    type="text"
+                    name="deadline"
+                    id="deadline"
+                    class="jalali-date-input"
+                    placeholder="انتخاب مهلت"
+                    autocomplete="off"
+                    readonly
+                >
+
+            </div>
+
+
+            <div
+                id="create-task-error"
+                class="create-task-error"
+                hidden
+            ></div>
+
+
+            <div class="create-task-actions">
+
+                <button
+                    type="button"
+                    id="cancel-task-button"
+                    class="cancel-task-button"
+                >
+
+                    انصراف
+
+                </button>
+
+
+                <button
+                    type="submit"
+                    id="save-task-button"
+                    class="save-task-button"
+                >
+
+                    ایجاد وظیفه
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<!-- ==================================================
+     CREATE TOPIC MODAL
+================================================== -->
+
+<div
+    id="create-topic-modal"
+    class="create-topic-modal"
+    hidden
+>
+
+    <div class="create-topic-overlay"></div>
+
+
+    <div class="create-topic-container">
+
+        <button
+            type="button"
+            id="create-topic-close"
+            class="create-topic-close"
+            aria-label="بستن"
+        >
+
+            ×
+
+        </button>
+
+
+        <h2>
+            ایجاد موضوع جدید
+        </h2>
+
+
+        <input
+            type="text"
+            id="new-topic-name"
+            class="new-topic-input"
+            placeholder="مثلاً ورزش"
+            maxlength="50"
+            autocomplete="off"
+        >
+
+
+        <div class="create-topic-actions">
+
+            <button
+                type="button"
+                id="cancel-topic-button"
+                class="cancel-topic-button"
+            >
+
+                انصراف
+
+            </button>
+
+
+            <button
+                type="button"
+                id="save-topic-button"
+                class="save-topic-button"
+            >
+
+                ایجاد موضوع
+
+            </button>
+
+        </div>
+
+
+        <div
+            id="create-topic-error"
+            class="create-topic-error"
+            hidden
+        ></div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ==================================================
+     CALENDAR PICKER MODAL
+================================================== -->
+
+<div
+    id="calendar-picker-modal"
+    class="calendar-picker-modal"
+    hidden
+>
+
+    <div class="calendar-picker-overlay"></div>
+
+
+    <div class="calendar-picker-container">
+
+        <button
+            type="button"
+            id="calendar-picker-close"
+            class="calendar-picker-close"
+            aria-label="بستن تقویم"
+        >
+
+            ×
+
+        </button>
+
+
+        <div class="calendar-picker-header">
+
+            <h2>
+                انتخاب تاریخ
+            </h2>
+
+        </div>
+
+
+        <div class="calendar">
+
+            <div class="calendar-topbar">
+
+                <button
+                    type="button"
+                    id="previous-month"
+                    class="month-button"
+                    aria-label="ماه قبل"
+                >
+
+                    ‹
+
+                </button>
+
+
+                <div
+                    id="month-title"
+                    class="month-title"
+                ></div>
+
+
+                <button
+                    type="button"
+                    id="next-month"
+                    class="month-button"
+                    aria-label="ماه بعد"
+                >
+
+                    ›
+
+                </button>
+
+            </div>
+
+
+            <div
+                id="weekdays"
+                class="weekdays"
+            ></div>
+
+
+            <div
+                id="calendar-grid"
+                class="calendar-grid"
+            ></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ==================================================
+     JAVASCRIPT
+================================================== -->
+
+<script
+    src="{% static 'calendar/calendar.js' %}"
+></script>
+
+
+<script
+    src="{% static 'tasks/todo.js' %}"
+></script>
+
+
+<script
+    src="{% static 'tasks/home.js' %}"
+></script>
+
+
+</body>
+
+</html>

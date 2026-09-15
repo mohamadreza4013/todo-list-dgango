@@ -1,8 +1,11 @@
+from datetime import datetime, time
+
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.utils import timezone
 
 import jdatetime
 
@@ -87,6 +90,48 @@ def format_jalali_date(value):
 
     return to_persian_digits(
         value.strftime("%Y/%m/%d")
+    )
+
+
+def jalali_start_to_gregorian_datetime(value):
+    """
+    Convert a Jalali date to the beginning of that Gregorian day.
+    """
+
+    if not value:
+        return None
+
+    gregorian_date = value.togregorian()
+
+    naive_datetime = datetime.combine(
+        gregorian_date,
+        time.min
+    )
+
+    return timezone.make_aware(
+        naive_datetime,
+        timezone.get_current_timezone()
+    )
+
+
+def jalali_end_to_gregorian_datetime(value):
+    """
+    Convert a Jalali date to the end of that Gregorian day.
+    """
+
+    if not value:
+        return None
+
+    gregorian_date = value.togregorian()
+
+    naive_datetime = datetime.combine(
+        gregorian_date,
+        time.max
+    )
+
+    return timezone.make_aware(
+        naive_datetime,
+        timezone.get_current_timezone()
     )
 
 
@@ -362,15 +407,142 @@ def home(request):
         ""
     ).strip()
 
+    # Status filter:
+    # active / completed
+
     filter_type = request.GET.get(
         "filter",
         ""
     ).strip()
 
+    # Independent important filter.
+    #
+    # This allows combinations such as:
+    # active + important
+    # completed + important
+    # topic + important
+
+    important_filter = (
+        request.GET.get(
+            "important",
+            ""
+        ).strip()
+        == "1"
+    )
+
+    # Topic filter.
+
     topic_id = request.GET.get(
         "topic",
         ""
     ).strip()
+
+    # ==================================================
+    # SEARCH
+    # ==================================================
+
+    # Search in task title and description.
+
+    search_query = request.GET.get(
+        "search",
+        ""
+    ).strip()
+
+    # ==================================================
+    # GET DATE FILTER PARAMETERS
+    # ==================================================
+
+    # Start date.
+
+    start_date_from_str = request.GET.get(
+        "start_date_from",
+        ""
+    ).strip()
+
+    start_date_to_str = request.GET.get(
+        "start_date_to",
+        ""
+    ).strip()
+
+    # Deadline.
+
+    deadline_from_str = request.GET.get(
+        "deadline_from",
+        ""
+    ).strip()
+
+    deadline_to_str = request.GET.get(
+        "deadline_to",
+        ""
+    ).strip()
+
+    # Creation date.
+
+    created_at_from_str = request.GET.get(
+        "created_at_from",
+        ""
+    ).strip()
+
+    created_at_to_str = request.GET.get(
+        "created_at_to",
+        ""
+    ).strip()
+
+    # Completion / end date.
+
+    end_date_from_str = request.GET.get(
+        "end_date_from",
+        ""
+    ).strip()
+
+    end_date_to_str = request.GET.get(
+        "end_date_to",
+        ""
+    ).strip()
+
+    # ==================================================
+    # PARSE DATE FILTERS
+    # ==================================================
+
+    # Start date.
+
+    start_date_from = parse_jalali_date(
+        start_date_from_str
+    )
+
+    start_date_to = parse_jalali_date(
+        start_date_to_str
+    )
+
+    # Deadline.
+
+    deadline_from = parse_jalali_date(
+        deadline_from_str
+    )
+
+    deadline_to = parse_jalali_date(
+        deadline_to_str
+    )
+
+    # Creation date.
+
+    created_at_from = parse_jalali_date(
+        created_at_from_str
+    )
+
+    created_at_to = parse_jalali_date(
+        created_at_to_str
+    )
+
+    # Completion / end date.
+
+    end_date_from = parse_jalali_date(
+        end_date_from_str
+    )
+
+    end_date_to = parse_jalali_date(
+        end_date_to_str
+    )
 
     # ==================================================
     # BASE TASK QUERY
@@ -395,7 +567,7 @@ def home(request):
         #
         # Show only tasks created by the current user.
         #
-        # This includes both:
+        # This includes:
         # - personal tasks created by the user
         # - public tasks created by the user
 
@@ -429,7 +601,25 @@ def home(request):
         my_tasks = False
 
     # ==================================================
-    # STATUS / IMPORTANCE FILTER
+    # SEARCH FILTER
+    # ==================================================
+
+    if search_query:
+
+        # Search both title and description.
+
+        todos = todos.filter(
+            Q(
+                title__icontains=search_query
+            )
+            |
+            Q(
+                description__icontains=search_query
+            )
+        )
+
+    # ==================================================
+    # STATUS FILTER
     # ==================================================
 
     if filter_type == "active":
@@ -448,7 +638,11 @@ def home(request):
             completed=True
         )
 
-    elif filter_type == "important":
+    # ==================================================
+    # IMPORTANT FILTER
+    # ==================================================
+
+    if important_filter:
 
         # Show only important tasks.
 
@@ -507,6 +701,88 @@ def home(request):
             selected_topic = None
 
     # ==================================================
+    # START DATE FILTER
+    # ==================================================
+
+    if start_date_from:
+
+        todos = todos.filter(
+            start_date__gte=start_date_from
+        )
+
+    if start_date_to:
+
+        todos = todos.filter(
+            start_date__lte=start_date_to
+        )
+
+    # ==================================================
+    # DEADLINE FILTER
+    # ==================================================
+
+    if deadline_from:
+
+        todos = todos.filter(
+            deadline__gte=deadline_from
+        )
+
+    if deadline_to:
+
+        todos = todos.filter(
+            deadline__lte=deadline_to
+        )
+
+    # ==================================================
+    # CREATION DATE FILTER
+    # ==================================================
+
+    # created_at is a Gregorian DateTimeField.
+    #
+    # The user enters a Jalali date.
+    # Convert the Jalali boundary to the corresponding
+    # Gregorian datetime boundary.
+
+    if created_at_from:
+
+        created_at_from_datetime = (
+            jalali_start_to_gregorian_datetime(
+                created_at_from
+            )
+        )
+
+        todos = todos.filter(
+            created_at__gte=created_at_from_datetime
+        )
+
+    if created_at_to:
+
+        created_at_to_datetime = (
+            jalali_end_to_gregorian_datetime(
+                created_at_to
+            )
+        )
+
+        todos = todos.filter(
+            created_at__lte=created_at_to_datetime
+        )
+
+    # ==================================================
+    # COMPLETION / END DATE FILTER
+    # ==================================================
+
+    if end_date_from:
+
+        todos = todos.filter(
+            end_date__gte=end_date_from
+        )
+
+    if end_date_to:
+
+        todos = todos.filter(
+            end_date__lte=end_date_to
+        )
+
+    # ==================================================
     # ORDER TASKS
     # ==================================================
 
@@ -518,7 +794,8 @@ def home(request):
     # STATISTICS
     # ==================================================
 
-    # Calculate statistics before pagination.
+    # Calculate statistics after all filters
+    # and before pagination.
 
     total_tasks = todos.count()
 
@@ -657,6 +934,82 @@ def home(request):
             todo.deadline_jalali_str = None
 
     # ==================================================
+    # FORMAT CURRENT FILTER VALUES
+    # ==================================================
+
+    # Start date.
+
+    start_date_from_value = (
+        format_jalali_date(
+            start_date_from
+        )
+        if start_date_from
+        else ""
+    )
+
+    start_date_to_value = (
+        format_jalali_date(
+            start_date_to
+        )
+        if start_date_to
+        else ""
+    )
+
+    # Deadline.
+
+    deadline_from_value = (
+        format_jalali_date(
+            deadline_from
+        )
+        if deadline_from
+        else ""
+    )
+
+    deadline_to_value = (
+        format_jalali_date(
+            deadline_to
+        )
+        if deadline_to
+        else ""
+    )
+
+    # Creation date.
+
+    created_at_from_value = (
+        format_jalali_date(
+            created_at_from
+        )
+        if created_at_from
+        else ""
+    )
+
+    created_at_to_value = (
+        format_jalali_date(
+            created_at_to
+        )
+        if created_at_to
+        else ""
+    )
+
+    # Completion / end date.
+
+    end_date_from_value = (
+        format_jalali_date(
+            end_date_from
+        )
+        if end_date_from
+        else ""
+    )
+
+    end_date_to_value = (
+        format_jalali_date(
+            end_date_to
+        )
+        if end_date_to
+        else ""
+    )
+
+    # ==================================================
     # TOPIC LISTS
     # ==================================================
 
@@ -698,45 +1051,282 @@ def home(request):
     )
 
     # ==================================================
+    # ACTIVE FILTER QUERY
+    # ==================================================
+
+    # Build a query string without the page parameter.
+    #
+    # This is useful for pagination and for preserving
+    # all active filters while moving between pages.
+
+    filter_query_parts = []
+
+    # --------------------------------------------------
+    # SEARCH
+    # --------------------------------------------------
+
+    if search_query:
+
+        filter_query_parts.append(
+            "search="
+            + search_query
+        )
+
+    # --------------------------------------------------
+    # SCOPE
+    # --------------------------------------------------
+
+    if scope == "my":
+
+        filter_query_parts.append(
+            "scope=my"
+        )
+
+    # --------------------------------------------------
+    # STATUS
+    # --------------------------------------------------
+
+    if filter_type in [
+        "active",
+        "completed",
+    ]:
+
+        filter_query_parts.append(
+            f"filter={filter_type}"
+        )
+
+    # --------------------------------------------------
+    # IMPORTANT
+    # --------------------------------------------------
+
+    if important_filter:
+
+        filter_query_parts.append(
+            "important=1"
+        )
+
+    # --------------------------------------------------
+    # TOPIC
+    # --------------------------------------------------
+
+    if selected_topic:
+
+        filter_query_parts.append(
+            f"topic={selected_topic.id}"
+        )
+
+    # --------------------------------------------------
+    # START DATE
+    # --------------------------------------------------
+
+    if start_date_from:
+
+        filter_query_parts.append(
+            "start_date_from="
+            + start_date_from.strftime(
+                "%Y/%m/%d"
+            )
+        )
+
+    if start_date_to:
+
+        filter_query_parts.append(
+            "start_date_to="
+            + start_date_to.strftime(
+                "%Y/%m/%d"
+            )
+        )
+
+    # --------------------------------------------------
+    # DEADLINE
+    # --------------------------------------------------
+
+    if deadline_from:
+
+        filter_query_parts.append(
+            "deadline_from="
+            + deadline_from.strftime(
+                "%Y/%m/%d"
+            )
+        )
+
+    if deadline_to:
+
+        filter_query_parts.append(
+            "deadline_to="
+            + deadline_to.strftime(
+                "%Y/%m/%d"
+            )
+        )
+
+    # --------------------------------------------------
+    # CREATION DATE
+    # --------------------------------------------------
+
+    if created_at_from:
+
+        filter_query_parts.append(
+            "created_at_from="
+            + created_at_from.strftime(
+                "%Y/%m/%d"
+            )
+        )
+
+    if created_at_to:
+
+        filter_query_parts.append(
+            "created_at_to="
+            + created_at_to.strftime(
+                "%Y/%m/%d"
+            )
+        )
+
+    # --------------------------------------------------
+    # COMPLETION / END DATE
+    # --------------------------------------------------
+
+    if end_date_from:
+
+        filter_query_parts.append(
+            "end_date_from="
+            + end_date_from.strftime(
+                "%Y/%m/%d"
+            )
+        )
+
+    if end_date_to:
+
+        filter_query_parts.append(
+            "end_date_to="
+            + end_date_to.strftime(
+                "%Y/%m/%d"
+            )
+        )
+
+    filter_query = "&".join(
+        filter_query_parts
+    )
+
+    # ==================================================
     # TEMPLATE CONTEXT
     # ==================================================
 
     context = {
 
-        # Current page of Todo objects.
+        # --------------------------------------------------
+        # TASKS
+        # --------------------------------------------------
+
         "todos": page_obj,
 
-        # Django pagination object.
         "page_obj": page_obj,
 
-        # Pagination numbers.
+        # --------------------------------------------------
+        # PAGINATION
+        # --------------------------------------------------
+
         "page_numbers": page_numbers,
 
-        # Current status / importance filter.
+        "filter_query": filter_query,
+
+        # --------------------------------------------------
+        # SEARCH
+        # --------------------------------------------------
+
+        "search_query": search_query,
+
+        # --------------------------------------------------
+        # STATUS FILTER
+        # --------------------------------------------------
+
         "filter_type": filter_type,
 
-        # Current scope.
+        # --------------------------------------------------
+        # IMPORTANT FILTER
+        # --------------------------------------------------
+
+        "important_filter": important_filter,
+
+        # --------------------------------------------------
+        # SCOPE
+        # --------------------------------------------------
+
         "my_tasks": my_tasks,
 
-        # Current Topic filter.
+        # --------------------------------------------------
+        # TOPIC FILTER
+        # --------------------------------------------------
+
         "selected_topic": selected_topic,
 
-        # Available Topic filters.
         "filter_topics": filter_topics,
 
-        # Statistics.
+        # --------------------------------------------------
+        # DATE FILTERS
+        # --------------------------------------------------
+
+        # Start date.
+
+        "start_date_from_value": (
+            start_date_from_value
+        ),
+
+        "start_date_to_value": (
+            start_date_to_value
+        ),
+
+        # Deadline.
+
+        "deadline_from_value": (
+            deadline_from_value
+        ),
+
+        "deadline_to_value": (
+            deadline_to_value
+        ),
+
+        # Creation date.
+
+        "created_at_from_value": (
+            created_at_from_value
+        ),
+
+        "created_at_to_value": (
+            created_at_to_value
+        ),
+
+        # Completion / end date.
+
+        "end_date_from_value": (
+            end_date_from_value
+        ),
+
+        "end_date_to_value": (
+            end_date_to_value
+        ),
+
+        # --------------------------------------------------
+        # STATISTICS
+        # --------------------------------------------------
+
         "total_tasks": total_tasks,
 
         "completed_tasks": completed_tasks,
 
         "remaining_tasks": remaining_tasks,
 
-        # Topics for task creation.
+        # --------------------------------------------------
+        # TOPICS FOR TASK CREATION
+        # --------------------------------------------------
+
         "public_topics": public_topics,
 
         "personal_topics": personal_topics,
 
-        # Google Calendar status.
+        # --------------------------------------------------
+        # GOOGLE CALENDAR
+        # --------------------------------------------------
+
         "google_connected": google_connected,
 
     }

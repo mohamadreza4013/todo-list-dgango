@@ -8,9 +8,11 @@
 # directly from the views package instead of importing
 # them separately from each view module.
 
+from .landing import landing
 
 # Import the dashboard view
 from .dashboard import home
+from .create import create_todo
 
 
 # Import todo-related views
